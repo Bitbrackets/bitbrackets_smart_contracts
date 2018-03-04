@@ -1,0 +1,23 @@
+{
+  "name": "bitbrackets_smart_contracts",
+  "version": "1.0.0",
+  "description": "Download truffle v4.1.0 or up https://github.com/trufflesuite/truffle/releases",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://dmolina79@bitbucket.org/bitbrackets/bitbrackets_smart_contracts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/bitbrackets/bitbrackets_smart_contracts#readme",
+  "dependencies": {
+    "zeppelin-solidity": "1.7.0"
+  }
+}
