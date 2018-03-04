@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.18;
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -23,8 +23,6 @@ contract ContestPool is Ownable {
         startDate = _startDate;
         endDate = _endDate;
         daysGrace = _daysGrace;
-
-
     }
 
 }
