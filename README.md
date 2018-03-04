@@ -1,20 +1,26 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Download truffle v4.1.0 or up
+https://github.com/trufflesuite/truffle/releases
 
-### What is this repository for? ###
+npm install -g truffle
+
+Download ganache client
+http://truffleframework.com/ganache/
 
 * Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+Repository for BitBrackets Smart Contracts repositories
+0.0.1
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
+*Working with Truffle
+cd into your working directory.
+From there, you can run truffle compile, truffle migrate and truffle test to compile your contracts, deploy those contracts to the network, and run their associated unit tests.
+
 * How to run tests
+truffle test
+
 * Deployment instructions
 
 ### Contribution guidelines ###
@@ -26,4 +32,4 @@ This README would normally document whatever steps are necessary to get your app
 ### Who do I talk to? ###
 
 * Repo owner or admin
-* Other community or team contact
+Slack
