@@ -21,6 +21,10 @@ From there, you can run truffle compile, truffle migrate and truffle test to com
 * How to run tests
 truffle test
 
+* Project uses Open Zepellin Contracts
+https://github.com/OpenZeppelin/zeppelin-solidity
+
+
 * Deployment instructions
 
 ### Contribution guidelines ###
