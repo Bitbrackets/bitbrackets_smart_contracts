@@ -24,7 +24,6 @@ truffle test
 * Project uses Open Zepellin Contracts
 https://github.com/OpenZeppelin/zeppelin-solidity
 
-
 * Deployment instructions
 
 ### Contribution guidelines ###

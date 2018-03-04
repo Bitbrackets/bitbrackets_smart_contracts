@@ -1,6 +1,6 @@
 {
   "name": "bitbrackets_smart_contracts",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Download truffle v4.1.0 or up https://github.com/trufflesuite/truffle/releases",
   "main": "truffle-config.js",
   "directories": {
