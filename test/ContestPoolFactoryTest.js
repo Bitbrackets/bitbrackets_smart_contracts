@@ -14,6 +14,13 @@ contract('ContestPoolFactory', function(accounts) {
     const daysGrace = 2;
     const instance = await ContestPoolFactory.deployed();
     await instance.createContestPoolDefinition(contestName, startDate, endDate, daysGrace);
+
+    const result = await instance.definitions(contestName);
+    
+    assert.equal(contestName, stringUtils.cleanNulls(web3.toAscii(result[0])));
+    assert.equal(startDate, result[1]);
+    assert.equal(endDate, result[2]);
+    assert.equal(daysGrace, result[3]);
   });
 
   it("Creating a contest pool definition twice. It should fail.", async function() {
