@@ -16,7 +16,7 @@ contract ContestPoolFactory is Ownable {
     function ContestPoolFactory() public {
         owner = msg.sender;
     }
-
+    
     function validateContestPoolDefinitionNotExist(bytes32 contestName) view internal {
         ContestPoolDefinition memory currentDefinition = definitions[contestName];
         require(currentDefinition.contestName == bytes32(0x0));
