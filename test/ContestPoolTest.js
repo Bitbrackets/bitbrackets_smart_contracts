@@ -33,8 +33,21 @@ contract('ContestPool', accounts => {
         assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTime);
     });
 
-    it('should take contributions from players', async () => {
+    xit('should take contributions from players', async () => {
         
+        const contribution = web3.toWei(0.2, "ether");
+        const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
+        const prediction = parseInt( predictionStr, 2 );
+        const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
+
+        await contestPoolInstance.sendPrediction(prediction, contribution, {from: player1 })
+
+        const contractPrediction = await contestPoolInstance.predictions(player1);
+        const finalBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber();
+
+        assert.equal(contractPrediction, prediction, "Prediction for player 1 should be " + prediction);
+        assert.equal(initialBalance + contribution, finalBalance);
+
     });
 
 

@@ -9,6 +9,8 @@ contract ContestPool is Ownable {
     uint public startTime;
     uint public endTime;
     uint public graceTime;
+
+    mapping(address => uint) public predictions;
     
     function ContestPool(
         address _owner, 
@@ -24,5 +26,11 @@ contract ContestPool is Ownable {
         endTime = _endTime;
         graceTime = _graceTime;
     }
+
+    // function sendPrediction(uint prediction, uint contribution)  public payable {
+
+    // }
+
+
 
 }
