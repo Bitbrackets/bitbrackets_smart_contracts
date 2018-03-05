@@ -11,6 +11,8 @@ contract ContestPool is Ownable {
     uint public graceTime;
 
     mapping(address => uint) public predictions;
+    mapping(address => uint) public participantPoints;
+    uint public numberOfParticipants;
     
     function ContestPool(
         address _owner, 
