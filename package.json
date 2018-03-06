@@ -18,6 +18,9 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/bitbrackets/bitbrackets_smart_contracts#readme",
   "dependencies": {
+    "bluebird": "^3.5.1",
+    "ethereumjs-util": "^5.1.5",
+    "lodash": "^4.17.5",
     "moment": "^2.21.0",
     "zeppelin-solidity": "1.7.0"
   }

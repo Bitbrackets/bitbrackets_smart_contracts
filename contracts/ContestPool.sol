@@ -13,20 +13,24 @@ contract ContestPool is Ownable {
     mapping(address => uint) public predictions;
     mapping(address => uint) public participantPoints;
     uint public numberOfParticipants;
+    uint public maxBalance;
     
     function ContestPool(
         address _owner, 
+        address _manager, 
         bytes32 _contestName, 
         uint _startTime, 
         uint _endTime,
-        uint _graceTime
+        uint _graceTime,
+        uint _maxBalance
     ) public {
-        manager = msg.sender;
         owner = _owner;
+        manager = _manager;
         contestName = _contestName;
         startTime = _startTime;
         endTime = _endTime;
         graceTime = _graceTime;
+        maxBalance = _maxBalance;
     }
 
     function sendPrediction(uint prediction) public payable {
