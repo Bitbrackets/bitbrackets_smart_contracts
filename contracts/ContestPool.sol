@@ -9,20 +9,24 @@ contract ContestPool is Ownable {
     uint public startTime;
     uint public endTime;
     uint public graceTime;
+    uint public maxBalance;
     
     function ContestPool(
         address _owner, 
+        address _manager, 
         bytes32 _contestName, 
         uint _startTime, 
         uint _endTime,
-        uint _graceTime
+        uint _graceTime,
+        uint _maxBalance
     ) public {
-        manager = msg.sender;
         owner = _owner;
+        manager = _manager;
         contestName = _contestName;
         startTime = _startTime;
         endTime = _endTime;
         graceTime = _graceTime;
+        maxBalance = _maxBalance;
     }
 
 }
