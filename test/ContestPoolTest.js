@@ -33,14 +33,14 @@ contract('ContestPool', accounts => {
         assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTime);
     });
 
-    xit('should take contributions from players', async () => {
+    it('should take contributions from players', async () => {
         
         const contribution = web3.toWei(0.2, "ether");
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
         const prediction = parseInt( predictionStr, 2 );
         const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
 
-        await contestPoolInstance.sendPrediction(prediction, contribution, {from: player1 })
+        await contestPoolInstance.sendPrediction(prediction, { from: player1, value: contribution });
 
         const contractPrediction = await contestPoolInstance.predictions(player1);
         const finalBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber();
@@ -48,6 +48,31 @@ contract('ContestPool', accounts => {
         assert.equal(contractPrediction, prediction, "Prediction for player 1 should be " + prediction);
         assert.equal(initialBalance + contribution, finalBalance);
 
+    });
+
+    it('should fail when a player has already contributed', async () => {
+        
+        const contribution = web3.toWei(0.2, "ether");
+        const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
+        const prediction = parseInt( predictionStr, 2 );
+        const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
+
+        await contestPoolInstance.sendPrediction(prediction, { from: player1, value: contribution });
+        const finalBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber();
+
+        try {
+            await contestPoolInstance.sendPrediction(prediction, { from: player1, value: contribution });
+        } catch (error) {
+            assert(error.message.includes("revert"));
+            assert(true, "we got an error");
+            assert.equal(initialBalance + contribution, finalBalance);
+            return;
+        }
+
+        throw new Error("should have failed when trying to contribute two times ");
+
+
+        
     });
 
 

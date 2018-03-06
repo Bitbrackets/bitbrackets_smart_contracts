@@ -29,9 +29,11 @@ contract ContestPool is Ownable {
         graceTime = _graceTime;
     }
 
-    // function sendPrediction(uint prediction, uint contribution)  public payable {
-
-    // }
+    function sendPrediction(uint prediction) public payable {
+        require(prediction > 0);
+        require(predictions[msg.sender] == 0);
+        predictions[msg.sender] = prediction;
+    }
 
 
 
