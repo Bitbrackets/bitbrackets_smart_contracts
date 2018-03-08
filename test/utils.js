@@ -2,7 +2,11 @@ var _ = require("lodash");
 var Promise = require("bluebird");
 
 module.exports = {
-    assertEvent: function(contract, count, filter) {
+    defaultCallback: async function(log) {
+        console.log('Default event callback:');
+        console.log(log);
+    },
+    assertEvent: function(contract, filter, count, callback = this.defaultCallback) {
         return new Promise((resolve, reject) => {
             var event = contract[filter.event]();
             event.watch();
@@ -12,7 +16,7 @@ module.exports = {
                     throw Error("Failed to find filtered event for " + filter.event);
                 }
                 if (log) {
-                    resolve(log);
+                    resolve(callback(log));
                 } else {
                     throw Error("Failed to find filtered event for " + filter.event);
                 }
