@@ -41,9 +41,9 @@ contract ContestPool is Ownable {
     * @dev this function is used for a winner to claim the prize
     *
     **/
-    function claimThePrize() external returns(bool) {
+    function claimThePrize() public returns(bool) {
         require(winners[msg.sender] > 0);
-        require(getTimestamp().sub(endTime) > graceTime);
+        require(getCurrentTimestamp().sub(endTime) > graceTime);
 
         uint prize = winners[msg.sender];
 
@@ -66,17 +66,17 @@ contract ContestPool is Ownable {
         predictions[msg.sender] = prediction;
     }
 
-    function addWinner(address winnerAddress, uint256 prize) public returns(bool){
+    function addWinner(address winnerAddress, uint256 prize) public onlyOwner returns (bool) {
         winners[winnerAddress] = prize;
         return true;
     }
 
-    function addressHasPrize () public view returns (bool res) {
+    function addressPrize () public view returns (uint256) {
 
-        return winners[msg.sender] > 0;
+        return winners[msg.sender];
     }
     
-    function getTimestamp() public view returns (uint256)
+    function getCurrentTimestamp() public view returns (uint256)
     { 
         return now; 
     }
