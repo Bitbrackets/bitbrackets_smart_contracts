@@ -11,7 +11,7 @@ contract('ContestPoolMock', accounts => {
 
     let startDate = moment("2018-06-01").toDate().getTime()/1000;
     let endDate = moment("2018-06-10").toDate().getTime()/1000;
-    let daysGrace = 1;
+    let daysGrace = 1 * 86400;
 
     const maxBalance = web3.toWei(1,'ether');
     const contribution = web3.toWei(0.3, "ether");

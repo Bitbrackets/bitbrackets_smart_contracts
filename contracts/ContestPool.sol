@@ -51,10 +51,13 @@ contract ContestPool is Ownable {
 
         winners[msg.sender] = 0;
 
-        if (!msg.sender.send(prize)) {
-            winners[msg.sender] = prize;
-            return false;
-        }
+//        if (!msg.sender.send(prize)) {
+//            winners[msg.sender] = prize;
+//            return false;
+//        }
+        //TODO: which one is cheaper to use:
+        // use assert or use if to validate the send
+        assert(msg.sender.send(prize));
 
         return true;
         
