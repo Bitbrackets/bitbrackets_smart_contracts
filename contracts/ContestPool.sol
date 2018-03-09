@@ -46,8 +46,8 @@ contract ContestPool is Ownable {
         require(getCurrentTimestamp().sub(endTime) > graceTime);
 
         uint prize = winners[msg.sender];
-
-        require(this.balance >= prize);
+        // TODO sera >= ?? habra que refactorizar con manager y comision
+        require(this.balance > prize);
 
         winners[msg.sender] = 0;
 
