@@ -7,6 +7,16 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 contract ContestPool is Ownable {
     using SafeMath for uint256;
 
+    event SendPrediction (
+        uint prediction,
+        address indexed player
+    );
+
+    event ClaimPrize (
+        address indexed manager,
+        uint prize
+    );
+
     address public manager;
     bytes32 public contestName;
     uint public startTime;
@@ -58,15 +68,20 @@ contract ContestPool is Ownable {
         //TODO: which one is cheaper to use:
         // use assert or use if to validate the send
         assert(msg.sender.send(prize));
-
+        ClaimPrize(msg.sender, prize);
         return true;
-        
     }
 
-    function sendPrediction(uint prediction) public payable {
+    modifier isBeforeStartTime() {
+        require(getCurrentTimestamp() < startTime);
+        _;
+    }
+
+    function sendPrediction(uint prediction) isBeforeStartTime public payable {
         require(prediction > 0);
         require(predictions[msg.sender] == 0);
         predictions[msg.sender] = prediction;
+        SendPrediction(prediction, msg.sender);
     }
 
     function addWinner(address winnerAddress, uint256 prize) public onlyOwner returns (bool) {
