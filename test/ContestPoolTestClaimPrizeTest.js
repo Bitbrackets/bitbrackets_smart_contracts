@@ -1,7 +1,7 @@
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const dateUtil = require('./DateUtil');
 
-contract('ContestPoolMock', accounts => {
+contract('ContestPoolWinnerClaimPrize', accounts => {
     let contestPoolInstance;
     let owner = accounts[9];
     let manager = accounts[0];

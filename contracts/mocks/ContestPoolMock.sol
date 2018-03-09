@@ -31,5 +31,9 @@ contract ContestPoolMock is ContestPool {
         return now;
     }
 
+    // for testing only
+    function addWinner(address winnerAddress, uint256 prize) public returns (bool) {
+        return addToWinners(winnerAddress, prize);
+    }
 
 }
