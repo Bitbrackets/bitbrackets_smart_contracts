@@ -49,7 +49,8 @@ contract ContestPool is Ownable {
 
     /**
     * @dev this function is used for a winner to claim the prize
-    *
+    *   https://consensys.github.io/smart-contract-best-practices/
+    *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/
     function claimThePrize() public returns(bool) {
         require(winners[msg.sender] > 0);
@@ -60,14 +61,8 @@ contract ContestPool is Ownable {
         require(this.balance > prize);
 
         winners[msg.sender] = 0;
+        msg.sender.transfer(prize);
 
-//        if (!msg.sender.send(prize)) {
-//            winners[msg.sender] = prize;
-//            return false;
-//        }
-        //TODO: which one is cheaper to use:
-        // use assert or use if to validate the send
-        assert(msg.sender.send(prize));
         ClaimPrize(msg.sender, prize);
         return true;
     }
