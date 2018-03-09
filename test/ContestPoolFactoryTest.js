@@ -69,7 +69,7 @@ contract('ContestPoolFactory', function(accounts) {
   });
 
   
-  it("Creating a contest pool instance.", async function() {
+  it("Creating a contest pool instance. Should create event", async function() {
     const contestName = 'Rusia18';
     const startTime = 1000;
     const endTime = 2000;
@@ -99,8 +99,8 @@ contract('ContestPoolFactory', function(accounts) {
 
       assert.equal(maxBalanceContestPool, maxBalance);
       assert.equal(contestNameContestPool, contestNameBytes32);
-      assert.equal(startDateContestPool, startDate);
-      assert.equal(endDateContestPool, endDate);
+      assert.equal(startDateContestPool, startTime);
+      assert.equal(endDateContestPool, endTime);
       assert.equal(maxBalanceContestPool, maxBalance);
     };
     await utils.assertEvent(instance, { event: "CreateContestPool", args: {
