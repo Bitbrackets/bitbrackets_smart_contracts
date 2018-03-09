@@ -47,7 +47,7 @@ contract ContestPool is Ownable {
 
         uint prize = winners[msg.sender];
 
-        require(this.balance > prize);
+        require(this.balance >= prize);
 
         winners[msg.sender] = 0;
 
@@ -69,11 +69,6 @@ contract ContestPool is Ownable {
         predictions[msg.sender] = prediction;
     }
 
-    function addWinner(address winnerAddress, uint256 prize) public onlyOwner returns (bool) {
-        winners[winnerAddress] = prize;
-        return true;
-    }
-
     function addressPrize () public view returns (uint256) {
 
         return winners[msg.sender];
@@ -82,6 +77,11 @@ contract ContestPool is Ownable {
     function getCurrentTimestamp() public view returns (uint256)
     { 
         return now; 
+    }
+
+    function addToWinners(address winnerAddress, uint256 prize) internal returns (bool) {
+        winners[winnerAddress] = prize;
+        return true;
     }
 
 
