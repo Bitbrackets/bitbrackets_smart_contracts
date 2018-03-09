@@ -1,4 +1,5 @@
 const ContestPool = artifacts.require("./ContestPool.sol");
+const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const moment = require('moment');
 
 // test suite
@@ -20,7 +21,6 @@ contract('ContestPool', accounts => {
             owner, 
             manager,
             "Rusia2018",
-
             startDate, 
             endDate, 
             daysGrace,

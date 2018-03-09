@@ -7,16 +7,16 @@ import "./ContestPool.sol";
 contract ContestPoolFactory is Ownable {
 
     event CreateContestPoolDefinition(
-        bytes32 contestName,
-        uint startDate,
-        uint endDate,
+        bytes32 indexed contestName,
+        uint indexed startDate,
+        uint indexed endDate,
         uint daysGrace
     );
     
     event CreateContestPool(
-        bytes32 contestName,
-        address manager,
-        address contestPoolAddress
+        bytes32 indexed contestName,
+        address indexed manager,
+        address indexed contestPoolAddress
     );
 
     struct ContestPoolDefinition {
