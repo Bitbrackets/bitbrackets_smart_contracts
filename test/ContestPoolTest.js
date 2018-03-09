@@ -20,8 +20,8 @@ contract('ContestPool', accounts => {
             owner, 
             manager,
             "Rusia2018",
-            startTime, 
-            endTime, 
+            startTime,
+            endTime,
             graceTime,
             maxBalance
         );

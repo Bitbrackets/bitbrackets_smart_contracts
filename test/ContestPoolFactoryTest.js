@@ -1,4 +1,6 @@
 var ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
+var ContestPool = artifacts.require("./ContestPool.sol");
+
 const stringUtils = require('./StringUtil');
 var utils = require("./utils.js");
 
@@ -73,18 +75,37 @@ contract('ContestPoolFactory', function(accounts) {
     const endTime = 2000;
     const graceTime = 2;
     const maxBalance = web3.toWei(1,'ether');
+    const contestNameBytes32 = stringUtils.stringToBytes32(contestName);
 
     await instance.createContestPoolDefinition(contestName, startTime, endTime, graceTime, maxBalance);
     
-    const contestPoolAddress = await instance.createContestPool(contestName, web3.toWei(2, 'ether'));
+    await instance.createContestPool(contestName, web3.toWei(2, 'ether'));
 
-    const contestNameBytes32 = stringUtils.stringToBytes32(contestName);
-    
-    await utils.assertEvent(instance, 1, { event: "CreateContestPool", args: {
-      contestName: contestNameBytes32,
-      contestPoolAddress: '0x5677db552d5fd9911a5560cb0bd40be90a70eff2'
-    }});
-    assert.ok(contestPoolAddress);
+    let contestPoolAddress;
+    let contestPool;
+
+    const callback = async function(log) {
+      contestPoolAddress = log[0].args.contestPoolAddress;
+      contestPool = ContestPool.at(contestPoolAddress);
+
+      assert.ok(contestPoolAddress);
+      assert.ok(contestPool);
+
+      const maxBalanceContestPool = await contestPool.maxBalance();
+      const contestNameContestPool = await contestPool.contestName();
+      const startDateContestPool = await contestPool.startTime();
+      const endDateContestPool = await contestPool.endTime();
+      const daysGraceContestPool = await contestPool.graceTime();
+
+      assert.equal(maxBalanceContestPool, maxBalance);
+      assert.equal(contestNameContestPool, contestNameBytes32);
+      assert.equal(startDateContestPool, startDate);
+      assert.equal(endDateContestPool, endDate);
+      assert.equal(maxBalanceContestPool, maxBalance);
+    };
+    await utils.assertEvent(instance, { event: "CreateContestPool", args: {
+      contestName: contestNameBytes32
+    }}, 1, callback);
   });
 
   it("Creating a contest pool instance using invalid contest name.", async function() {
@@ -94,7 +115,6 @@ contract('ContestPoolFactory', function(accounts) {
       assert(false, 'It should fail because contest name is invalid.');
     } catch(err) {
       assert(err);
-    }
-    
+    }    
   });
 });
