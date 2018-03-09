@@ -19,31 +19,31 @@ contract('ContestPoolFactory', function(accounts) {
 
   it("Creating a contest pool definition.", async function() {
     const contestName = 'ContestPool';
-    const startDate = 1000;
-    const endDate = 2000;
-    const daysGrace = 2;
+    const startTime = 1000;
+    const endTime = 2000;
+    const graceTime = 2;
     const maxBalance = web3.toWei(10,'ether');
 
-    await instance.createContestPoolDefinition(contestName, startDate, endDate, daysGrace, maxBalance);
+    await instance.createContestPoolDefinition(contestName, startTime, endTime, graceTime, maxBalance);
 
     const result = await instance.definitions(contestName);
     
     assert.equal(contestName, stringUtils.cleanNulls(web3.toAscii(result[0])));
-    assert.equal(startDate, result[1]);
-    assert.equal(endDate, result[2]);
-    assert.equal(daysGrace, result[3]);
+    assert.equal(startTime, result[1]);
+    assert.equal(endTime, result[2]);
+    assert.equal(graceTime, result[3]);
   });
 
   it("Creating a contest pool definition twice. It should fail.", async function() {
     const contestName = 'NewContestPool';
-    const startDate = 1000;
-    const endDate = 2000;
-    const daysGrace = 2;
+    const startTime = 1000;
+    const endTime = 2000;
+    const graceTime = 2;
     const maxBalance = web3.toWei(10,'ether');
-    await instance.createContestPoolDefinition(contestName, startDate, endDate, daysGrace, maxBalance);
+    await instance.createContestPoolDefinition(contestName, startTime, endTime, graceTime, maxBalance);
 
     try {
-      await instance.createContestPoolDefinition(contestName, startDate, endDate, daysGrace, maxBalance);
+      await instance.createContestPoolDefinition(contestName, startTime, endTime, graceTime, maxBalance);
       assert(false, 'It should have failed because the contest name is repetead.');
     } catch(err) {
       assert(err);
@@ -71,13 +71,13 @@ contract('ContestPoolFactory', function(accounts) {
   
   it("Creating a contest pool instance.", async function() {
     const contestName = 'Rusia18';
-    const startDate = 1000;
-    const endDate = 2000;
-    const daysGrace = 2;
+    const startTime = 1000;
+    const endTime = 2000;
+    const graceTime = 2;
     const maxBalance = web3.toWei(1,'ether');
     const contestNameBytes32 = stringUtils.stringToBytes32(contestName);
 
-    await instance.createContestPoolDefinition(contestName, startDate, endDate, daysGrace, maxBalance);
+    await instance.createContestPoolDefinition(contestName, startTime, endTime, graceTime, maxBalance);
     
     await instance.createContestPool(contestName, web3.toWei(2, 'ether'));
 

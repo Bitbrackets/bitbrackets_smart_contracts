@@ -1,6 +1,5 @@
 const ContestPool = artifacts.require("./ContestPool.sol");
-const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
-const moment = require('moment');
+const dateUtil = require('./DateUtil');
 
 // test suite
 contract('ContestPool', accounts => {
@@ -11,9 +10,9 @@ contract('ContestPool', accounts => {
     let player2 = accounts[2];
     let player3 = accounts[3];
 
-    let startDate = moment("2018-06-14").toDate().getMilliseconds();
-    let endDate = moment("2018-07-16").toDate().getMilliseconds();
-    let daysGrace = 1;
+    let startTime = dateUtil.toMillis(2018, 6, 14);
+    let endTime = dateUtil.toMillis(2018, 7, 16);
+    let graceTime = 1;
     const maxBalance = web3.toWei(1,'ether');
 
     beforeEach('setup contract for each test', async() => {
@@ -21,9 +20,9 @@ contract('ContestPool', accounts => {
             owner, 
             manager,
             "Rusia2018",
-            startDate, 
-            endDate, 
-            daysGrace,
+            startTime,
+            endTime,
+            graceTime,
             maxBalance
         );
     })
@@ -33,53 +32,8 @@ contract('ContestPool', accounts => {
         const endTimeContract = await contestPoolInstance.endTime();
         const graceTimeContract = await contestPoolInstance.graceTime();
         
-        
-        assert.equal(startDate, startTimeContract, "Contest start time should be " + startDate);
-        assert.equal(endDate, endTimeContract, "Contest end time should be " + endDate);
-        assert.equal(daysGrace, graceTimeContract, "Contest grace time should be " + daysGrace);
+        assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
+        assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
+        assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTime);
     });
-
-    it('should take contributions from players', async () => {
-        
-        const contribution = web3.toWei(0.2, "ether");
-        const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-        const prediction = parseInt( predictionStr, 2 );
-        const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
-
-        await contestPoolInstance.sendPrediction(prediction, { from: player1, value: contribution });
-
-        const contractPrediction = await contestPoolInstance.predictions(player1);
-        const finalBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber();
-
-        assert.equal(contractPrediction, prediction, "Prediction for player 1 should be " + prediction);
-        assert.equal(initialBalance + contribution, finalBalance);
-
-    });
-
-    it('should fail when a player has already contributed', async () => {
-        
-        const contribution = web3.toWei(0.2, "ether");
-        const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-        const prediction = parseInt( predictionStr, 2 );
-        const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
-
-        await contestPoolInstance.sendPrediction(prediction, { from: player1, value: contribution });
-        const finalBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber();
-
-        try {
-            await contestPoolInstance.sendPrediction(prediction, { from: player1, value: contribution });
-        } catch (error) {
-            assert(error.message.includes("revert"));
-            assert(true, "we got an error");
-            assert.equal(initialBalance + contribution, finalBalance);
-            return;
-        }
-
-        throw new Error("should have failed when trying to contribute two times ");
-
-
-        
-    });
-
-
 });

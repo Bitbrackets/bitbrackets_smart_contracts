@@ -8,9 +8,9 @@ contract ContestPoolFactory is Ownable {
 
     event CreateContestPoolDefinition(
         bytes32 indexed contestName,
-        uint indexed startDate,
-        uint indexed endDate,
-        uint daysGrace
+        uint indexed startTime,
+        uint indexed endTime,
+        uint graceTime
     );
     
     event CreateContestPool(
@@ -21,9 +21,9 @@ contract ContestPoolFactory is Ownable {
 
     struct ContestPoolDefinition {
         bytes32 contestName;
-        uint startDate;
-        uint endDate;
-        uint daysGrace;
+        uint startTime;
+        uint endTime;
+        uint graceTime;
         uint maxBalance;
     }
 
@@ -36,37 +36,37 @@ contract ContestPoolFactory is Ownable {
     function validateContestPoolDefinitionNotExist(bytes32 contestName) view internal {
         ContestPoolDefinition memory currentDefinition = definitions[contestName];
         require(currentDefinition.contestName == bytes32(0x0));
-        require(currentDefinition.startDate == 0);
-        require(currentDefinition.endDate == 0);
-        require(currentDefinition.daysGrace == 0);
+        require(currentDefinition.startTime == 0);
+        require(currentDefinition.endTime == 0);
+        require(currentDefinition.graceTime == 0);
         require(currentDefinition.maxBalance == 0);
     }
 
     function validateContestPoolDefinitionExist(bytes32 contestName) view internal {
         ContestPoolDefinition memory currentDefinition = definitions[contestName];
         require(currentDefinition.contestName != bytes32(0x0));
-        require(currentDefinition.startDate != 0);
-        require(currentDefinition.endDate != 0);
-        require(currentDefinition.daysGrace != 0);
+        require(currentDefinition.startTime != 0);
+        require(currentDefinition.endTime != 0);
+        require(currentDefinition.graceTime != 0);
     }
 
-    function createContestPoolDefinition(bytes32 contestName, uint startDate, uint endDate, uint daysGrace, uint maxBalance) onlyOwner public {
+    function createContestPoolDefinition(bytes32 contestName, uint startTime, uint endTime, uint graceTime, uint maxBalance) onlyOwner public {
         validateContestPoolDefinitionNotExist(contestName);
         require(contestName != bytes32(0x0));
-        require(startDate != 0);
-        require(endDate != 0);
-        require(daysGrace != 0);
+        require(startTime != 0);
+        require(endTime != 0);
+        require(graceTime != 0);
         require(maxBalance != 0);
-        require(startDate < endDate);
+        require(startTime < endTime);
 
         ContestPoolDefinition memory newDefinition = ContestPoolDefinition({
             contestName: contestName,
-            startDate: startDate,
-            endDate: endDate,
-            daysGrace: daysGrace,
+            startTime: startTime,
+            endTime: endTime,
+            graceTime: graceTime,
             maxBalance: maxBalance
         });
-        CreateContestPoolDefinition(contestName, startDate, endDate, daysGrace);
+        CreateContestPoolDefinition(contestName, startTime, endTime, graceTime);
         definitions[contestName] = newDefinition;
     }
 
@@ -81,9 +81,9 @@ contract ContestPoolFactory is Ownable {
             owner,
             manager,
             definition.contestName,
-            definition.startDate,
-            definition.endDate,
-            definition.daysGrace,
+            definition.startTime,
+            definition.endTime,
+            definition.graceTime,
             definition.maxBalance
             );
         CreateContestPool(definition.contestName, manager, newContestPoolAddress);
