@@ -5,7 +5,7 @@ import "./ContestPool.sol";
 
 
 contract ContestPoolFactory is Ownable {
-    
+
      /*** events ***************/
     event CreateContestPoolDefinition(
         bytes32 indexed contestName,
@@ -61,10 +61,9 @@ contract ContestPoolFactory is Ownable {
         uint _endTime, 
         uint _graceTime, 
         uint _maxBalance) 
-    onlyOwner isNew(contestName) public 
+    onlyOwner isNew(_contestName) public 
     {
-        require(contestName != bytes32(0x0));
-        validateContestPoolDefinitionNotExist(_contestName);
+        require(_contestName != bytes32(0x0));
         require(_startTime != 0);
         require(_endTime != 0);
         require(_graceTime != 0);
@@ -77,7 +76,7 @@ contract ContestPoolFactory is Ownable {
             endTime: _endTime,
             graceTime: _graceTime,
             maxBalance: _maxBalance,
-            fee: fee,
+            fee: _fee,
             exists: true
         });
         CreateContestPoolDefinition(
@@ -88,10 +87,11 @@ contract ContestPoolFactory is Ownable {
         );
         definitions[_contestName] = newDefinition;
     }
-
-    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) public payable exists(contestName) returns (address) {
+        
+    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) public payable exists(_contestName) returns (address) {
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
+        //TODO Add require definition.amountPerPlayer > amountPerPlayer
         require(definition.fee == msg.value);
         require(definition.maxBalance > _amountPerPlayer);
 
