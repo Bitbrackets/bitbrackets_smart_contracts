@@ -32,6 +32,8 @@ https://github.com/OpenZeppelin/zeppelin-solidity
 * Code review
 * Other guidelines
 
+Using Solium for Linter Solidity https://github.com/duaraghav8/Solium
+
 ### Who do I talk to? ###
 
 * Repo owner or admin
