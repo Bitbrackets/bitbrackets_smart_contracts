@@ -26,6 +26,7 @@ contract ContestPoolFactory is Ownable {
         uint graceTime;
         uint maxBalance;
         uint fee;
+        bool exists;
     }
 
     mapping(bytes32 => ContestPoolDefinition) public definitions;
@@ -35,23 +36,23 @@ contract ContestPoolFactory is Ownable {
     }
 
     function validateContestPoolDefinitionNotExist(bytes32 contestName) view internal {
-        ContestPoolDefinition memory currentDefinition = definitions[contestName];
-        require(currentDefinition.contestName == bytes32(0x0));
-        require(currentDefinition.startTime == 0);
-        require(currentDefinition.endTime == 0);
-        require(currentDefinition.graceTime == 0);
-        require(currentDefinition.maxBalance == 0);
+        require(!definitions[contestName].exists);
     }
 
     function validateContestPoolDefinitionExist(bytes32 contestName) view internal {
-        ContestPoolDefinition memory currentDefinition = definitions[contestName];
-        require(currentDefinition.contestName != bytes32(0x0));
-        require(currentDefinition.startTime != 0);
-        require(currentDefinition.endTime != 0);
-        require(currentDefinition.graceTime != 0);
+        require(definitions[contestName].exists);
     }
 
-    function createContestPoolDefinition(bytes32 contestName, uint fee, uint startTime, uint endTime, uint graceTime, uint maxBalance) onlyOwner public {
+    function createContestPoolDefinition(
+        bytes32 _contestName, 
+        uint _fee,
+        uint _startTime, 
+        uint _endTime, 
+        uint _graceTime, 
+        uint _maxBalance) 
+    onlyOwner public 
+    {
+        validateContestPoolDefinitionNotExist(contestName);
         require(contestName != bytes32(0x0));
         validateContestPoolDefinitionNotExist(contestName);
         require(startTime != 0);
@@ -66,13 +67,19 @@ contract ContestPoolFactory is Ownable {
             endTime: endTime,
             graceTime: graceTime,
             maxBalance: maxBalance,
-            fee: fee
+            fee: fee,
+            exists: true
         });
-        CreateContestPoolDefinition(contestName, startTime, endTime, graceTime);
+        CreateContestPoolDefinition(
+            contestName, 
+            startTime, 
+            endTime, 
+            graceTime
+        );
         definitions[contestName] = newDefinition;
     }
 
-    function createContestPool(bytes32 contestName, uint amountPerPlayer) public payable returns (address){
+    function createContestPool(bytes32 contestName, uint amountPerPlayer) public payable returns (address) {
         validateContestPoolDefinitionExist(contestName);
         require(amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[contestName];
@@ -89,7 +96,8 @@ contract ContestPoolFactory is Ownable {
             definition.graceTime,
             definition.maxBalance,
             amountPerPlayer
-            );
+        );
+
         CreateContestPool(definition.contestName, manager, newContestPoolAddress);
         return newContestPoolAddress;
     }
