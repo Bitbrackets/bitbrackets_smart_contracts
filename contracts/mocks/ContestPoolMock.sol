@@ -13,8 +13,9 @@ contract ContestPoolMock is ContestPool {
         uint _startTime,
         uint _endTime,
         uint _graceTime,
-        uint _maxBalance
-    ) public ContestPool(_owner, _manager, _contestName, _startTime, _endTime, _graceTime, _maxBalance) { }
+        uint _maxBalance,
+        uint _amountPerPlayer
+    ) public ContestPool(_owner, _manager, _contestName, _startTime, _endTime, _graceTime, _maxBalance, _amountPerPlayer) { }
 
     function getCurrentTimestamp() public view returns (uint256) {
 

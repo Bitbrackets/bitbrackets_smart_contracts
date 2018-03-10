@@ -24,6 +24,7 @@ contract ContestPool is Ownable {
     uint public graceTime;
     uint public numberOfParticipants;
     uint public maxBalance;
+    uint public amountPerPlayer;
 
     mapping(address => uint) public predictions;
     mapping(address => uint) private winners;
@@ -35,7 +36,8 @@ contract ContestPool is Ownable {
         uint _startTime,
         uint _endTime,
         uint _graceTime,
-        uint _maxBalance
+        uint _maxBalance,
+        uint _amountPerPlayer
     ) public
     {
         owner = _owner;
@@ -45,6 +47,23 @@ contract ContestPool is Ownable {
         endTime = _endTime;
         graceTime = _graceTime;
         maxBalance = _maxBalance;
+        amountPerPlayer = _amountPerPlayer;
+    }
+
+    //Modifiers
+    modifier isBeforeStartTime() {
+        require(getCurrentTimestamp() < startTime);
+        _;
+    }
+
+    modifier isAmountPerPlayer() {
+        require(msg.value == amountPerPlayer);
+        _;
+    }
+
+    //Functions
+    function getMaxUsersCount() view public returns (uint usersCount) {
+        return maxBalance.div(amountPerPlayer);
     }
 
     /**
@@ -66,12 +85,7 @@ contract ContestPool is Ownable {
         ClaimPrize(msg.sender, prize);
     }
 
-    modifier isBeforeStartTime() {
-        require(getCurrentTimestamp() < startTime);
-        _;
-    }
-
-    function sendPrediction(uint prediction) public isBeforeStartTime payable {
+    function sendPrediction(uint prediction) public isBeforeStartTime isAmountPerPlayer payable {
         require(prediction > 0);
         require(predictions[msg.sender] == 0);
         predictions[msg.sender] = prediction;

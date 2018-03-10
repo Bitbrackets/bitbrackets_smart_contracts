@@ -14,6 +14,7 @@ contract('ContestPool', accounts => {
     let endTime = dateUtil.toMillis(2018, 7, 16);
     let graceTime = 1;
     const maxBalance = web3.toWei(1, 'ether');
+    const amountPerPlayer = web3.toWei(0.1, 'ether');
 
     beforeEach('setup contract for each test', async () => {
         contestPoolInstance = await ContestPool.new(
@@ -23,7 +24,8 @@ contract('ContestPool', accounts => {
             startTime,
             endTime,
             graceTime,
-            maxBalance
+            maxBalance,
+            amountPerPlayer
         );
     })
 

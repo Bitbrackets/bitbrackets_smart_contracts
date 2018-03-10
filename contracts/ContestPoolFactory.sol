@@ -74,7 +74,7 @@ contract ContestPoolFactory is Ownable {
         validateContestPoolDefinitionExist(contestName);
         require(amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[contestName];
-        //TODO Add require definition.amountPerPlayer > amountPerPlayer
+        require(definition.maxBalance > amountPerPlayer);
 
         address manager = msg.sender;
         ContestPool newContestPoolAddress = new ContestPool(
@@ -84,7 +84,8 @@ contract ContestPoolFactory is Ownable {
             definition.startTime,
             definition.endTime,
             definition.graceTime,
-            definition.maxBalance
+            definition.maxBalance,
+            amountPerPlayer
             );
         CreateContestPool(definition.contestName, manager, newContestPoolAddress);
         return newContestPoolAddress;
