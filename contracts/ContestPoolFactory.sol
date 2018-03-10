@@ -5,7 +5,8 @@ import "./ContestPool.sol";
 
 
 contract ContestPoolFactory is Ownable {
-
+    
+     /*** events ***************/
     event CreateContestPoolDefinition(
         bytes32 indexed contestName,
         uint indexed startTime,
@@ -19,6 +20,8 @@ contract ContestPoolFactory is Ownable {
         address indexed contestPoolAddress
     );
 
+    /**** Structs ***********/
+
     struct ContestPoolDefinition {
         bytes32 contestName;
         uint startTime;
@@ -29,18 +32,26 @@ contract ContestPoolFactory is Ownable {
         bool exists;
     }
 
+    /**** Properties ***********/
+
     mapping(bytes32 => ContestPoolDefinition) public definitions;
 
+    /*** Modifiers ***************/
+
+    modifier isNew(bytes32 _contestName) {
+        require(!definitions[_contestName].exists);
+        _;
+    }
+
+    modifier exists(bytes32 _contestName) {
+        require(definitions[_contestName].exists);
+        _;
+    }
+
+    /**** methods ***********/
+
     function ContestPoolFactory() public {
-        owner = msg.sender;
-    }
-
-    function validateContestPoolDefinitionNotExist(bytes32 contestName) view internal {
-        require(!definitions[contestName].exists);
-    }
-
-    function validateContestPoolDefinitionExist(bytes32 contestName) view internal {
-        require(definitions[contestName].exists);
+        // owner = msg.sender; not needed isOwnable already
     }
 
     function createContestPoolDefinition(
@@ -50,41 +61,39 @@ contract ContestPoolFactory is Ownable {
         uint _endTime, 
         uint _graceTime, 
         uint _maxBalance) 
-    onlyOwner public 
+    onlyOwner isNew(contestName) public 
     {
-        validateContestPoolDefinitionNotExist(contestName);
         require(contestName != bytes32(0x0));
-        validateContestPoolDefinitionNotExist(contestName);
-        require(startTime != 0);
-        require(endTime != 0);
-        require(graceTime != 0);
-        require(maxBalance != 0);
-        require(startTime < endTime);
+        validateContestPoolDefinitionNotExist(_contestName);
+        require(_startTime != 0);
+        require(_endTime != 0);
+        require(_graceTime != 0);
+        require(_maxBalance != 0);
+        require(_startTime < _endTime);
 
         ContestPoolDefinition memory newDefinition = ContestPoolDefinition({
-            contestName: contestName,
-            startTime: startTime,
-            endTime: endTime,
-            graceTime: graceTime,
-            maxBalance: maxBalance,
+            contestName: _contestName,
+            startTime: _startTime,
+            endTime: _endTime,
+            graceTime: _graceTime,
+            maxBalance: _maxBalance,
             fee: fee,
             exists: true
         });
         CreateContestPoolDefinition(
-            contestName, 
-            startTime, 
-            endTime, 
-            graceTime
+            _contestName, 
+            _startTime, 
+            _endTime, 
+            _graceTime
         );
-        definitions[contestName] = newDefinition;
+        definitions[_contestName] = newDefinition;
     }
 
-    function createContestPool(bytes32 contestName, uint amountPerPlayer) public payable returns (address) {
-        validateContestPoolDefinitionExist(contestName);
-        require(amountPerPlayer > 0);
-        ContestPoolDefinition storage definition = definitions[contestName];
+    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) public payable exists(contestName) returns (address) {
+        require(_amountPerPlayer > 0);
+        ContestPoolDefinition storage definition = definitions[_contestName];
         require(definition.fee == msg.value);
-        require(definition.maxBalance > amountPerPlayer);
+        require(definition.maxBalance > _amountPerPlayer);
 
         address manager = msg.sender;
         ContestPool newContestPoolAddress = new ContestPool(
@@ -95,7 +104,7 @@ contract ContestPoolFactory is Ownable {
             definition.endTime,
             definition.graceTime,
             definition.maxBalance,
-            amountPerPlayer
+            _amountPerPlayer
         );
 
         CreateContestPool(definition.contestName, manager, newContestPoolAddress);
