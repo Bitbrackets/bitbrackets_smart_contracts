@@ -13,11 +13,11 @@ contract('ContestPool', accounts => {
     let startTime = dateUtil.toMillis(2018, 6, 14);
     let endTime = dateUtil.toMillis(2018, 7, 16);
     let graceTime = 1;
-    const maxBalance = web3.toWei(1,'ether');
+    const maxBalance = web3.toWei(1, 'ether');
 
-    beforeEach('setup contract for each test', async() => {
+    beforeEach('setup contract for each test', async () => {
         contestPoolInstance = await ContestPool.new(
-            owner, 
+            owner,
             manager,
             "Rusia2018",
             startTime,
@@ -31,7 +31,7 @@ contract('ContestPool', accounts => {
         const startTimeContract = await contestPoolInstance.startTime();
         const endTimeContract = await contestPoolInstance.endTime();
         const graceTimeContract = await contestPoolInstance.graceTime();
-        
+
         assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
         assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
         assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTime);

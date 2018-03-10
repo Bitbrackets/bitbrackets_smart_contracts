@@ -29,14 +29,14 @@ contract ContestPool is Ownable {
     mapping(address => uint) private winners;
 
     function ContestPool(
-        address _owner, 
-        address _manager, 
-        bytes32 _contestName, 
-        uint _startTime, 
+        address _owner,
+        address _manager,
+        bytes32 _contestName,
+        uint _startTime,
         uint _endTime,
         uint _graceTime,
         uint _maxBalance
-    ) public 
+    ) public
     {
         owner = _owner;
         manager = _manager;
@@ -52,7 +52,7 @@ contract ContestPool is Ownable {
     *   https://consensys.github.io/smart-contract-best-practices/
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/
-    function claimThePrize() public returns(bool) {
+    function claimThePrize() public {
         require(winners[msg.sender] > 0);
         require(getCurrentTimestamp().sub(endTime) > graceTime);
 
@@ -64,7 +64,6 @@ contract ContestPool is Ownable {
         msg.sender.transfer(prize);
 
         ClaimPrize(msg.sender, prize);
-        return true;
     }
 
     modifier isBeforeStartTime() {
@@ -72,24 +71,26 @@ contract ContestPool is Ownable {
         _;
     }
 
-    function sendPrediction(uint prediction) isBeforeStartTime public payable {
+    function sendPrediction(uint prediction) public isBeforeStartTime payable {
         require(prediction > 0);
         require(predictions[msg.sender] == 0);
         predictions[msg.sender] = prediction;
         SendPrediction(prediction, msg.sender);
     }
 
-    function addressPrize () public view returns (uint256) {
+    function addressPrize() public view returns (uint256)
+    {
 
         return winners[msg.sender];
     }
-    
+
     function getCurrentTimestamp() public view returns (uint256)
-    { 
-        return now; 
+    {
+        return now;
     }
 
-    function addToWinners(address winnerAddress, uint256 prize) internal returns (bool) {
+    function addToWinners(address winnerAddress, uint256 prize) internal returns (bool)
+    {
         winners[winnerAddress] = prize;
         return true;
     }
