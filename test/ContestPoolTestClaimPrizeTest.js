@@ -173,7 +173,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         }
     });
 
-    it('Should not take contributions from players higher than max balance.', async () => {
+    it(t('aPlayer', 'sendPrediction', 'Should not able to take contributions higher than max balance.', true), async () => {
         const contribution = web3.toWei(2, "ether");//Max Balance: 1 eth
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
         const prediction = parseInt(predictionStr, 2);
@@ -190,7 +190,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         }
     });
 
-    it('Should not take contributions equals to max balance.', async () => {
+    it(t('aPlayer', 'sendPrediction', 'Should not able to take contributions equals to max balance.', true), async () => {
         const contribution = web3.toWei(1, "ether");//Max Balance: 1 eth
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
         const prediction = parseInt(predictionStr, 2);
