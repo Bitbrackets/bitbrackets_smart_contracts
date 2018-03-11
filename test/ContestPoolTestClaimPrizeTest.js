@@ -36,7 +36,6 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
     });
 
     it(t('anUser', 'claimThePrize', 'Winner should be able to claim prize.'), async () => {
-        console.log('pending -> ' + await contestPoolInstance.getPendingPayments());
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
 
         await contestPoolInstance.sendPrediction(prediction, {from: player1, value: contribution});
@@ -46,8 +45,6 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         await contestPoolInstance.addWinner(player1, prizeValue, {from: manager});
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 7, 12));
-
-        console.log('pending -> ' + await contestPoolInstance.getPendingPayments());
 
         await contestPoolInstance.claimThePrize({from: player1});
         const finalBalancePlayer1 = web3.eth.getBalance(player1).toNumber();
