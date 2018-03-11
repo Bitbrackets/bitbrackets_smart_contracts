@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.19;
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
@@ -55,6 +55,11 @@ contract ContestPool is Ownable {
         _;
     }
 
+    modifier isAfterStartTime() {
+        require(getCurrentTimestamp() > startTime);
+        _;
+    }
+
     modifier isBeforeStartTime() {
         require(getCurrentTimestamp() < startTime);
         _;
@@ -64,6 +69,17 @@ contract ContestPool is Ownable {
         require(msg.value == amountPerPlayer);
         _;
     }
+    modifier onlyForPlayers() {
+        require(msg.sender != owner && msg.sender != manager);
+        _;
+    }
+
+    modifier onlyActivePlayers() {
+        require(msg.sender != owner && msg.sender != manager);
+        require(predictions[msg.sender] != 0);
+        _;
+    }
+
 
     modifier notManager() {
         require(msg.sender != manager);
@@ -143,11 +159,32 @@ contract ContestPool is Ownable {
         ClaimPaymentByOwner(msg.sender, claimedCommission);
     }
 
-    function sendPrediction(uint prediction) public notManager isBeforeStartTime isAmountPerPlayer payable {
-        require(prediction > 0);
+    function publishScore() onlyActivePlayers isAfterStartTime external returns (bool) {
+        //check sender is a player and has prediction
+        
+        //check pool graceTime has not ended
+        require(isContestActive());
+
+        //check current results
+
+        //compare players prediction to current results
+        // and compute player score
+
+        //update player score in contract if its different from
+        //his last score
+
+        //if player has higher score we update high score
+        //add player to the winners array
+
+        return false;
+
+    }
+
+    function sendPrediction(uint _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer payable {
+        require(_prediction > 0);
         require(predictions[msg.sender] == 0);
-        predictions[msg.sender] = prediction;
-        SendPrediction(prediction, msg.sender);
+        predictions[msg.sender] = _prediction;
+        SendPrediction(_prediction, msg.sender);
     }
 
     function addressPrize() public view returns (uint256) {
@@ -183,5 +220,14 @@ contract ContestPool is Ownable {
 
         return commission;
     }
+    
+    function hasContestEnded() private view returns (bool) {
+        return getCurrentTimestamp().sub(endTime) > graceTime;
+    }
+
+    function isContestActive() private view returns (bool) {
+        return !hasContestEnded();
+    }
+
 
 }

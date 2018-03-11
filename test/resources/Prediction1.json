@@ -1,0 +1,44 @@
+{
+    "games": [
+        {
+            "numberId" : "1",
+            "result" : "A"
+        },
+        {
+            "numberId" : "2",
+            "result" : "B"
+        },
+        {
+            "numberId" : "3",
+            "result" : "X"
+        },
+        {
+            "numberId" : "4",
+            "result" : "A"
+        },
+        {
+            "numberId" : "5",
+            "result" : "B"
+        },
+        {
+            "numberId" : "6",
+            "result" : "X"
+        },
+        {
+            "numberId" : "7",
+            "result" : "X"
+        },
+        {
+            "numberId" : "8",
+            "result" : "B"
+        },
+        {
+            "numberId" : "9",
+            "result" : "A"
+        },
+        {
+            "numberId" : "10",
+            "result" : "B"
+        }
+    ]
+}

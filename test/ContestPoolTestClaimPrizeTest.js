@@ -35,7 +35,24 @@ contract('ContestPoolWinning', accounts => {
         );
     });
 
+    it(t('anUser', 'publishScore', 'Player should be able to publish score'), async () => {
+        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
+
+        await contestPoolInstance.sendPrediction(prediction, {from: player1, value: contribution});
+        //start the contest
+        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 6, 5));
+        
+        const success = await contestPoolInstance.publishScore();
+
+        const playerScore = await contestPoolInstance.getPlayerScore();
+
+        assert(success, "should update score to high score");
+
+
+    });
+
     it(t('anUser', 'claimThePrize', 'Winner should be able to claim prize.'), async () => {
+
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
 
         await contestPoolInstance.sendPrediction(prediction, {from: player1, value: contribution});
