@@ -153,7 +153,7 @@ contract('ContestPoolFactory', function (accounts) {
         }
     });
 
-    it("Creating a contest pool instance without paying fee. Should fail.", async function () {
+    it(t('aPlayer', 'createContestPool', 'Should not be able to create a contest pool without paying a fee.', true), async function () {
         const contestName = stringUtils.uniqueText('MyCustomContestPool');
         const startTime = 1000;
         const endTime = 2000;
@@ -177,7 +177,7 @@ contract('ContestPoolFactory', function (accounts) {
         }
     });
 
-    it("Adding fee to contract balance.", async function () {
+    it(t('aPlayer', 'createContestPool', 'When creating a contest pool, the factory balance should be increased based on the fee defined in the pool definition.'), async function () {
         const contestName = stringUtils.uniqueText('MyPool');
         const startTime = 1000;
         const endTime = 2000;
@@ -201,7 +201,7 @@ contract('ContestPoolFactory', function (accounts) {
         assert.equal(previousBalanceFactory, finalBalanceFactory);
     });
 
-    it("Creating a contest pool paying fee lower than is in the definition.", async function () {
+    it(t('aPlayer', 'createContestPool', 'Should not be able to create a contest pool paying a different fee.', true), async function () {
         const contestName = stringUtils.uniqueText('MyContest');
         const startTime = 1000;
         const endTime = 2000;
@@ -225,7 +225,7 @@ contract('ContestPoolFactory', function (accounts) {
         }
     });
 
-    it("Withdrawing balance as a owner.", async function () {
+    it(t('aOwner', 'withdrawFee', 'Should be able to withdraw factory balance.'), async function () {
         const contestName = stringUtils.uniqueText('MyContest');
         const graceTime = 2;
         const amountPerPlayer = web3.toWei(0.01, 'ether');
@@ -268,8 +268,8 @@ contract('ContestPoolFactory', function (accounts) {
 
         assert.ok(marginError >= finalDifference);
     });
-
-    it("Should not able to withdraw balance from factory.", async function () {
+    
+    it(t('aPlayer', 'withdrawFee', 'Should not able to withdraw balance from factory.', true), async function () {
         const contestName = stringUtils.uniqueText('MyContest');
         const graceTime = 2;
         const amountPerPlayer = web3.toWei(0.01, 'ether');
@@ -303,7 +303,7 @@ contract('ContestPoolFactory', function (accounts) {
         }
     });
 
-    it("Creating a contest pool definition with fee equals to 0.", async function () {
+    it(t('aPlayer', 'createContestPoolDefinition', 'Should be able to create a contest pool definition with fee equals to 0.'), async function () {
         const contestName = stringUtils.uniqueText('MyContestPool');
         const startTime = 1000;
         const endTime = 2000;
