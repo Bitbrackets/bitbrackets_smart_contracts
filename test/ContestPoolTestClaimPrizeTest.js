@@ -1,5 +1,6 @@
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const dateUtil = require('./DateUtil');
+const t = require('./TestUtil').title;
 
 contract('ContestPoolWinnerClaimPrize', accounts => {
     let contestPoolInstance;
@@ -33,7 +34,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         );
     });
 
-    it('Winner should be able to claim prize', async () => {
+    it(t('aUser', 'claimThePrize', 'Winner should be able to claim prize'), async () => {
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
 
@@ -52,7 +53,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
 
     });
 
-    it('Winner should not be able to claim prize before endTime.', async () => {
+    it(t('aUser', 'claimThePrize', 'Winner should not be able to claim prize before endTime.', true), async () => {
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 10));
 
@@ -72,7 +73,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         }
     });
 
-    it('A non winner should not be able to claim prize ', async () => {
+    it(t('aUser', 'claimThePrize', 'A non winner should not be able to claim prize', true), async () => {
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 10));
 
@@ -91,7 +92,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         }
     });
 
-    it('All winners should be able to claim prize', async () => {
+    it(t('allWinners', 'claimThePrize', 'All winners should be able to claim prize'), async () => {
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
 
@@ -115,7 +116,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         assert(initialBalancePlayer2 < finalBalancePlayer2);
     });
 
-    it('Winner should be able to claim prize only once', async () => {
+    it(t('aWinner', 'claimThePrize', 'Winner should not be able to claim prize twice', false), async () => {
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
         await contestPoolInstance.sendPrediction(prediction, {from: player1, value: contribution});
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 7, 12));
@@ -134,8 +135,8 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
             assert(error.message.includes("revert"));
         }
     });
-
-    it('Should take contributions from players', async () => {
+    
+    it(t('aPlayer', 'sendPrediction', 'Should take contributions from players'), async () => {
         const contribution = web3.toWei(0.3, "ether");
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
         const prediction = parseInt(predictionStr, 2);
@@ -152,7 +153,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         assert.equal(initialBalance + contribution, finalBalance);
     });
 
-    it('Should fail when a player has already contributed', async () => {
+    it(t('aPlayer', 'sendPrediction', 'Should not be able to contributes twice.', true), async () => {
         const contribution = web3.toWei(0.3, "ether");
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
         const prediction = parseInt(predictionStr, 2);
