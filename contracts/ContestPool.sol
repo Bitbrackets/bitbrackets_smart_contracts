@@ -3,6 +3,7 @@ pragma solidity ^0.4.18;
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
+
 contract ContestPool is Ownable {
     using SafeMath for uint256;
 
@@ -34,7 +35,7 @@ contract ContestPool is Ownable {
     uint public     numberOfParticipants;
     uint public     maxBalance;
     uint public     amountPerPlayer;
-    uint private    pendingWinnerPayments;
+    uint256 private    pendingWinnerPayments;
 
     mapping(address => uint) public     predictions;
     mapping(address => uint) private    payments;
@@ -58,6 +59,7 @@ contract ContestPool is Ownable {
         graceTime = _graceTime;
         maxBalance = _maxBalance;
         amountPerPlayer = _amountPerPlayer;
+
     }
 
     //Modifiers
@@ -87,7 +89,7 @@ contract ContestPool is Ownable {
     }
 
     modifier hasPendingPayment() {
-        //require(pendingWinnerPayments > 0);
+        require(pendingWinnerPayments > 0);
         require(payments[msg.sender] > 0);
         _;
     }
@@ -110,7 +112,7 @@ contract ContestPool is Ownable {
         require(this.balance > prize);
 
         payments[msg.sender] = 0;
-        pendingWinnerPayments.sub(1);
+        pendingWinnerPayments = pendingWinnerPayments.sub(1);
         msg.sender.transfer(prize);
         ClaimPrize(msg.sender, prize);
     }
@@ -151,8 +153,15 @@ contract ContestPool is Ownable {
 
     function addToWinners(address winnerAddress, uint256 prize) internal returns (bool)
     {
-        pendingWinnerPayments.add(1);
+        pendingWinnerPayments = pendingWinnerPayments.add(1);
         payments[winnerAddress] = prize;
+        return true;
+    }
+
+    function addCommission(address paymentAddress, uint256 commission) internal onlyOwner returns (bool)
+    {
+
+        payments[paymentAddress] = commission;
         return true;
     }
 
