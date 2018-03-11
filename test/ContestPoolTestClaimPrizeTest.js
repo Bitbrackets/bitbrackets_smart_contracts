@@ -13,6 +13,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
     let graceTime = 1 * 86400;
 
     const maxBalance = web3.toWei(1, 'ether');
+    const amountPerPlayer = web3.toWei(0.3, "ether");
     const contribution = web3.toWei(0.3, "ether");
     const prizeValue = web3.toWei(0.05, "ether");
 
@@ -27,7 +28,8 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
             startTime,
             endTime,
             graceTime,
-            maxBalance
+            maxBalance,
+            amountPerPlayer
         );
     });
 
@@ -134,8 +136,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
     });
 
     it('Should take contributions from players', async () => {
-
-        const contribution = web3.toWei(0.2, "ether");
+        const contribution = web3.toWei(0.3, "ether");
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
         const prediction = parseInt(predictionStr, 2);
         const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
@@ -152,7 +153,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
     });
 
     it('Should fail when a player has already contributed', async () => {
-        const contribution = web3.toWei(0.2, "ether");
+        const contribution = web3.toWei(0.3, "ether");
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
         const prediction = parseInt(predictionStr, 2);
         const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
@@ -168,6 +169,39 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
             assert(error);
             assert(error.message.includes("revert"));
             assert.equal(initialBalance + contribution, finalBalance);
+        }
+    });
+
+    it('Should not take contributions from players higher than max balance.', async () => {
+        const contribution = web3.toWei(2, "ether");//Max Balance: 1 eth
+        const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
+        const prediction = parseInt(predictionStr, 2);
+        const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
+
+        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
+
+        try {
+            await contestPoolInstance.sendPrediction(prediction, {from: player1, value: contribution});
+            asser(false, 'It should have failed because contribution is higher than max balance.');
+        } catch (error) {
+            assert(error);
+            assert(error.message.includes("revert"));
+        }
+    });
+
+    it('Should not take contributions equals to max balance.', async () => {
+        const contribution = web3.toWei(1, "ether");//Max Balance: 1 eth
+        const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
+        const prediction = parseInt(predictionStr, 2);
+
+        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
+
+        try {
+            await contestPoolInstance.sendPrediction(prediction, {from: player1, value: contribution});
+            asser(false, 'It should have failed because contribution is higher than max balance.');
+        } catch (error) {
+            assert(error);
+            assert(error.message.includes("revert"));
         }
     });
 });

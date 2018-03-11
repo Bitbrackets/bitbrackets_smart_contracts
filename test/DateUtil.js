@@ -10,5 +10,8 @@ module.exports = {
     toMillis: function (year, month, day) {
         const date = year + "-" + month + '-' + day;
         return moment(date, 'YYYY-MM-DD').toDate().getTime() / 1000;
+    },
+    nowInMillis: function() {
+        return moment().toDate().getTime() / 1000;
     }
 };

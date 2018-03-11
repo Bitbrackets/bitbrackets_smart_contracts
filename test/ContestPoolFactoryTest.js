@@ -75,11 +75,12 @@ contract('ContestPoolFactory', function (accounts) {
         const endTime = 2000;
         const graceTime = 2;
         const maxBalance = web3.toWei(1, 'ether');
+        const amountPerPlayer = web3.toWei(0.1, 'ether');
         const contestNameBytes32 = stringUtils.stringToBytes32(contestName);
 
         await instance.createContestPoolDefinition(contestName, startTime, endTime, graceTime, maxBalance);
 
-        await instance.createContestPool(contestName, web3.toWei(2, 'ether'));
+        await instance.createContestPool(contestName, amountPerPlayer);
 
         let contestPoolAddress;
         let contestPool;
