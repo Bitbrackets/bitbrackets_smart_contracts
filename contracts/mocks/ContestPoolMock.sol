@@ -15,7 +15,8 @@ contract ContestPoolMock is ContestPool {
         uint _graceTime,
         uint _maxBalance,
         uint _amountPerPlayer
-    ) public ContestPool(_owner, _manager, _contestName, _startTime, _endTime, _graceTime, _maxBalance, _amountPerPlayer) { }
+    ) public
+    ContestPool(_owner, _manager, _contestName, _startTime, _endTime, _graceTime, _maxBalance, _amountPerPlayer) { }
 
     function getCurrentTimestamp() public view returns (uint256) {
 
@@ -36,5 +37,7 @@ contract ContestPoolMock is ContestPool {
     function addWinner(address winnerAddress, uint256 prize) public returns (bool) {
         return addToWinners(winnerAddress, prize);
     }
+
+
 
 }

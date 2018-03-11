@@ -34,7 +34,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         );
     });
 
-    it(t('aUser', 'claimThePrize', 'Winner should be able to claim prize'), async () => {
+    it(t('anUser', 'claimThePrize', 'Winner should be able to claim prize'), async () => {
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
 
@@ -46,6 +46,8 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 7, 12));
 
+        console.log('pending -> ' + contestPoolInstance.getPendingPayments());
+
         await contestPoolInstance.claimThePrize({from: player1});
         const finalBalancePlayer1 = web3.eth.getBalance(player1).toNumber();
 
@@ -53,7 +55,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
 
     });
 
-    it(t('aUser', 'claimThePrize', 'Winner should not be able to claim prize before endTime.', true), async () => {
+    it(t('anUser', 'claimThePrize', 'Winner should not be able to claim prize before endTime.', true), async () => {
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 10));
 
@@ -73,7 +75,7 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
         }
     });
 
-    it(t('aUser', 'claimThePrize', 'A non winner should not be able to claim prize', true), async () => {
+    it(t('anUser', 'claimThePrize', 'A non winner should not be able to claim prize', true), async () => {
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 10));
 
