@@ -1,7 +1,6 @@
 var ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 var ContestPool = artifacts.require("./ContestPool.sol");
 const t = require('./TestUtil').title;
-
 const stringUtils = require('./StringUtil');
 var utils = require("./utils.js");
 
@@ -48,15 +47,18 @@ contract('ContestPoolFactory', function (accounts) {
             assert(false, 'It should have failed because the contest name is repetead.');
         } catch (err) {
             assert(err);
+            assert(err.message.includes("revert"));
         }
     });
 
-    it(t('aOwner', 'createContestPoolDefinition', 'Should not be able to create a contest pool definition with a null contest name.', true), async function () {
+    it(t('aOwner', 'createContestPoolDefinition', 'Should not be able to create a contest pool definition with a 0x0 contest name.', true), async function () {
         try {
-            await instance.createContestPoolDefinition(null, 1, 2, 2, 10);
-            assert(false, 'It should have failed because the contest name is invalid.');
+          const contestName = '0x0000000000000000000000000000000000000000000000000000000000000000';
+          await instance.createContestPoolDefinition(contestName, 1, 2, 10, 10);
+          assert(false, 'It should have failed because the contest name is invalid.');
         } catch (err) {
-            assert(err);
+          assert(err);
+          assert(err.message.includes("revert"));
         }
     });
 
@@ -66,7 +68,19 @@ contract('ContestPoolFactory', function (accounts) {
             assert(false, 'It should have failed because the start date is zero.');
         } catch (err) {
             assert(err);
+            assert(err.message.includes("revert"));
         }
+    });
+
+    it(t('aPlayer', 'createContestPoolDefinition', 'A player should not be able to create a contest pool definition.', true), async function () {
+      try {
+          const player = accounts[4];
+          await instance.createContestPoolDefinition('CustomValue', 1000, 2000, 2, 10, {from: player});
+          assert(false, 'It should have failed because a player should not able to create a definition.');
+      } catch (err) {
+          assert(err);
+          assert(err.message.includes("revert"));
+      }
     });
 
     it(t('aUser', 'createContestPool', 'Should be able to send create a contest pool based on a definition.'), async function () {
@@ -118,6 +132,7 @@ contract('ContestPoolFactory', function (accounts) {
             assert(false, 'It should fail because contest name is invalid.');
         } catch (err) {
             assert(err);
+            assert(err.message.includes("revert"));
         }
     });
 });

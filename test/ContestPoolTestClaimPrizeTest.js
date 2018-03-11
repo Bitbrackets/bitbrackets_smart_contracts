@@ -205,4 +205,19 @@ contract('ContestPoolWinnerClaimPrize', accounts => {
             assert(error.message.includes("revert"));
         }
     });
+
+    it(t('aManager', 'sendPrediction', 'Should not be able to contribute to his contest pool.', true), async () => {
+        const contribution = web3.toWei(0.2, "ether");
+        const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
+        const prediction = parseInt(predictionStr, 2);
+
+        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
+        try {
+            await contestPoolInstance.sendPrediction(prediction, {from: manager, value: contribution});
+            assert(false, 'It should have failed because a manager must not participate in his own contest pool.');
+        } catch (error) {
+            assert(error);
+            assert(error.message.includes("revert"));
+        }
+    });
 });

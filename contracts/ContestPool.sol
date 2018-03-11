@@ -61,6 +61,11 @@ contract ContestPool is Ownable {
         _;
     }
 
+    modifier notManager() {
+        require(msg.sender != manager);
+        _;
+    }
+
     //Functions
     function getMaxUsersCount() view public returns (uint usersCount) {
         return maxBalance.div(amountPerPlayer);
@@ -85,7 +90,7 @@ contract ContestPool is Ownable {
         ClaimPrize(msg.sender, prize);
     }
 
-    function sendPrediction(uint prediction) public isBeforeStartTime isAmountPerPlayer payable {
+    function sendPrediction(uint prediction) public notManager isBeforeStartTime isAmountPerPlayer payable {
         require(prediction > 0);
         require(predictions[msg.sender] == 0);
         predictions[msg.sender] = prediction;
