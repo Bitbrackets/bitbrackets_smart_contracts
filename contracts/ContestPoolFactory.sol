@@ -25,6 +25,7 @@ contract ContestPoolFactory is Ownable {
         uint endTime;
         uint graceTime;
         uint maxBalance;
+        uint fee;
     }
 
     mapping(bytes32 => ContestPoolDefinition) public definitions;
@@ -50,7 +51,7 @@ contract ContestPoolFactory is Ownable {
         require(currentDefinition.graceTime != 0);
     }
 
-    function createContestPoolDefinition(bytes32 contestName, uint startTime, uint endTime, uint graceTime, uint maxBalance) onlyOwner public {
+    function createContestPoolDefinition(bytes32 contestName, uint fee, uint startTime, uint endTime, uint graceTime, uint maxBalance) onlyOwner public {
         require(contestName != bytes32(0x0));
         validateContestPoolDefinitionNotExist(contestName);
         require(startTime != 0);
@@ -64,16 +65,18 @@ contract ContestPoolFactory is Ownable {
             startTime: startTime,
             endTime: endTime,
             graceTime: graceTime,
-            maxBalance: maxBalance
+            maxBalance: maxBalance,
+            fee: fee
         });
         CreateContestPoolDefinition(contestName, startTime, endTime, graceTime);
         definitions[contestName] = newDefinition;
     }
 
-    function createContestPool(bytes32 contestName, uint amountPerPlayer) public returns (address){
+    function createContestPool(bytes32 contestName, uint amountPerPlayer) public payable returns (address){
         validateContestPoolDefinitionExist(contestName);
         require(amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[contestName];
+        require(definition.fee == msg.value);
         require(definition.maxBalance > amountPerPlayer);
 
         address manager = msg.sender;
@@ -89,5 +92,10 @@ contract ContestPoolFactory is Ownable {
             );
         CreateContestPool(definition.contestName, manager, newContestPoolAddress);
         return newContestPoolAddress;
+    }
+
+    function withdrawFee() onlyOwner public {
+        require(this.balance > 0);
+        owner.transfer(this.balance);
     }
 }
