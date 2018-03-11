@@ -51,8 +51,8 @@ contract ContestPoolFactory is Ownable {
     }
 
     function createContestPoolDefinition(bytes32 contestName, uint startTime, uint endTime, uint graceTime, uint maxBalance) onlyOwner public {
-        validateContestPoolDefinitionNotExist(contestName);
         require(contestName != bytes32(0x0));
+        validateContestPoolDefinitionNotExist(contestName);
         require(startTime != 0);
         require(endTime != 0);
         require(graceTime != 0);

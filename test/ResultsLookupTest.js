@@ -1,22 +1,23 @@
 var ResultsLookup = artifacts.require("./ResultsLookup.sol");
 const stringUtils = require('./StringUtil');
+const t = require('./TestUtil').title;
 var utils = require("./utils.js");
 var date = require("./DateUtil.js");
 
 let instance;
 
 contract('ResultsLookup', function(accounts) {
-  
+
   beforeEach('Setup contract for each test', async() => {
     instance = await ResultsLookup.deployed();
   });
 
-  it("Should deploy ResultsLookup contract.", async function() {
+  it(t('aPlayer', 'new', 'Should able to deploy a ResultsLookup contract.'), async function() {
     assert(instance);
     assert(instance.address);
   });
 
-  it("Owner should can register result and get it.", async function() {
+  it(t('aOwner', 'getResult', 'Should able to get a result (pre registered).'), async function() {
     const owner = accounts[0];
     const contestName = stringUtils.stringToBytes32('Rusia2018');
     const value = 10101010101010111011;
@@ -32,7 +33,7 @@ contract('ResultsLookup', function(accounts) {
     assert.ok(parseInt(whenDateTime) <= nowInMillis);
   });
 
-  it("A non owner should not can register result.", async function() {
+  it(t('aNonOwner', 'registerResult', 'Should not able to register a result.', true), async function() {
     const player = accounts[1];
     const contestName = stringUtils.stringToBytes32('Rusia2018');
     const value = 10101010101010111011;
@@ -46,7 +47,7 @@ contract('ResultsLookup', function(accounts) {
     }
   });
 
-  it("A non owner should not can get a result.", async function() {
+  it(t('aNonOwner', 'getResult', 'Should not able to get a result pre registered.', true), async function() {
     const owner = accounts[0];
     const player = accounts[1];
     const contestName = stringUtils.stringToBytes32('GrandSlam2018');
@@ -61,8 +62,8 @@ contract('ResultsLookup', function(accounts) {
       assert(error.message.includes("revert"));
     }
   });
-
-  it("Owner should can register twice results and get last one.", async function() {
+  
+  it(t('aOwner', 'getResult', 'Should able to register two results and get the last result.', true), async function() {
     const owner = accounts[0];
     const contestName = stringUtils.stringToBytes32('Rusia2018');
     const value1 = 10101010101010111011;

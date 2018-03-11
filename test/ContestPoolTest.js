@@ -1,5 +1,6 @@
 const ContestPool = artifacts.require("./ContestPool.sol");
 const dateUtil = require('./DateUtil');
+const t = require('./TestUtil').title;
 
 // test suite
 contract('ContestPool', accounts => {
@@ -29,7 +30,7 @@ contract('ContestPool', accounts => {
         );
     })
 
-    it('should be initialized with correct values', async () => {
+    it(t('AnyUser', 'new', 'Should be initialized with correct values'), async () => {
         const startTimeContract = await contestPoolInstance.startTime();
         const endTimeContract = await contestPoolInstance.endTime();
         const graceTimeContract = await contestPoolInstance.graceTime();
