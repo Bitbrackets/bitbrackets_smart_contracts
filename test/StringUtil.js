@@ -1,4 +1,5 @@
 const util = require('ethereumjs-util');
+const now = require('./DateUtil').nowInMillis;
 
 module.exports = {
     cleanNulls: function (value) {
@@ -11,5 +12,8 @@ module.exports = {
     },
     stringToBytes8: function (text) {
         return util.bufferToHex(util.setLengthRight(text, 8));
+    },
+    uniqueText: function (text) {
+        return text + '_' + now();
     }
 };
