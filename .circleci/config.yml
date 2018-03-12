@@ -27,12 +27,12 @@ jobs:
       - checkout
       - restore_cache:
            <<: *cache-options
-      # - run:
-      #     name: install-truffle
-      #     command: npm install -g truffle    
-      # - run:
-      #     name: install-ganache
-      #     command: npm install -g ganache-cli       
+      - run:
+          name: install-truffle
+          command: sudo npm install -g truffle    
+      - run:
+          name: install-ganache
+          command: sudo npm install -g ganache-cli       
       - run:
           name: install-package-dependencies
           command: npm install    
