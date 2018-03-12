@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 function parseBigInt(bigint, base) {
     //convert bigint string to array of digit values
     for (var values = [], i = 0; i < bigint.length; i++) {
@@ -40,19 +42,39 @@ function parseBigInt(bigint, base) {
     return formatBigInt(outputValues, outputBase);
   }
 
+function getBinaryString(n) {    
+    return convertBase(n,10,2);
+}
 
 module.exports = {
-    getScore(prediction, results, games, shift) {
+    getScore(prediction, result, games, bits) {
+      let binPrediction = getBinaryString(prediction);
+      let binResult = getBinaryString(result);
+      
+      let i = 0;
+      let score = 0;
 
-    },
-    getBinaryString(n) {
-        return formatBigInt(parseBigInt(n.replace(/\s+/g, ''), 2))
+      let gamePred, gameRes;
+      while (i < games) {
+        gamePred = _.take(binPrediction, bits);
+        gameRes = _.take(binResult, bits);
+        if (_.isEqual(gamePred,gameRes)) {
+          score++;
+        }
+        binPrediction = _.slice(binPrediction, bits);
+        binResult = _.slice(binResult, bits);
+
+        i++;
+      }
+
+      return score;
     },
     parseToInt(n) {
         return convertBase(n.replace(/\s+/g, ''), 2, 10)
     },
     parseBigInt,
     formatBigInt,
-    convertBase
+    convertBase,
+    getBinaryString
 
 };

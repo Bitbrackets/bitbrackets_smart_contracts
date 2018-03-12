@@ -35,7 +35,7 @@ contract('ContestPoolWinning', accounts => {
         );
     });
 
-    it(t('anUser', 'publishScore', 'Player should be able to publish score'), async () => {
+    xit(t('anUser', 'publishScore', 'Player should be able to publish score'), async () => {
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
 
         await contestPoolInstance.sendPrediction(prediction, {from: player1, value: contribution});
