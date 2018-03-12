@@ -1,6 +1,7 @@
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const dateUtil = require('./DateUtil');
 const t = require('./TestUtil').title;
+const { getScore, parseToInt } = require('./ScoreUtil');
 
 contract('ContestPoolWinning', accounts => {
     let contestPoolInstance;
@@ -20,7 +21,8 @@ contract('ContestPoolWinning', accounts => {
     const managerCommission = web3.toWei(0.03, "ether");
 
     const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-    const prediction = parseInt(predictionStr, 2);
+    const prediction = parseToInt(predictionStr);
+    console.log('prediction int', prediction);
 
     beforeEach('setup contract for each test', async () => {
         contestPoolInstance = await ContestPoolMock.new(
@@ -156,7 +158,7 @@ contract('ContestPoolWinning', accounts => {
     it(t('aPlayer', 'sendPrediction', 'Should take contributions from players'), async () => {
         const contribution = web3.toWei(0.3, "ether");
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-        const prediction = parseInt(predictionStr, 2);
+        const prediction = parseToInt(predictionStr);
         const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
@@ -166,14 +168,14 @@ contract('ContestPoolWinning', accounts => {
         const contractPrediction = await contestPoolInstance.predictions(player1);
         const finalBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber();
 
-        assert.equal(contractPrediction, prediction, "Prediction for player 1 should be " + prediction);
+        assert.equal(contractPrediction.toNumber(), prediction, "Prediction for player 1 should be " + prediction);
         assert.equal(initialBalance + contribution, finalBalance);
     });
 
     it(t('aPlayer', 'sendPrediction', 'Should not be able to contributes twice.', true), async () => {
         const contribution = web3.toWei(0.3, "ether");
         const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-        const prediction = parseInt(predictionStr, 2);
+        const prediction = parseToInt(predictionStr);
         const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
 
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
