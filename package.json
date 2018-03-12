@@ -23,5 +23,12 @@
     "lodash": "^4.17.5",
     "moment": "^2.21.0",
     "zeppelin-solidity": "1.7.0"
+  },
+  "devDependencies": {
+    "ganache-cli": "^6.0.3",
+    "solium": "^1.1.2",
+    "truffle": "4.1.0",
+    "truffle-config": "^1.0.4",
+    "truffle-hdwallet-provider": "0.0.3"
   }
 }
