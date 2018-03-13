@@ -263,11 +263,9 @@ contract('ContestPoolFactory', function (accounts) {
         const finalOwnerBalance = await web3.eth.getBalance(owner).toNumber();
         assert.ok(finalOwnerBalance >= initialOwnerBalance);
         
-        const marginError = initialOwnerBalance * 0.00001976;//Gas consumed.
         const expectedFinalOwnerBalance = parseInt(initialBalanceFactory) + parseInt(initialOwnerBalance);
-        const finalDifference = finalOwnerBalance - expectedFinalOwnerBalance;
-
-        assert.ok(marginError >= finalDifference);
+        
+        assert.ok(finalOwnerBalance >= expectedFinalOwnerBalance);
     });
     
     it(t('aPlayer', 'withdrawFee', 'Should not able to withdraw balance from factory.', true), async function () {
