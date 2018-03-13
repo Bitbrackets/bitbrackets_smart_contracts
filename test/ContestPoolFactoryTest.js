@@ -94,6 +94,7 @@ contract('ContestPoolFactory', function (accounts) {
 
     it(t('aUser', 'createContestPool', 'Should be able to send create a contest pool based on a definition.'), async function () {
         const contestName = stringUtils.uniqueText('Rusia2018');
+        // TODO : add test to check manager and owner address of contest pool should be different
         const startTime = 1000;
         const endTime = 2000;
         const graceTime = 2;

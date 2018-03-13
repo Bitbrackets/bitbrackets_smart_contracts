@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.19;
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
@@ -6,6 +6,22 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract ContestPool is Ownable {
     using SafeMath for uint256;
+
+    /**** Properties ***********/
+    address public  manager;
+    bytes32 public  contestName;
+    uint public     startTime;
+    uint public     endTime;
+    uint public     graceTime;
+    uint public     numberOfParticipants;
+    uint public     maxBalance;
+    uint public     amountPerPlayer;
+    uint256 private    pendingWinnerPayments;
+
+    mapping(address => uint) public     predictions;
+    mapping(address => uint) private    payments;
+
+    /**** Events ***********/
 
     event SendPrediction (
         uint prediction,
@@ -21,24 +37,72 @@ contract ContestPool is Ownable {
         address indexed manager,
         uint prize
     );
-
+    
     event ClaimPaymentByOwner (
         address indexed owner,
         uint prize
     );
 
-    address public  manager;
-    bytes32 public  contestName;
-    uint public     startTime;
-    uint public     endTime;
-    uint public     graceTime;
-    uint public     numberOfParticipants;
-    uint public     maxBalance;
-    uint public     amountPerPlayer;
-    uint256 private    pendingWinnerPayments;
+    /*** Modifiers ***************/
 
-    mapping(address => uint) public     predictions;
-    mapping(address => uint) private    payments;
+    modifier onlyWinner() {
+        require(payments[msg.sender] > 0);
+        _;
+    }
+
+    modifier poolHasEnded() {
+        require(getCurrentTimestamp().sub(endTime) > graceTime);
+        _;
+    }
+
+    modifier isAfterStartTime() {
+        require(getCurrentTimestamp() > startTime);
+        _;
+    }
+
+    modifier isBeforeStartTime() {
+        require(getCurrentTimestamp() < startTime);
+        _;
+    }
+
+    modifier isAmountPerPlayer() {
+        require(msg.value == amountPerPlayer);
+        _;
+    }
+    modifier onlyForPlayers() {
+        require(msg.sender != owner && msg.sender != manager);
+        _;
+    }
+
+    modifier onlyActivePlayers() {
+        require(msg.sender != owner && msg.sender != manager);
+        require(predictions[msg.sender] != 0);
+        _;
+    }
+
+
+    modifier notManager() {
+        require(msg.sender != manager);
+        _;
+    }
+
+    modifier onlyManager() {
+        require(msg.sender == manager);
+        _;
+    }
+
+    modifier allWinnersHaveClaimedTheirPrize() {
+        require(pendingWinnerPayments == 0);
+        _;
+    }
+
+    modifier hasPendingPayment() {
+        require(pendingWinnerPayments > 0);
+        require(payments[msg.sender] > 0);
+        _;
+    }
+
+   
 
     function ContestPool(
         address _owner,
@@ -62,39 +126,7 @@ contract ContestPool is Ownable {
 
     }
 
-    //Modifiers
-    modifier isBeforeStartTime() {
-        require(getCurrentTimestamp() < startTime);
-        _;
-    }
-
-    modifier isAmountPerPlayer() {
-        require(msg.value == amountPerPlayer);
-        _;
-    }
-
-    modifier notManager() {
-        require(msg.sender != manager);
-        _;
-    }
-
-    modifier onlyManager() {
-        require(msg.sender == manager);
-        _;
-    }
-
-    modifier allWinnersHaveClaimedTheirPrize() {
-        require(pendingWinnerPayments == 0);
-        _;
-    }
-
-    modifier hasPendingPayment() {
-        require(pendingWinnerPayments > 0);
-        require(payments[msg.sender] > 0);
-        _;
-    }
-
-    //Functions
+    /*** Methods ***************/
     function getMaxUsersCount() public view returns (uint usersCount) {
         return maxBalance.div(amountPerPlayer);
     }
@@ -104,11 +136,9 @@ contract ContestPool is Ownable {
     *   https://consensys.github.io/smart-contract-best-practices/
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/
-    function claimThePrize() public hasPendingPayment {
-
-        require(getCurrentTimestamp().sub(endTime) > graceTime);
-
+    function claimThePrize() public hasPendingPayment onlyWinner poolHasEnded {
         uint prize = payments[msg.sender];
+        // TODO sera >= ?? habra que refactorizar con manager y comision
         require(this.balance > prize);
 
         payments[msg.sender] = 0;
@@ -129,21 +159,39 @@ contract ContestPool is Ownable {
         ClaimPaymentByOwner(msg.sender, claimedCommission);
     }
 
-    function sendPrediction(uint prediction) public notManager isBeforeStartTime isAmountPerPlayer payable {
-        require(prediction > 0);
-        require(predictions[msg.sender] == 0);
-        predictions[msg.sender] = prediction;
-        SendPrediction(prediction, msg.sender);
+    function publishScore() onlyActivePlayers isAfterStartTime external returns (bool) {
+        //check sender is a player and has prediction
+        
+        //check pool graceTime has not ended
+        require(isContestActive());
+
+        //check current results
+
+        //compare players prediction to current results
+        // and compute player score
+
+        //update player score in contract if its different from
+        //his last score
+
+        //if player has higher score we update high score
+        //add player to the winners array
+
+        return false;
+
     }
 
-    function addressPrize() public view returns (uint256)
-    {
+    function sendPrediction(uint _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer payable {
+        require(_prediction > 0);
+        require(predictions[msg.sender] == 0);
+        predictions[msg.sender] = _prediction;
+        SendPrediction(_prediction, msg.sender);
+    }
 
+    function addressPrize() public view returns (uint256) {
         return payments[msg.sender];
     }
 
-    function getCurrentTimestamp() public view returns (uint256)
-    {
+    function getCurrentTimestamp() public view returns (uint256) {
         return now;
     }
 
@@ -151,15 +199,13 @@ contract ContestPool is Ownable {
         return pendingWinnerPayments;
     }
 
-    function addToWinners(address winnerAddress, uint256 prize) internal returns (bool)
-    {
+    function addToWinners(address winnerAddress, uint256 prize) internal returns (bool) {
         pendingWinnerPayments = pendingWinnerPayments.add(1);
         payments[winnerAddress] = prize;
         return true;
     }
 
-    function addCommission(address paymentAddress, uint256 commission) internal onlyOwner returns (bool)
-    {
+    function addCommission(address paymentAddress, uint256 commission) internal onlyOwner returns (bool) {
 
         payments[paymentAddress] = commission;
         return true;
@@ -174,5 +220,14 @@ contract ContestPool is Ownable {
 
         return commission;
     }
+    
+    function hasContestEnded() private view returns (bool) {
+        return getCurrentTimestamp().sub(endTime) > graceTime;
+    }
+
+    function isContestActive() private view returns (bool) {
+        return !hasContestEnded();
+    }
+
 
 }
