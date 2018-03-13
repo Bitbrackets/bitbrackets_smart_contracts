@@ -20,9 +20,12 @@ contract('ContestPoolWinning', accounts => {
     const prizeValue = web3.toWei(0.05, "ether");
     const managerCommission = web3.toWei(0.03, "ether");
 
-    const predictionStr = "01111111 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
+    const predictionStr = "01111101 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
     const prediction = parseToInt(predictionStr);
-    console.log('prediction int', prediction);
+
+    const resultStr = "01010101 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
+    const result = parseToInt(resultStr);
+
 
     beforeEach('setup contract for each test', async () => {
         contestPoolInstance = await ContestPoolMock.new(
@@ -43,14 +46,14 @@ contract('ContestPoolWinning', accounts => {
         await contestPoolInstance.sendPrediction(prediction, {from: player1, value: contribution});
         //start the contest
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 6, 5));
+        // setting mock results
+        await contestPoolInstance.setMockResults(result, 4);
         
-        const success = await contestPoolInstance.publishScore();
+        const success = await contestPoolInstance.publishHighScore();
 
-        const playerScore = await contestPoolInstance.getPlayerScore();
+        const playerScore = await contestPoolInstance.highScore();
 
         assert(success, "should update score to high score");
-
-
     });
 
     it(t('anUser', 'claimThePrize', 'Winner should be able to claim prize.'), async () => {

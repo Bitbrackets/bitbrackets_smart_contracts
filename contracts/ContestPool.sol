@@ -2,10 +2,12 @@ pragma solidity ^0.4.19;
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./utils/BitUtil.sol";
 
 
 contract ContestPool is Ownable {
     using SafeMath for uint256;
+    using BitUtil for bytes32;
 
     /**** Properties ***********/
     address public  manager;
@@ -17,9 +19,13 @@ contract ContestPool is Ownable {
     uint public     maxBalance;
     uint public     amountPerPlayer;
     uint256 private    pendingWinnerPayments;
+    uint public highScore;
+
+    address[] public winnerArray;
 
     mapping(address => uint) public     predictions;
     mapping(address => uint) private    payments;
+    mapping(address => bool) public winners;
 
     /**** Events ***********/
 
@@ -41,6 +47,12 @@ contract ContestPool is Ownable {
     event ClaimPaymentByOwner (
         address indexed owner,
         uint prize
+    );
+
+    event LogPublishedScore (
+        address indexed player,
+        uint score,
+        uint highScore
     );
 
     /*** Modifiers ***************/
@@ -159,25 +171,54 @@ contract ContestPool is Ownable {
         ClaimPaymentByOwner(msg.sender, claimedCommission);
     }
 
-    function publishScore() onlyActivePlayers isAfterStartTime external returns (bool) {
+    function publishHighScore() onlyActivePlayers isAfterStartTime external returns (bool) {
         //check sender is a player and has prediction
         
         //check pool graceTime has not ended
         require(isContestActive());
 
         //check current results
+        var (result,games) = getResult();
 
         //compare players prediction to current results
         // and compute player score
+        uint prediction = predictions[msg.sender];
+        uint8 totalGames = uint8(games*2);
 
+        bytes32 pred = bytes32(prediction).getFirstN(totalGames);
+        bytes32 res = bytes32(result).getFirstN(totalGames);
         //update player score in contract if its different from
         //his last score
+        uint i = 0;
+        uint score = 0;
+        uint bitGames = games * 2;
+
+        bytes32 diff = res.xor(pred);
+        while (i < bitGames) {
+
+            if (!diff.getBit(uint8(i)) && !diff.getBit(uint8(i+1))) {
+                score++;
+            }
+
+            i = i + 2;
+        }
 
         //if player has higher score we update high score
         //add player to the winners array
+        if (score > highScore) {
+            highScore = score;
+            winners[msg.sender] = true;
+            winnerArray.push(msg.sender);
+
+            return true;
+        }
 
         return false;
 
+    }
+
+    function getResult() internal pure returns (uint result, uint games) {
+        return (0,0);
     }
 
     function sendPrediction(uint _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer payable {
