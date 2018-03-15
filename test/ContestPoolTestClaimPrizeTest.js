@@ -20,11 +20,11 @@ contract('ContestPoolWinning', accounts => {
     const prizeValue = web3.toWei(0.05, "ether");
     const managerCommission = web3.toWei(0.03, "ether");
 
-    const predictionStr = "01111101 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-    const prediction = parseToInt(predictionStr);
+    // prediction = 
+    const prediction = [8,2,1,3,5,6,111,17,32,111,9,7,31,28,22,14,111,7,11,30];
 
-    const resultStr = "01010101 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-    const result = parseToInt(resultStr);
+    // const resultStr = "01010101 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
+    const result = [8,3,111,3,5,1,24,17,21,13,9,7,31,28,22,14,18,7,11,30];
 
 
     beforeEach('setup contract for each test', async () => {
