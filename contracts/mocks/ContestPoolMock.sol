@@ -8,7 +8,7 @@ import "../../contracts/ContestPool.sol";
 contract ContestPoolMock is ContestPool {
     uint public currentTime;
     
-    uint mockResult;
+    uint8[] mockResult;
     uint mockNoGames;
 
     function ContestPoolMock (
@@ -54,11 +54,11 @@ contract ContestPoolMock is ContestPool {
 
     }
 
-    function getResult() internal view returns (uint result, uint games) {
+    function getResult() internal view returns (uint8[] result, uint games) {
         return (mockResult,mockNoGames);
     }
 
-    function setMockResult(uint _mockResult, uint _mockGames) public {
+    function setMockResults(uint8[] _mockResult, uint _mockGames) public {
         mockResult = _mockResult;
         mockNoGames = _mockGames;
     }

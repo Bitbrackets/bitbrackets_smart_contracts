@@ -21,28 +21,28 @@ contract ContestPool is Ownable {
 
     address[] public winnerArray;
 
-    mapping(address => uint) public     predictions;
+    mapping(address => uint8[]) public     predictions;
     mapping(address => uint) private    payments;
     mapping(address => bool) public winners;
 
     /**** Events ***********/
 
-    event SendPrediction (
-        uint prediction,
+    event LogSendPrediction (
+        uint8[] prediction,
         address indexed player
     );
 
-    event ClaimPrize (
+    event LogClaimPrize (
         address indexed winner,
         uint prize
     );
 
-    event ClaimManagerCommission (
+    event LogClaimManagerCommission (
         address indexed manager,
         uint prize
     );
     
-    event ClaimPaymentByOwner (
+    event LogClaimPaymentByOwner (
         address indexed owner,
         uint prize
     );
@@ -86,7 +86,7 @@ contract ContestPool is Ownable {
 
     modifier onlyActivePlayers() {
         require(msg.sender != owner && msg.sender != manager);
-        require(predictions[msg.sender] != 0);
+        require(predictions[msg.sender].length != 0);
         _;
     }
 
@@ -154,57 +154,85 @@ contract ContestPool is Ownable {
         payments[msg.sender] = 0;
         pendingWinnerPayments = pendingWinnerPayments.sub(1);
         msg.sender.transfer(prize);
-        ClaimPrize(msg.sender, prize);
+        LogClaimPrize(msg.sender, prize);
     }
 
     function claimCommissionByManager() public onlyManager allWinnersHaveClaimedTheirPrize {
 
         uint claimedCommission = claimCommission();
-        ClaimManagerCommission(msg.sender, claimedCommission);
+        LogClaimManagerCommission(msg.sender, claimedCommission);
     }
 
     function claimCommissionByOwner() public onlyOwner {
 
         uint claimedCommission = claimCommission();
-        ClaimPaymentByOwner(msg.sender, claimedCommission);
+        LogClaimPaymentByOwner(msg.sender, claimedCommission);
     }
 
     function publishHighScore() onlyActivePlayers isAfterStartTime view external returns (bool) {
         //check sender is a player and has prediction
         
         //check pool graceTime has not ended
-        require(isContestActive());
+        // require(isContestActive());
 
         //check current results
-        // var (result,games) = getResult();
+        var (result,games) = getResult();
+        uint8[] memory prediction = predictions[msg.sender];
 
         //compare players prediction to current results
         // and compute player score
+        uint score = calculatePlayerScore(result, prediction, games);
 
         //update player score in contract if its different from
         //his last score
+        // TODO we need to keep track of players score and games counted to save gas
+        // each time they publish
 
         //if player has higher score we update high score
         //add player to the winners array
+        LogPublishedScore(msg.sender, score, highScore);
 
+        if (score >= highScore) {
+            if (score > highScore) {
+                highScore = score;
+            }  
+            winnerArray.push(msg.sender);
+            winners[msg.sender] = true;
+            return true;
+        }
 
         return false;
 
     }
 
-    function getResult() internal view returns (uint result, uint games) {
-        return (0,0);
+    function calculatePlayerScore(uint8[] results, uint8[] prediction, uint games) private pure returns (uint) {
+        assert(games <= results.length);
+        uint score = 0;
+        for (uint i = 0; i < games; i++) {
+            if (results[i] == prediction[i]) {
+                score.add(1);
+            }
+        }
+        return score;
     }
 
-    function sendPrediction(uint _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer payable {
-        require(_prediction > 0);
-        require(predictions[msg.sender] == 0);
+    function getResult() internal view returns (uint8[] result, uint games) {
+        return (new uint8[](0),0);
+    }
+
+    function sendPredictionSet(uint8[] _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer payable {
+        require(_prediction.length > 0);
+        require(predictions[msg.sender].length == 0);
         predictions[msg.sender] = _prediction;
-        SendPrediction(_prediction, msg.sender);
+        LogSendPrediction(_prediction, msg.sender);
     }
 
     function addressPrize() public view returns (uint256) {
         return payments[msg.sender];
+    }
+
+    function getPredictionSet(address _playerAddress) public view returns (uint8[]) {
+        return predictions[_playerAddress];
     }
 
     function getCurrentTimestamp() public view returns (uint256) {
