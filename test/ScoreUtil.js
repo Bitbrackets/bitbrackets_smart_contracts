@@ -47,7 +47,7 @@ function getBinaryString(n) {
 }
 
 module.exports = {
-    getScoreWithArray(prediction, result, games, bits) {
+    getScoreWithArray(prediction, result, games) {
       let i = 0;
       let score = 0;
 

@@ -201,6 +201,8 @@ contract ContestPool is Ownable {
             return true;
         }
 
+
+
         return false;
 
     }
@@ -210,7 +212,7 @@ contract ContestPool is Ownable {
         uint score = 0;
         for (uint i = 0; i < games; i++) {
             if (results[i] == prediction[i]) {
-                score.add(1);
+                score = score.add(1);
             }
         }
         return score;

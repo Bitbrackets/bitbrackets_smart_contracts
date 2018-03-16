@@ -8,8 +8,8 @@ import "../../contracts/ContestPool.sol";
 contract ContestPoolMock is ContestPool {
     uint public currentTime;
     
-    uint8[] mockResult;
-    uint mockNoGames;
+    uint8[] public mockResult;
+    uint public mockNoGames;
 
     function ContestPoolMock (
         address _owner,

@@ -3,7 +3,7 @@ const _ = require('lodash');
 const dateUtil = require('./DateUtil');
 const { toBigNumberArray, assertBigNumberArrayIsEqual } = require('./TestUtil');
 const  t = require('./TestUtil').title;
-const { getScoreArray } = require('./ScoreUtil');
+const { getScoreWithArray } = require('./ScoreUtil');
 
 contract('ContestPoolWinning', accounts => {
     let contestPoolInstance;
@@ -22,10 +22,9 @@ contract('ContestPoolWinning', accounts => {
     const prizeValue = web3.toWei(0.05, "ether");
     const managerCommission = web3.toWei(0.03, "ether");
 
-    // prediction = 
+
     const prediction = [8,2,1,3,5,6,111,17,32,111,9,7,31,28,22,14,111,7,11,30];
 
-    // const resultStr = "01010101 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
     const result = [8,3,111,3,5,1,24,17,21,13,9,7,31,28,22,14,18,7,11,30];
 
 
@@ -42,7 +41,7 @@ contract('ContestPoolWinning', accounts => {
         );
     });
 
-    xit(t('anUser', 'publishScore', 'Player should be able to publish score'), async () => {
+    it(t('anUser', 'publishScore', 'Player should be able to publish score'), async () => {
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
 
         await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
@@ -51,11 +50,14 @@ contract('ContestPoolWinning', accounts => {
         // setting mock results
         await contestPoolInstance.setMockResults(result, 4);
         
-        const success = await contestPoolInstance.publishHighScore();
+        const success = await contestPoolInstance.publishHighScore({from: player1});
 
-        const playerScore = await contestPoolInstance.highScore();
+        const highScore = await contestPoolInstance.highScore();
+        console.log("high score", highScore.toNumber());
 
         assert(success, "should update score to high score");
+
+       // assert.equal(getScoreWithArray(prediction, result,4), highScore.toNumber(), 'Player 1 should have high score');
     });
 
     it(t('anUser', 'claimThePrize', 'Winner should be able to claim prize.'), async () => {
