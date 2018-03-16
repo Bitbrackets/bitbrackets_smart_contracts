@@ -4,9 +4,10 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /// @title It looks for a specific result.
 /// @author Guillermo Salazar
+
 contract ResultsLookup is Ownable {
 
-    event RegisterResult (
+    event LogRegisterResult (
         bytes32 indexed contestName,
         uint indexed result,
         uint whenDateTime
@@ -19,11 +20,14 @@ contract ResultsLookup is Ownable {
 
     mapping(bytes32 => Result) public results;
 
+
     // Modifier
+
 
     function ResultsLookup() public {
         owner = msg.sender;
     }
+    
 
     function registerResult(bytes32 contestName, uint result) public onlyOwner {
         uint whenDateTime = now;
@@ -32,7 +36,7 @@ contract ResultsLookup is Ownable {
             dateTime: whenDateTime
         });
         results[contestName] = newResult;
-        RegisterResult(contestName, result, whenDateTime);
+        LogRegisterResult(contestName, result, whenDateTime);
     }
 
     function getResult(bytes32 contestName) public onlyOwner view returns (uint result, uint dateTime) {

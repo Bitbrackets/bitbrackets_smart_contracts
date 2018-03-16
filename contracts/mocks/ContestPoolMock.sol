@@ -1,8 +1,6 @@
 pragma solidity ^0.4.18;
 
-
 import "../../contracts/ContestPool.sol";
-
 
 
 contract ContestPoolMock is ContestPool {
