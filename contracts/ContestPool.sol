@@ -169,7 +169,7 @@ contract ContestPool is Ownable {
         LogClaimPaymentByOwner(msg.sender, claimedCommission);
     }
 
-    function publishHighScore() onlyActivePlayers isAfterStartTime view external returns (bool) {
+    function publishHighScore() onlyActivePlayers isAfterStartTime external returns (bool) {
         //check sender is a player and has prediction
         
         //check pool graceTime has not ended
@@ -200,9 +200,7 @@ contract ContestPool is Ownable {
             winners[msg.sender] = true;
             return true;
         }
-
-
-
+        
         return false;
 
     }

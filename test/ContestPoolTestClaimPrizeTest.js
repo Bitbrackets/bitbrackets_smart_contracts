@@ -57,7 +57,7 @@ contract('ContestPoolWinning', accounts => {
 
         assert(success, "should update score to high score");
 
-       // assert.equal(getScoreWithArray(prediction, result,4), highScore.toNumber(), 'Player 1 should have high score');
+        assert.equal(getScoreWithArray(prediction, result,4), highScore.toNumber(), 'Player 1 should have high score');
     });
 
     it(t('anUser', 'claimThePrize', 'Winner should be able to claim prize.'), async () => {
