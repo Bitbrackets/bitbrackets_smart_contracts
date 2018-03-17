@@ -7,14 +7,14 @@ pragma solidity ^0.4.19;
 contract BbStorage {
 
     /**** Storage Types *******/
-
-    mapping(bytes32 => uint256)    private uIntStorage;
+  
     mapping(bytes32 => string)     private stringStorage;
     mapping(bytes32 => address)    private addressStorage;
     mapping(bytes32 => bytes)      private bytesStorage;
     mapping(bytes32 => bool)       private boolStorage;
     mapping(bytes32 => int256)     private intStorage;
-    mapping(bytes32 => int[])      private intArrayStorage; 
+    mapping(bytes32 => uint256)    private uIntStorage;
+    mapping(bytes32 => uint8[100])     private int8ArrayStorage; 
 
 
     /*** Modifiers ************/
@@ -71,8 +71,8 @@ contract BbStorage {
     }
 
     /// @param _key The key for the record
-    function getIntArray(bytes32 _key) external view returns (int[]) {
-        return intArrayStorage[_key];
+    function getInt8Array(bytes32 _key) external view returns (uint8[100]) {
+        return int8ArrayStorage[_key];
     }
 
     /**** Set Methods ***********/
@@ -108,8 +108,8 @@ contract BbStorage {
     }
     /// @param _key The key for the record
     /// @param _values Array of Values
-    function setIntArray(bytes32 _key, int[] _values) external onlyBitBracketsContract {
-        intArrayStorage[_key] = _values;
+    function setInt8Array(bytes32 _key, uint8[100] _values) external onlyBitBracketsContract {
+        int8ArrayStorage[_key] = _values;
     }
     
     /**** Delete Methods ***********/
@@ -145,7 +145,7 @@ contract BbStorage {
     }
 
     /// @param _key The key for the record
-    function deleteIntArray(bytes32 _key)  external onlyBitBracketsContract {
-        delete intArrayStorage[_key];
+    function deleteInt8Array(bytes32 _key)  external onlyBitBracketsContract {
+        delete int8ArrayStorage[_key];
     }
 }

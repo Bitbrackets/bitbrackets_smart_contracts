@@ -3,6 +3,7 @@ pragma solidity ^0.4.18;
 /// @title It looks for a specific result.
 /// @author Guillermo Salazar
 
+import "./interface/BbStorageInterface.sol";
 import "./BbBase.sol";
 
 
@@ -11,16 +12,16 @@ contract ResultsLookup is BbBase {
 
     event LogRegisterResult (
         bytes32 indexed contestName,
-        uint indexed result,
+        uint8[100] result,
         uint whenDateTime
     );
 
-    struct Result {
-        uint result;
-        uint dateTime;
-    }
+    // struct Result {
+    //     uint8[] result;
+    //     uint dateTime;
+    // }
 
-    mapping(bytes32 => Result) public results;
+    // mapping(bytes32 => Result) public results;
 
 
     // Modifier
@@ -32,18 +33,18 @@ contract ResultsLookup is BbBase {
     }
     
     
-    function registerResult(bytes32 contestName, uint result) public onlyOwner {
-        uint whenDateTime = now;
-        Result memory newResult = Result({
-            result: result,
-            dateTime: whenDateTime
-        });
-        results[contestName] = newResult;
-        LogRegisterResult(contestName, result, whenDateTime);
+    function registerResult(bytes32 contestName, uint8[100] result, uint games) public onlySuperUser {
+        bbStorage.setUint(keccak256("contest.playedGames", contestName), games);
+        bbStorage.setInt8Array(keccak256("contest.result", contestName), result);
+
+        LogRegisterResult(contestName, result, now);
     }
 
-    function getResult(bytes32 contestName) public onlyOwner view returns (uint result, uint dateTime) {
-        Result memory currentResult = results[contestName];
-        return (currentResult.result, currentResult.dateTime);
+    function getResult(bytes32 contestName) public view returns (uint8[100], uint ) {
+        uint games = bbStorage.getUint(keccak256("contest.playedGames", contestName));
+        uint8[100] memory result = bbStorage.getInt8Array(keccak256("contest.result", contestName));   
+
+        return (result, games);
+        
     }
 }
