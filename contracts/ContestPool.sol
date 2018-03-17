@@ -17,6 +17,7 @@ contract ContestPool is Ownable {
     uint public    startTime;
     /** End time in seconds. */
     uint public     endTime;
+
     /** Time (in seconds) after finishing this contest pool which allows the winners to claim the prize. */
     uint public    graceTime;
     uint public    maxBalance;
@@ -25,9 +26,13 @@ contract ContestPool is Ownable {
     uint public    managerFee;
     /** Percentage (between 0 and 100) that represents the owner fee. */
     uint public     ownerFee;
-    uint public     highestScore;
+    uint public     highScore;
 
     mapping(address => uint8[]) public  predictions;
+
+    uint public     numberOfParticipants;
+    uint256 private    pendingWinnerPayments;
+    
 
     /**
      * It contains all the current winners for this contest pool.

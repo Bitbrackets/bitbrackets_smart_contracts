@@ -98,7 +98,8 @@ contract ContestPoolFactory is BbBase {
         definitions[_contestName] = newDefinition;
     }
         
-    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) public payable exists(_contestName) returns (address) {
+    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) 
+        public payable exists(_contestName) returns (address) {
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
         require(definition.fee == msg.value);
@@ -106,7 +107,7 @@ contract ContestPoolFactory is BbBase {
 
         address manager = msg.sender;
         ContestPool newContestPoolAddress = new ContestPool(
-            manager,
+            address(bbStorage),
             manager,
             definition.contestName,
             definition.startTime,
