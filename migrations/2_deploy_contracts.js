@@ -17,15 +17,16 @@ module.exports = function(deployer, network, accounts) {
 
     return deployer.deploy(BbStorage).then(async () => {
 
-        deployer.deploy(AddressArray);
+
+        await deployer.deploy(AddressArray);
     
         if(network !== 'live') {
             deployer.link(AddressArray, ContestPool);
             deployer.deploy(ContestPool, owner, manager, "", 0,0,0,10, 10000, 10, 10);
         }
 
-        deployer.link(AddressArray, ContestPoolFactory);
-        deployer.deploy(ContestPoolFactory);
+        await deployer.link(AddressArray, ContestPoolFactory);
+        await deployer.deploy(ContestPoolFactory, BbStorage.address);
 
         if(network !== 'live') {
             deployer.link(AddressArray, ContestPoolMock);
@@ -33,9 +34,7 @@ module.exports = function(deployer, network, accounts) {
         }
 
         await deployer.deploy(ResultsLookup, BbStorage.address);
-        // deployer.deploy(ContestPoolFactory);
-        // const owner = accounts[0];
-        // const manager = accounts[1];
+        
         deployer.deploy(ContestPool, owner, manager, "", 0,0,0,10, 10000);
         
 
