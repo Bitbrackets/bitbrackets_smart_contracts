@@ -13,16 +13,9 @@ contract ResultsLookup is BbBase {
     event LogRegisterResult (
         bytes32 indexed contestName,
         uint8[100] result,
+        uint numberOfGames,
         uint whenDateTime
     );
-
-    // struct Result {
-    //     uint8[] result;
-    //     uint dateTime;
-    // }
-
-    // mapping(bytes32 => Result) public results;
-
 
     // Modifier
 
@@ -37,7 +30,7 @@ contract ResultsLookup is BbBase {
         bbStorage.setUint(keccak256("contest.playedGames", contestName), games);
         bbStorage.setInt8Array(keccak256("contest.result", contestName), result);
 
-        LogRegisterResult(contestName, result, now);
+        LogRegisterResult(contestName, result, games, now);
     }
 
     function getResult(bytes32 contestName) public view returns (uint8[100], uint ) {

@@ -48,6 +48,7 @@ contract('ResultsLookup', function(accounts) {
       assert(error.message.includes("revert"));
     }
   });
+  // TODO should not be able to get a result from a contest that does not exist
   // TODO access to be restricted to contracts in ContestPool
   xit(t('aNonOwner', 'getResult', 'Should not able to get a result pre registered.', true), async function() {
     const owner = accounts[0];
@@ -74,9 +75,8 @@ contract('ResultsLookup', function(accounts) {
     await instance.registerResult(contestName, value2, games2, {from: owner});
     const result = await instance.getResult(contestName, {from: owner});
     
-    // assert.notEqual(value1, result[0]);
     assertBigNumberArrayIsEqual(toBigNumberArray(value2), result[0]);
-    // assert.equal(value2, result[0]);
+
     assert.equal(games2,result[1].toNumber());
   });
 });
