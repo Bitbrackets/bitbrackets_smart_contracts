@@ -2,6 +2,8 @@ const AddressArray = artifacts.require("./AddressArray.sol");
 const ContestPool = artifacts.require("./ContestPool.sol");
 const ContestPoolMock = artifacts.require("./ContestPoolMock.sol");
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
+const ResultsLookup = artifacts.require("./ResultsLookup.sol");
+const ContestPool = artifacts.require("./ContestPool.sol");
 
 
 module.exports = function(deployer, network, accounts) {
@@ -22,4 +24,6 @@ module.exports = function(deployer, network, accounts) {
         deployer.link(AddressArray, ContestPoolMock);
         deployer.deploy(ContestPoolMock, owner, manager);
     }
+
+    deployer.deploy(ResultsLookup);
 };
