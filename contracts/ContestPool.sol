@@ -291,7 +291,7 @@ contract ContestPool is Ownable {
         return score;
     }
 
-    function getResult() internal pure returns (uint8[] result, uint games) {
+    function getResult() internal view returns (uint8[] result, uint games) {
         return (new uint8[](0),0);
     }
 
