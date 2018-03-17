@@ -1,8 +1,8 @@
 var ResultsLookup = artifacts.require("./ResultsLookup.sol");
-const stringUtils = require('./StringUtil');
-const t = require('./TestUtil').title;
-var utils = require("./utils.js");
-var date = require("./DateUtil.js");
+const stringUtils = require('./utils/StringUtil');
+const t = require('./utils/TestUtil').title;
+var utils = require("./utils/utils.js");
+var date = require("./utils/DateUtil.js");
 
 let instance;
 

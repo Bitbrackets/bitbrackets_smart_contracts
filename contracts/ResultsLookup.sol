@@ -2,6 +2,8 @@ pragma solidity ^0.4.18;
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
+/// @title It looks for a specific result.
+/// @author Guillermo Salazar
 contract ResultsLookup is Ownable {
 
     event RegisterResult (

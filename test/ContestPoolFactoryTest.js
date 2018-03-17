@@ -1,9 +1,9 @@
 var ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 var ContestPool = artifacts.require("./ContestPool.sol");
-const t = require('./TestUtil').title;
-const stringUtils = require('./StringUtil');
-const toMillis = require('./DateUtil').toMillis;
-var utils = require("./utils.js");
+const t = require('./utils/TestUtil').title;
+const stringUtils = require('./utils/StringUtil');
+const toMillis = require('./utils/DateUtil').toMillis;
+var utils = require("./utils/utils.js");
 
 let instance;
 
@@ -12,6 +12,8 @@ contract('ContestPoolFactory', function (accounts) {
     const owner = accounts[0];
     const player1 = accounts[1];
     const player2 = accounts[2];
+    const managerFee = 10;
+    const ownerFee = 10;
 
     beforeEach('setup contract for each test', async () => {
         instance = await ContestPoolFactory.deployed();
@@ -30,7 +32,7 @@ contract('ContestPoolFactory', function (accounts) {
         const fee = web3.toWei(0.01, 'ether');
         const maxBalance = web3.toWei(10, 'ether');
 
-        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance);
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
         const result = await instance.definitions(contestName);
 
@@ -49,10 +51,10 @@ contract('ContestPoolFactory', function (accounts) {
         const graceTime = 2;
         const maxBalance = web3.toWei(10, 'ether');
         const fee = web3.toWei(0.01, 'ether');
-        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance);
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
         try {
-            await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance);
+            await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
             assert(false, 'It should have failed because the contest name is repetead.');
         } catch (err) {
             assert(err);
@@ -63,7 +65,7 @@ contract('ContestPoolFactory', function (accounts) {
     it(t('aOwner', 'createContestPoolDefinition', 'Should not be able to create a contest pool definition with a 0x0 contest name.', true), async function () {
         try {
           const contestName = '0x0000000000000000000000000000000000000000000000000000000000000000';
-          await instance.createContestPoolDefinition(contestName, 10000, 1, 2, 10, 10);
+          await instance.createContestPoolDefinition(contestName, 10000, 1, 2, 10, 10, 10, 10);
           assert(false, 'It should have failed because the contest name is invalid.');
         } catch (err) {
           assert(err);
@@ -73,7 +75,7 @@ contract('ContestPoolFactory', function (accounts) {
 
     it(t('aOwner', 'createContestPoolDefinition', 'Should not be able to create a contest pool definition with end date equals to 0.', true), async function () {
         try {
-            await instance.createContestPoolDefinition('CustomValue', 20000, 0, 2, 2, 10);
+            await instance.createContestPoolDefinition('CustomValue', 20000, 0, 2, 2, 10, 10, 10);
             assert(false, 'It should have failed because the start date is zero.');
         } catch (err) {
             assert(err);
@@ -84,7 +86,7 @@ contract('ContestPoolFactory', function (accounts) {
     it(t('aPlayer', 'createContestPoolDefinition', 'A player should not be able to create a contest pool definition.', true), async function () {
       try {
           const player = accounts[4];
-          await instance.createContestPoolDefinition('CustomValue', 1000, 1000, 2000, 2, 10, {from: player});
+          await instance.createContestPoolDefinition('CustomValue', 1000, 1000, 2000, 2, 10, 10, 10, {from: player});
           assert(false, 'It should have failed because a player should not able to create a definition.');
       } catch (err) {
           assert(err);
@@ -103,7 +105,7 @@ contract('ContestPoolFactory', function (accounts) {
         const amountPerPlayer = web3.toWei(0.1, 'ether');
         const contestNameBytes32 = stringUtils.stringToBytes32(contestName);
 
-        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance);
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
         await instance.createContestPool(contestName, amountPerPlayer, {
             from: accounts[3],
@@ -164,7 +166,7 @@ contract('ContestPoolFactory', function (accounts) {
         const amountPerPlayer = web3.toWei(0.1, 'ether');
         const contestNameBytes32 = stringUtils.stringToBytes32(contestName);
 
-        await instance.createContestPoolDefinition(contestNameBytes32, fee, startTime, endTime, graceTime, maxBalance);
+        await instance.createContestPoolDefinition(contestNameBytes32, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
         try {
             await instance.createContestPool(contestNameBytes32, amountPerPlayer, {
@@ -190,7 +192,7 @@ contract('ContestPoolFactory', function (accounts) {
         const initialBalanceFactory = web3.eth.getBalance(instance.address).toNumber();
 
         const previousBalanceFactory = parseInt(fee) + parseInt(initialBalanceFactory);
-        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance);
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
         await instance.createContestPool(contestName, amountPerPlayer, {
             from: accounts[3],
@@ -212,7 +214,7 @@ contract('ContestPoolFactory', function (accounts) {
         const fee = web3.toWei(5, 'ether');
         const myFee = web3.toWei(4.9, 'ether');
 
-        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance);
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
         try {
             await instance.createContestPool(contestName, amountPerPlayer, {
@@ -238,7 +240,9 @@ contract('ContestPoolFactory', function (accounts) {
             toMillis(2018, 01, 01),
             toMillis(2018, 02, 01),
             graceTime,
-            web3.toWei(5, 'ether')
+            web3.toWei(5, 'ether'),
+            managerFee,
+            ownerFee
         );
 
         const initialOwnerBalance = await web3.eth.getBalance(owner).toNumber();
@@ -280,7 +284,9 @@ contract('ContestPoolFactory', function (accounts) {
             toMillis(2018, 01, 01),
             toMillis(2018, 02, 01),
             graceTime,
-            web3.toWei(5, 'ether')
+            web3.toWei(5, 'ether'),
+            managerFee,
+            ownerFee
         );
 
         await instance.createContestPool(
@@ -310,7 +316,7 @@ contract('ContestPoolFactory', function (accounts) {
         const maxBalance = web3.toWei(10, 'ether');
         const fee = 0;
 
-        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance);
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
         const result = await instance.definitions(contestName);
 
         assert.equal(contestName, stringUtils.cleanNulls(web3.toAscii(result[0])));

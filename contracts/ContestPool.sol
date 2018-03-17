@@ -2,47 +2,69 @@ pragma solidity ^0.4.19;
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
-
+import './AddressArray.sol';
 
 contract ContestPool is Ownable {
     using SafeMath for uint256;
+    using AddressArray for address[];
+
+    uint constant private AVOID_DECIMALS = 100000000000000000;
 
     /**** Properties ***********/
     address public  manager;
     bytes32 public  contestName;
-    uint public     startTime;
+    /** Start time in seconds. */
+    uint public    startTime;
+    /** End time in seconds. */
     uint public     endTime;
-    uint public     graceTime;
-    uint public     numberOfParticipants;
-    uint public     maxBalance;
-    uint public     amountPerPlayer;
-    uint256 private    pendingWinnerPayments;
-    uint public highScore;
+    /** Time (in seconds) after finishing this contest pool which allows the winners to claim the prize. */
+    uint public    graceTime;
+    uint public    maxBalance;
+    uint public    amountPerPlayer;
+    /** Percentage (between 0 and 100) that represents the manager fee. */
+    uint public    managerFee;
+    /** Percentage (between 0 and 100) that represents the owner fee. */
+    uint public     ownerFee;
+    uint public     highestScore;
 
-    address[] public winnerArray;
+    mapping(address => uint8[]) public  predictions;
 
-    mapping(address => uint8[]) public     predictions;
-    mapping(address => uint) private    payments;
-    mapping(address => bool) public winners;
+    /**
+     * It contains all the current winners for this contest pool.
+     * It may be updated when a player attempts to publish a score, and 
+     *  it is higher than the current one(s). 
+     *
+     * @dev https://ethereum.stackexchange.com/questions/12740/truffle-console-return-array-of-addresses-issue
+     */
+    address[] public    winners;
+
+    /**
+     * This is used to identify if an address has claimed its prize.
+     */
+    mapping(address => bool) public payments;
 
     /**** Events ***********/
 
     event LogSendPrediction (
+        address indexed contractAddress,
         uint8[] prediction,
         address indexed player
     );
 
     event LogClaimPrize (
+        address indexed contractAddress,
         address indexed winner,
         uint prize
     );
 
-    event LogClaimManagerCommission (
+    event LogClaimPaymentByManager (
+        address indexed contractAddress,
         address indexed manager,
         uint prize
     );
     
     event LogClaimPaymentByOwner (
+        address indexed contractAddress,
         address indexed owner,
         uint prize
     );
@@ -56,12 +78,21 @@ contract ContestPool is Ownable {
     /*** Modifiers ***************/
 
     modifier onlyWinner() {
-        require(payments[msg.sender] > 0);
+        require(winners.contains(msg.sender));
         _;
     }
 
-    modifier poolHasEnded() {
-        require(getCurrentTimestamp().sub(endTime) > graceTime);
+    modifier isAfterGraceTime() {
+        uint endGraceTime = endTime.add(graceTime);
+        require(getCurrentTimestamp() > endGraceTime);
+        _;
+    }
+
+    modifier isInGraceTime() {
+        uint startGraceTime = endTime;
+        uint endGraceTime = endTime.add(graceTime);
+        require(getCurrentTimestamp() > startGraceTime);
+        require(getCurrentTimestamp() < endGraceTime);
         _;
     }
 
@@ -90,7 +121,6 @@ contract ContestPool is Ownable {
         _;
     }
 
-
     modifier notManager() {
         require(msg.sender != manager);
         _;
@@ -101,19 +131,6 @@ contract ContestPool is Ownable {
         _;
     }
 
-    modifier allWinnersHaveClaimedTheirPrize() {
-        require(pendingWinnerPayments == 0);
-        _;
-    }
-
-    modifier hasPendingPayment() {
-        require(pendingWinnerPayments > 0);
-        require(payments[msg.sender] > 0);
-        _;
-    }
-
-   
-
     function ContestPool(
         address _owner,
         address _manager,
@@ -122,7 +139,9 @@ contract ContestPool is Ownable {
         uint _endTime,
         uint _graceTime,
         uint _maxBalance,
-        uint _amountPerPlayer
+        uint _amountPerPlayer,
+        uint _managerFee,
+        uint _ownerFee
     ) public
     {
         owner = _owner;
@@ -133,40 +152,97 @@ contract ContestPool is Ownable {
         graceTime = _graceTime;
         maxBalance = _maxBalance;
         amountPerPlayer = _amountPerPlayer;
-
+        ownerFee = _ownerFee;
+        managerFee = _managerFee;
     }
 
     /*** Methods ***************/
+
+    function getWinners() public view returns (address[] ) {
+        return winners;
+    }
+
     function getMaxUsersCount() public view returns (uint usersCount) {
         return maxBalance.div(amountPerPlayer);
+    }
+
+    /**
+     * Gets the prize amount for ONLY one winner based on:
+     *  - Whether owner withdraw his/her fee.
+     *  - Whether manager withdraw his/her fee.
+     *  - Whether other winners (when there are multiple winner) withdraw the fee.
+    */
+    function getWinnerAmount() internal view returns (uint winnersAmount) {
+        require(winners.length > 0);
+        uint totalFee = uint(100).mul(AVOID_DECIMALS);
+        
+        if(!payments[owner]) {
+            totalFee = totalFee.sub(ownerFee.mul(AVOID_DECIMALS));
+        }
+        if(!payments[manager]) {
+            totalFee = totalFee.sub(managerFee.mul(AVOID_DECIMALS));
+        }
+
+        uint totalWinners = AVOID_DECIMALS.mul(winners.length);
+        uint feePerPlayer = AVOID_DECIMALS.mul(totalFee).div(totalWinners);
+
+        uint pendingWinners = 0;
+        for (uint i = 0; i < winners.length - 1; i++){
+            if(!payments[winners[i]]) {
+                pendingWinners++;
+            }
+        }
+
+        totalFee = totalFee.sub(pendingWinners.mul(feePerPlayer));
+
+        uint total = address(this).balance;
+
+        uint quotient = AVOID_DECIMALS.mul(100);
+
+        uint semiTotal = total.mul(feePerPlayer);
+        return semiTotal.div(quotient);
     }
 
     /**
     * @dev this function is used for a winner to claim the prize
     *   https://consensys.github.io/smart-contract-best-practices/
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
-    **/
-    function claimThePrize() public hasPendingPayment onlyWinner poolHasEnded {
-        uint prize = payments[msg.sender];
-        // TODO sera >= ?? habra que refactorizar con manager y comision
-        require(this.balance > prize);
+    **/    
+    function claimThePrize() public isAfterGraceTime onlyWinner {
+        require(!payments[msg.sender]);
+        uint winnersAmount = getWinnerAmount();
+        require(winnersAmount > 0);
 
-        payments[msg.sender] = 0;
-        pendingWinnerPayments = pendingWinnerPayments.sub(1);
-        msg.sender.transfer(prize);
-        LogClaimPrize(msg.sender, prize);
+		payments[msg.sender] = true;        
+        msg.sender.transfer(winnersAmount);
+
+        LogClaimPrize(this, msg.sender, winnersAmount);
     }
 
-    function claimCommissionByManager() public onlyManager allWinnersHaveClaimedTheirPrize {
+    function claimPaymentByManager() public onlyManager {
+        uint managerFeeAmount = getFeeFor(managerFee, msg.sender);
 
-        uint claimedCommission = claimCommission();
-        LogClaimManagerCommission(msg.sender, claimedCommission);
+        payments[manager] = true;
+        msg.sender.transfer(managerFeeAmount);
+        
+        LogClaimPaymentByManager(this, msg.sender, managerFeeAmount);
     }
 
-    function claimCommissionByOwner() public onlyOwner {
+    function getFeeFor(uint fee, address _address) internal view returns (uint amount){
+        require(fee > 0);
+        require(!payments[_address]);
+        uint feeAmount = fee.div(100).mul(this.balance);
+        require(feeAmount > 0);
+        return feeAmount;
+    }
 
-        uint claimedCommission = claimCommission();
-        LogClaimPaymentByOwner(msg.sender, claimedCommission);
+    function claimPaymentByOwner() public onlyOwner {
+        uint ownerFeeAmount = getFeeFor(ownerFee, msg.sender);
+
+        payments[msg.sender] = true;
+        msg.sender.transfer(ownerFeeAmount);
+        
+        LogClaimPaymentByOwner(this, msg.sender, ownerFeeAmount);
     }
 
     function publishHighScore() onlyActivePlayers isAfterStartTime external returns (bool) {
@@ -190,14 +266,13 @@ contract ContestPool is Ownable {
 
         //if player has higher score we update high score
         //add player to the winners array
-        LogPublishedScore(msg.sender, score, highScore);
+        LogPublishedScore(msg.sender, score, highestScore);
 
-        if (score >= highScore) {
-            if (score > highScore) {
-                highScore = score;
+        if (score >= highestScore) {
+            if (score > highestScore) {
+                highestScore = score;
             }  
-            winnerArray.push(msg.sender);
-            winners[msg.sender] = true;
+            winners.push(msg.sender);
             return true;
         }
         
@@ -224,11 +299,7 @@ contract ContestPool is Ownable {
         require(_prediction.length > 0);
         require(predictions[msg.sender].length == 0);
         predictions[msg.sender] = _prediction;
-        LogSendPrediction(_prediction, msg.sender);
-    }
-
-    function addressPrize() public view returns (uint256) {
-        return payments[msg.sender];
+        LogSendPrediction(this, _prediction, msg.sender);
     }
 
     function getPredictionSet(address _playerAddress) public view returns (uint8[]) {
@@ -238,32 +309,6 @@ contract ContestPool is Ownable {
     function getCurrentTimestamp() public view returns (uint256) {
         return now;
     }
-
-    function getPendingPayments() public view returns (uint) {
-        return pendingWinnerPayments;
-    }
-
-    function addToWinners(address winnerAddress, uint256 prize) internal returns (bool) {
-        pendingWinnerPayments = pendingWinnerPayments.add(1);
-        payments[winnerAddress] = prize;
-        return true;
-    }
-
-    function addCommission(address paymentAddress, uint256 commission) internal onlyOwner returns (bool) {
-
-        payments[paymentAddress] = commission;
-        return true;
-    }
-
-    function claimCommission() internal returns (uint) {
-        uint commission = payments[msg.sender];
-        require(this.balance >= commission);
-
-        payments[msg.sender] = 0;
-        msg.sender.transfer(commission);
-
-        return commission;
-    }
     
     function hasContestEnded() private view returns (bool) {
         return getCurrentTimestamp().sub(endTime) > graceTime;
@@ -272,6 +317,4 @@ contract ContestPool is Ownable {
     function isContestActive() private view returns (bool) {
         return !hasContestEnded();
     }
-
-
 }

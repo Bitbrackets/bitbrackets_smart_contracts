@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "ganache-cli": "^6.0.3",
+    "leche": "^2.2.3",
+    "mocha": "^5.0.4",
     "solium": "^1.1.2",
     "truffle": "4.1.0",
     "truffle-config": "^1.0.4",

@@ -1,6 +1,6 @@
 const ContestPool = artifacts.require("./ContestPool.sol");
-const dateUtil = require('./DateUtil');
-const t = require('./TestUtil').title;
+const dateUtil = require('./utils/DateUtil');
+const t = require('./utils/TestUtil').title;
 
 // test suite
 contract('ContestPool', accounts => {
@@ -16,6 +16,8 @@ contract('ContestPool', accounts => {
     let graceTime = 1;
     const maxBalance = web3.toWei(1, 'ether');
     const amountPerPlayer = web3.toWei(0.1, 'ether');
+    const managerFee = 10;
+    const ownerFee = 10;
 
     beforeEach('setup contract for each test', async () => {
         contestPoolInstance = await ContestPool.new(
@@ -26,7 +28,9 @@ contract('ContestPool', accounts => {
             endTime,
             graceTime,
             maxBalance,
-            amountPerPlayer
+            amountPerPlayer,
+            managerFee,
+            ownerFee
         );
     })
 

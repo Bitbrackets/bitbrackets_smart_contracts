@@ -6,7 +6,7 @@ const {
     getBinaryString, 
     getScore,
     getScoreWithArray
-} = require('./ScoreUtil');
+} = require('./utils/ScoreUtil');
 
 
 describe('Unit tests for ScoreUtil JS', () => {

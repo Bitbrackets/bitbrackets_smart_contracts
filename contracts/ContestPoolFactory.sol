@@ -30,6 +30,8 @@ contract ContestPoolFactory is Ownable {
         uint maxBalance;
         uint fee;
         bool exists;
+        uint ownerFee;
+        uint managerFee;
     }
 
     /**** Properties ***********/
@@ -51,7 +53,7 @@ contract ContestPoolFactory is Ownable {
     /**** methods ***********/
 
     function ContestPoolFactory() public {
-        // owner = msg.sender; not needed isOwnable already
+        
     }
 
     function createContestPoolDefinition(
@@ -60,7 +62,9 @@ contract ContestPoolFactory is Ownable {
         uint _startTime, 
         uint _endTime, 
         uint _graceTime, 
-        uint _maxBalance) 
+        uint _maxBalance,
+        uint _managerFee,
+        uint _ownerFee) 
     onlyOwner isNew(_contestName) public 
     {
         require(_contestName != bytes32(0x0));
@@ -77,7 +81,9 @@ contract ContestPoolFactory is Ownable {
             graceTime: _graceTime,
             maxBalance: _maxBalance,
             fee: _fee,
-            exists: true
+            exists: true,
+            managerFee: _managerFee,
+            ownerFee: _ownerFee
         });
         CreateContestPoolDefinition(
             _contestName, 
@@ -91,7 +97,6 @@ contract ContestPoolFactory is Ownable {
     function createContestPool(bytes32 _contestName, uint _amountPerPlayer) public payable exists(_contestName) returns (address) {
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
-        //TODO Add require definition.amountPerPlayer > amountPerPlayer
         require(definition.fee == msg.value);
         require(definition.maxBalance > _amountPerPlayer);
 
@@ -104,7 +109,9 @@ contract ContestPoolFactory is Ownable {
             definition.endTime,
             definition.graceTime,
             definition.maxBalance,
-            _amountPerPlayer
+            _amountPerPlayer,
+            definition.managerFee,
+            definition.ownerFee
         );
 
         CreateContestPool(definition.contestName, manager, newContestPoolAddress);
