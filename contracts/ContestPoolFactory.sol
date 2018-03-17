@@ -29,7 +29,7 @@ contract ContestPoolFactory is Ownable {
         uint graceTime;
         uint maxBalance;
         uint fee;
-        uint totalNumberOfGames;
+        //uint totalNumberOfGames;
         bool exists;
         uint ownerFee;
         uint managerFee;
