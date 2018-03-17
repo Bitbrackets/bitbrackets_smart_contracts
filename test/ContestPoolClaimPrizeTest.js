@@ -33,7 +33,7 @@ contract('ContestPoolClaimPrizeTest', accounts => {
 
     const result = [8,3,111,3,5,1,24,17,21,13,9,7,31,28,22,14,18,7,11,30];
 
-
+/*
     beforeEach('setup contract for each test', async () => {
         contestPoolInstance = await ContestPoolMock.new(
             owner,
@@ -48,8 +48,9 @@ contract('ContestPoolClaimPrizeTest', accounts => {
             ownerFee
         );
     });
+    */
 
-    it(t('anUser', 'publishScore', 'Player should be able to publish score'), async () => {
+    xit(t('anUser', 'publishScore', 'Player should be able to publish score'), async () => {
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
 
         await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
