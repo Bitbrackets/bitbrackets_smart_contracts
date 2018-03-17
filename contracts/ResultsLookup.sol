@@ -1,11 +1,13 @@
 pragma solidity ^0.4.18;
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
-
 /// @title It looks for a specific result.
 /// @author Guillermo Salazar
 
-contract ResultsLookup is Ownable {
+import "./BbBase.sol";
+
+
+
+contract ResultsLookup is BbBase {
 
     event LogRegisterResult (
         bytes32 indexed contestName,
@@ -24,11 +26,12 @@ contract ResultsLookup is Ownable {
     // Modifier
 
 
-    function ResultsLookup() public {
-        owner = msg.sender;
+    function ResultsLookup(address _storageAddress) public BbBase(_storageAddress) {
+        version = 1;
+        // owner = msg.sender;
     }
     
-
+    
     function registerResult(bytes32 contestName, uint result) public onlyOwner {
         uint whenDateTime = now;
         Result memory newResult = Result({
