@@ -47,6 +47,23 @@ function getBinaryString(n) {
 }
 
 module.exports = {
+    getScoreWithArray(prediction, result, games) {
+      let i = 0;
+      let score = 0;
+
+      if (prediction.length !== result.length) {
+        throw new Error("expected result and prediction to be the same length");
+      }
+
+      while (i < games) {
+        if (prediction[i] === result[i]) {
+          score++;
+        }  
+        i++;      
+      }
+
+      return score;
+    },
     getScore(prediction, result, games, bits) {
       let binPrediction = getBinaryString(prediction);
       let binResult = getBinaryString(result);

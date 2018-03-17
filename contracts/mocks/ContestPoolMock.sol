@@ -1,10 +1,15 @@
 pragma solidity ^0.4.18;
 
+
 import "../../contracts/ContestPool.sol";
+
 
 
 contract ContestPoolMock is ContestPool {
     uint public currentTime;
+    
+    uint8[] public mockResult;
+    uint public mockNoGames;
 
     function ContestPoolMock (
         address _owner,
@@ -47,6 +52,15 @@ contract ContestPoolMock is ContestPool {
     function addPayment(address paymentAddress, uint256 payment) public returns (bool) {
         return addCommission(paymentAddress, payment);
 
+    }
+
+    function getResult() internal view returns (uint8[] result, uint games) {
+        return (mockResult,mockNoGames);
+    }
+
+    function setMockResults(uint8[] _mockResult, uint _mockGames) public {
+        mockResult = _mockResult;
+        mockNoGames = _mockGames;
     }
 
 

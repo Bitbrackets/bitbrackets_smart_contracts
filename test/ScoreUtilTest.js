@@ -4,7 +4,8 @@ const {
     formatBigInt, 
     parseToInt, 
     getBinaryString, 
-    getScore
+    getScore,
+    getScoreWithArray
 } = require('./ScoreUtil');
 
 
@@ -15,16 +16,13 @@ describe('Unit tests for ScoreUtil JS', () => {
 
 
     beforeEach(() => {
-        // 10101101 first results
-        predictionStr = "10 01 10 01"; // should score 2
-        prediction = parseToInt(predictionStr);
+        // should score 2
+        prediction = [8,2,1,3,5,6,111,17,32,111,9,7,31,28,22,14,111,7,11,30]; 
 
-        exactPredictionStr = "01010101 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-        exactPrediction = parseToInt(exactPredictionStr);
+        exactPrediction = [8,3,111,3,5,1,24,17,21,13,9,7,31,28,22,14,18,7,11,30];;
 
-        resultStr = "01010101 11100100 00100111 10011110 01010001 01101010 00100000 00111010 10001010 10000111 00100100 11100011 00010010 11000111 01011001 10101101 ";
-        result = parseToInt(resultStr);
-        resultLength = resultStr.replace(/\s+/g, '').length;
+        result = [8,3,111,3,5,1,24,17,21,13,9,7,31,28,22,14,18,7,11,30];
+        resultLength = result.length;
     });
 
     it('Exact Prediction and Result should match', () => {
@@ -33,19 +31,19 @@ describe('Unit tests for ScoreUtil JS', () => {
         console.log("results", result);
         console.log("results length", resultLength);
 
-        assert.equal(result, exactPrediction);
+        assert(_.isEqual(result, exactPrediction));
     });
 
-    it('Should convert prediction to String Binary', () => {
-        const str = _.padStart(getBinaryString(result),resultLength, '0');
+    it('Should calculate score of exact prediction', () => {
+        const score = getScoreWithArray(exactPrediction, result, 20);
 
-        assert.equal(str, resultStr.replace(/\s+/g, ''));
+        assert.equal(20, score);
     });
 
     it('Should calculate score of prediction', () => {
-        const score = getScore(prediction, result, 4, 2);
+        const score = getScoreWithArray(prediction, result, 20);
 
-        assert.equal(2, score);
+        assert.equal(13, score);
     });
     
 });
