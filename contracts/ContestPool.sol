@@ -59,7 +59,7 @@ contract ContestPool is BbBase {
         address indexed player
     );
 
-    event LogClaimPrize (
+    event LogClaimPaymentByWinner (
         address indexed contractAddress,
         address indexed winner,
         uint prize
@@ -218,7 +218,7 @@ contract ContestPool is BbBase {
     *   https://consensys.github.io/smart-contract-best-practices/
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/    
-    function claimThePrize() public isAfterGraceTime onlyWinner {
+    function claimPaymentByWinner() public isAfterGraceTime onlyWinner {
         require(!payments[msg.sender]);
         uint winnersAmount = getWinnerAmount();
         require(winnersAmount > 0);
@@ -226,7 +226,7 @@ contract ContestPool is BbBase {
 		payments[msg.sender] = true;        
         msg.sender.transfer(winnersAmount);
 
-        LogClaimPrize(this, msg.sender, winnersAmount);
+        LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
     }
 
     function claimPaymentByManager() public onlyManager {

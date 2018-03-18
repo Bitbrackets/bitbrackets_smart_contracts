@@ -20,6 +20,11 @@ ContestPoolBuilder.prototype.endTime = async function endTime(who, year, month, 
     await this.contestPool.setEndTime(endTimeInMillis, {from: who});
 };
 
+ContestPoolBuilder.prototype.graceTimeDays = async function graceTimeDays(who, graceTimeInDays) {
+    const graceTimeInSeconds = dateUtil.daysToSeconds(graceTimeInDays);
+    await this.contestPool.setGraceTime(graceTimeInSeconds, {from: who});
+};
+
 ContestPoolBuilder.prototype.graceTime = async function graceTime(who, graceTimeInSeconds) {
     await this.contestPool.setGraceTime(graceTimeInSeconds, {from: who});
 };
@@ -85,6 +90,19 @@ ContestPoolBuilder.prototype.predictions = async function predictions(who, amoun
             prediction.prediction,
             {
                 from: prediction.player,
+                value: amount
+            }
+        );
+    });
+};
+
+ContestPoolBuilder.prototype.predictionsDef = async function predictionsDef(amount, defaultPredictions, players) {
+    const _contestPool = this.contestPool;
+    await players.forEach( async function(player) {
+        await _contestPool.sendPredictionSet(
+            defaultPredictions,
+            {
+                from: player,
                 value: amount
             }
         );

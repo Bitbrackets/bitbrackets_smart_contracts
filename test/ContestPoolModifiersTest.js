@@ -35,12 +35,15 @@ contract('ContestPoolModifiersTest', accounts => {
     withData({
         player1IsWinner: [player1, [player1, player2], false],
         player1IsNotWinner: [player1, [player2, player3], true],
+        player1OnlyWinner: [player1, [player1], false],
+        player1OnlyWinner: [player1, [player2, player1], false],
         emptyWinners: [player1, [], true]
     }, function(player, winners, shouldFail) {
         it(t('anUser', 'onlyWinners', 'Should be able to invoke function.'), async function() {
             //Setup
             const builder = new Builder(contestPoolInstance);
             await builder.winners(owner, winners);
+
             
             //Invocation
             try {

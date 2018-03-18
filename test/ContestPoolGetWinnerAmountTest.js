@@ -15,6 +15,7 @@ const Builder = require('./utils/ContestPoolBuilder');
  * Using 'Leche' for multiple data provider.
  * 
  * @dev https://github.com/box/leche
+ * @author Guillermo Salazar
  */
 contract('ContestPoolGetWinnerAmountTest', accounts => {
     let contestPoolInstance;
@@ -80,13 +81,6 @@ contract('ContestPoolGetWinnerAmountTest', accounts => {
             await builder.paymentsTrue(owner, payments);
             await builder.currentTime(owner, 2018, 01, 05);
             await builder.predictions(owner, amountPerPlayer, predictions);
-            /*await contestPoolInstance.sendPredictionSet(
-                [10010101,10010101],
-                {
-                    from: player1,
-                    value: amountPerPlayer
-                }
-            );*/
 
             //Invocation
             const result = await contestPoolInstance._getWinnerAmount();
