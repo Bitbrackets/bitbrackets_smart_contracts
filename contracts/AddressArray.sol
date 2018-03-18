@@ -5,7 +5,7 @@ library AddressArray {
     function remove(address[] storage array, uint index) public returns(address[]) {
         if (index >= array.length) return;
 
-        for (uint i = index; i < array.length-1; i++){
+        for (uint i = index; i < array.length; i++){
             array[i] = array[i+1];
         }
         array.length--;
@@ -13,8 +13,7 @@ library AddressArray {
     }    
 
     function contains(address[] array, address item) public pure returns(bool) {
-
-        for (uint i = 0; i < array.length-1; i++){
+        for (uint i = 0; i < array.length; i++){
             if(array[i] == item) {
                 return true;
             }
