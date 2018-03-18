@@ -287,8 +287,9 @@ contract ContestPool is BbBase {
 
     }
 
-    function calculatePlayerScore(uint8[] results, uint8[] prediction, uint games) private pure returns (uint) {
+    function calculatePlayerScore(uint8[100] results, uint8[] prediction, uint games) private pure returns (uint) {
         assert(games <= results.length);
+        assert(games <= prediction.length);
         uint score = 0;
         for (uint i = 0; i < games; i++) {
             if (results[i] == prediction[i]) {
@@ -298,8 +299,9 @@ contract ContestPool is BbBase {
         return score;
     }
 
-    function getResult() internal view returns (uint8[] result, uint games) {
-        return (new uint8[](0),0);
+    function getResult() internal view returns (uint8[100], uint) {
+        address resultLookupAddress = bbStorage.getAddress(keccak256("contract.name", "resultsLookup"));
+        return ResultsLookupInterface(resultLookupAddress).getResult(contestName);
     }
 
     function sendPredictionSet(uint8[] _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer payable {

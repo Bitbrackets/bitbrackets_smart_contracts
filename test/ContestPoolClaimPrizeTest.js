@@ -39,6 +39,7 @@ contract('ContestPoolClaimPrizeTest', accounts => {
 
 /*
     beforeEach('setup contract for each test', async () => {
+        resultsLookupInstance = await ResultsLookup.deployed();
         contestPoolInstance = await ContestPoolMock.new(
             BbStorage.address,
             manager,
@@ -60,8 +61,14 @@ contract('ContestPoolClaimPrizeTest', accounts => {
         await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
         //start the contest
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 6, 5));
-        // setting mock results
-        await contestPoolInstance.setMockResults(result, 4);
+        // setting results
+        // await contestPoolInstance.setMockResults(result, 4);
+        await resultsLookupInstance.registerResult(
+            "Rusia2018", 
+            result, 
+            4, 
+            { from:  owner}
+        );
         
         const success = await contestPoolInstance.publishHighScore({from: player1});
 

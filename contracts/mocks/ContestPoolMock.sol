@@ -16,9 +16,7 @@ contract ContestPoolMock is ContestPool {
 /*
     function ContestPoolMock2 (
         address _owner,
-=======
         address _storage,
->>>>>>> refactor contest pool mock for Storage
         address _manager,
         bytes32 _contestName,
         uint _startTime,
@@ -29,7 +27,7 @@ contract ContestPoolMock is ContestPool {
         uint _managerFee,
         uint _ownerFee
     ) public
-<<<<<<< HEAD
+
     ContestPool(_owner, _manager, _contestName, _startTime, _endTime, _graceTime, _maxBalance, _amountPerPlayer, _managerFee, _ownerFee) { }
 */
 
@@ -93,7 +91,6 @@ contract ContestPoolMock is ContestPool {
         addPayment(_address, false);
     }
 
-
     function addPaymentTrue(address _address) public {
         addPayment(_address, true);
     }
@@ -103,6 +100,10 @@ contract ContestPoolMock is ContestPool {
         if(state) {
             _address.transfer(_getWinnerAmount());
         }
+
+    // for testing only
+    function addWinner(address winnerAddress, uint256 prize) public returns (bool) {
+        return addToWinners(winnerAddress, prize);
     }
 
     function addPrediction(address _address, uint8[] _prediction) public {
@@ -120,19 +121,11 @@ contract ContestPoolMock is ContestPool {
     function _getWinnerAmount() public view returns (uint) {
         return getWinnerAmount();
     }
-
-    function getResult() internal view returns (uint8[] result, uint games) {
-        return (mockResult,mockNoGames);
-    }
-
-    function setMockResults(uint8[] _mockResult, uint _mockGames) public {
-        mockResult = _mockResult;
-        mockNoGames = _mockGames;
-    }
     
     function _onlyWinner() public view onlyWinner {
     }
 
     function _isAfterGraceTime() public view isAfterGraceTime {
     }
+
 }
