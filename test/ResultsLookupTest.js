@@ -1,10 +1,10 @@
 var ResultsLookup = artifacts.require("./ResultsLookup.sol");
 
-const stringUtils = require('./StringUtil');
-const { toBigNumberArray, assertBigNumberArrayIsEqual } = require('./TestUtil');
-const t = require('./TestUtil').title;
-var utils = require("./utils.js");
-var date = require("./DateUtil.js");
+const stringUtils = require('./utils/StringUtil');
+const { toBigNumberArray, assertBigNumberArrayIsEqual } = require('./utils/TestUtil');
+const t = require('./utils/TestUtil').title;
+var utils = require("./utils/utils.js");
+var date = require("./utils/DateUtil.js");
 
 
 let instance;

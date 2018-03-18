@@ -107,6 +107,10 @@ contract ContestPoolMock is ContestPool {
         return addToWinners(winnerAddress, prize);
     }
 
+    function addToWinners(address winnerAddress, uint256 prize) public returns (bool) {
+
+    }
+
     function addPrediction(address _address, uint8[] _prediction) public {
         predictions[_address] = _prediction;
     }
@@ -115,21 +119,8 @@ contract ContestPoolMock is ContestPool {
         return now;
     }
 
-    function getOwner() public view returns (address) {
-        return owner;
-    }
-
     function _getWinnerAmount() public view returns (uint) {
         return getWinnerAmount();
-    }
-
-    function getResult() internal view returns (uint8[] result, uint games) {
-        return (mockResult,mockNoGames);
-    }
-
-    function setMockResults(uint8[] _mockResult, uint _mockGames) public {
-        mockResult = _mockResult;
-        mockNoGames = _mockGames;
     }
     
     function _onlyWinner() public view onlyWinner {

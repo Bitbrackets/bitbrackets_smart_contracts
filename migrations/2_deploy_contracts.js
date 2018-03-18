@@ -5,7 +5,6 @@ const ContestPoolMock = artifacts.require("./ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
-const ContestPool = artifacts.require("./ContestPool.sol");
 
 
 module.exports = function(deployer, network, accounts) {
@@ -13,35 +12,33 @@ module.exports = function(deployer, network, accounts) {
     const owner = accounts[0];
     const manager = accounts[1];
 
-
-
     return deployer.deploy(BbStorage).then(async () => {
 
-
-        await deployer.deploy(AddressArray);
-    
-        if(network !== 'live') {
-            deployer.link(AddressArray, ContestPool);
-            deployer.deploy(ContestPool, owner, manager, "", 0,0,0,10, 10000, 10, 10);
-        }
-
-        await deployer.link(AddressArray, ContestPoolFactory);
-        await deployer.deploy(ContestPoolFactory, BbStorage.address);
-
-        if(network !== 'live') {
-            deployer.link(AddressArray, ContestPoolMock);
-            deployer.deploy(ContestPoolMock, owner, manager);
-        }
-
-        await deployer.deploy(ResultsLookup, BbStorage.address);
         
-        deployer.deploy(ContestPool, owner, manager, "", 0,0,0,10, 10000);
-        
-
         try {
+
+            // deploying contracts
+            await deployer.deploy(AddressArray);
+    
+            if(network !== 'live') {
+                deployer.link(AddressArray, ContestPool);
+                deployer.deploy(ContestPool, owner, manager, "", 0,0,0,10, 10000, 10, 10);
+            }
+    
+            await deployer.link(AddressArray, ContestPoolFactory);
+            await deployer.deploy(ContestPoolFactory, BbStorage.address);
+    
+            if(network !== 'live') {
+                deployer.link(AddressArray, ContestPoolMock);
+                deployer.deploy(ContestPoolMock, owner, manager);
+            }
+    
+            await deployer.deploy(ResultsLookup, BbStorage.address);
+
+
             const storageInstance = await BbStorage.deployed();
             console.log('\n');
-                
+            
             // Log it
             console.log('\x1b[33m%s\x1b[0m:', 'Set Storage Address');
             console.log(BbStorage.address);

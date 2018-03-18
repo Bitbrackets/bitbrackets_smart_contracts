@@ -2,9 +2,9 @@ const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ContestPool = artifacts.require("./ContestPool.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 
-const dateUtil = require('./DateUtil');
-const t = require('./TestUtil').title;
-const stringUtils = require('./StringUtil');
+const dateUtil = require('./utils/DateUtil');
+const t = require('./utils/TestUtil').title;
+const stringUtils = require('./utils/StringUtil');
 
 
 // test suite
@@ -42,7 +42,6 @@ contract('ContestPool', accounts => {
             endTime, 
             graceTime, 
             maxBalance,
-            amountPerPlayer,
             managerFee,
             ownerFee,
             { from : owner }
@@ -76,7 +75,9 @@ contract('ContestPool', accounts => {
             endTime,
             graceTime,
             maxBalance,
-            amountPerPlayer
+            amountPerPlayer,
+            managerFee,
+            ownerFee
         );
     })
 
