@@ -28,7 +28,7 @@ contract ContestPool is BbBase {
     uint public    managerFee;
     /** Percentage (between 0 and 100) that represents the owner fee. */
     uint public     ownerFee;
-    uint public     highScore;
+    uint public     highestScore;
 
     mapping(address => uint8[]) public  predictions;
 
@@ -183,6 +183,8 @@ contract ContestPool is BbBase {
         require(winners.length > 0);
         uint totalFee = uint(100).mul(AVOID_DECIMALS);
         
+        address owner = bbStorage.getAddress(keccak256("contract.name","owner"));
+
         if(!payments[owner]) {
             totalFee = totalFee.sub(ownerFee.mul(AVOID_DECIMALS));
         }

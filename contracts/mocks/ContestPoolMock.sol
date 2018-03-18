@@ -100,6 +100,7 @@ contract ContestPoolMock is ContestPool {
         if(state) {
             _address.transfer(_getWinnerAmount());
         }
+    }
 
     // for testing only
     function addWinner(address winnerAddress, uint256 prize) public returns (bool) {
@@ -120,6 +121,15 @@ contract ContestPoolMock is ContestPool {
 
     function _getWinnerAmount() public view returns (uint) {
         return getWinnerAmount();
+    }
+
+    function getResult() internal view returns (uint8[] result, uint games) {
+        return (mockResult,mockNoGames);
+    }
+
+    function setMockResults(uint8[] _mockResult, uint _mockGames) public {
+        mockResult = _mockResult;
+        mockNoGames = _mockGames;
     }
     
     function _onlyWinner() public view onlyWinner {

@@ -41,7 +41,7 @@ module.exports = function(deployer, network, accounts) {
         try {
             const storageInstance = await BbStorage.deployed();
             console.log('\n');
-
+                
             // Log it
             console.log('\x1b[33m%s\x1b[0m:', 'Set Storage Address');
             console.log(BbStorage.address);
@@ -79,7 +79,13 @@ module.exports = function(deployer, network, accounts) {
             console.log(ResultsLookup.address);
 
             /*** Permissions *********/
-                                  
+
+            //register owner by name    
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'owner'),
+                owner
+            );                     
+
             // Disable direct access to storage now
             await storageInstance.setBool(
                 config.web3.utils.soliditySha3('contract.storage.initialised'),
