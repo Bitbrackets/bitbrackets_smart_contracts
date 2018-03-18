@@ -97,18 +97,9 @@ contract ContestPoolMock is ContestPool {
 
     function addPayment(address _address, bool state) public {
         payments[_address] = state;
-        if(state) {
+        if (state) {
             _address.transfer(_getWinnerAmount());
         }
-    }
-
-    // for testing only
-    function addWinner(address winnerAddress, uint256 prize) public returns (bool) {
-        return addToWinners(winnerAddress, prize);
-    }
-
-    function addToWinners(address winnerAddress, uint256 prize) public returns (bool) {
-
     }
 
     function addPrediction(address _address, uint8[] _prediction) public {
