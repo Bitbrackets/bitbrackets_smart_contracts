@@ -3,8 +3,9 @@ pragma solidity ^0.4.19;
 import "./BbBase.sol";
 import "./interface/BbStorageInterface.sol";
 import "./interface/ResultsLookupInterface.sol";
+import "./AddressArray.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
-import './AddressArray.sol';
+
 
 contract ContestPool is BbBase {
     using SafeMath for uint256;
@@ -183,12 +184,12 @@ contract ContestPool is BbBase {
         require(winners.length > 0);
         uint totalFee = uint(100).mul(AVOID_DECIMALS);
         
-        address owner = bbStorage.getAddress(keccak256("contract.name","owner"));
+        address owner = bbStorage.getAddress(keccak256("contract.name", "owner"));
 
-        if(!payments[owner]) {
+        if (!payments[owner]) {
             totalFee = totalFee.sub(ownerFee.mul(AVOID_DECIMALS));
         }
-        if(!payments[manager]) {
+        if (!payments[manager]) {
             totalFee = totalFee.sub(managerFee.mul(AVOID_DECIMALS));
         }
 
@@ -197,7 +198,7 @@ contract ContestPool is BbBase {
 
         uint pendingWinners = 0;
         for (uint i = 0; i < winners.length - 1; i++){
-            if(!payments[winners[i]]) {
+            if (!payments[winners[i]]) {
                 pendingWinners++;
             }
         }

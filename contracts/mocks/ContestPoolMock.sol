@@ -10,9 +10,9 @@ contract ContestPoolMock is ContestPool {
     uint public mockNoGames;
 
     function ContestPoolMock (
-        address _owner,
+        address _storage,
         address _manager) public
-    ContestPool(_owner, _manager, ' ', 0, 0, 0, 0, 0, 0, 0) { }
+    ContestPool(_storage, _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
 /*
     function ContestPoolMock2 (
         address _owner,
