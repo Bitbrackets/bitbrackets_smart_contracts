@@ -37,7 +37,7 @@ jobs:
           name: install-package-dependencies
           command: npm install    
       # Download and cache dependencies
-      - run: truffle compile --all
+      - run: truffle compile --reset --all
 
       - run:
           name: test-reporter-setup
