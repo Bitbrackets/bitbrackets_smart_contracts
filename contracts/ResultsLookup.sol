@@ -1,42 +1,43 @@
 pragma solidity ^0.4.18;
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
-
 /// @title It looks for a specific result.
 /// @author Guillermo Salazar
-contract ResultsLookup is Ownable {
 
-    event RegisterResult (
+import "./interface/BbStorageInterface.sol";
+import "./BbBase.sol";
+
+
+
+contract ResultsLookup is BbBase {
+
+    event LogRegisterResult (
         bytes32 indexed contestName,
-        uint indexed result,
+        uint8[100] result,
+        uint numberOfGames,
         uint whenDateTime
     );
 
-    struct Result {
-        uint result;
-        uint dateTime;
-    }
-
-    mapping(bytes32 => Result) public results;
-
     // Modifier
 
-    function ResultsLookup() public {
-        owner = msg.sender;
+
+    function ResultsLookup(address _storageAddress) public BbBase(_storageAddress) {
+        version = 1;
+        // owner = msg.sender;
+    }
+    
+    
+    function registerResult(bytes32 contestName, uint8[100] result, uint games) public onlySuperUser {
+        bbStorage.setUint(keccak256("contest.playedGames", contestName), games);
+        bbStorage.setInt8Array(keccak256("contest.result", contestName), result);
+
+        LogRegisterResult(contestName, result, games, now);
     }
 
-    function registerResult(bytes32 contestName, uint result) public onlyOwner {
-        uint whenDateTime = now;
-        Result memory newResult = Result({
-            result: result,
-            dateTime: whenDateTime
-        });
-        results[contestName] = newResult;
-        RegisterResult(contestName, result, whenDateTime);
-    }
+    function getResult(bytes32 contestName) public view returns (uint8[100], uint ) {
+        uint games = bbStorage.getUint(keccak256("contest.playedGames", contestName));
+        uint8[100] memory result = bbStorage.getInt8Array(keccak256("contest.result", contestName));   
 
-    function getResult(bytes32 contestName) public onlyOwner view returns (uint result, uint dateTime) {
-        Result memory currentResult = results[contestName];
-        return (currentResult.result, currentResult.dateTime);
+        return (result, games);
+        
     }
 }

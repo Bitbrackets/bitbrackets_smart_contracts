@@ -1,8 +1,6 @@
 pragma solidity ^0.4.18;
 
-
 import "../../contracts/ContestPool.sol";
-
 
 
 contract ContestPoolMock is ContestPool {
@@ -12,12 +10,13 @@ contract ContestPoolMock is ContestPool {
     uint public mockNoGames;
 
     function ContestPoolMock (
-        address _owner,
+        address _storage,
         address _manager) public
-    ContestPool(_owner, _manager, ' ', 0, 0, 0, 0, 0, 0, 0) { }
+    ContestPool(_storage, _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
 /*
     function ContestPoolMock2 (
         address _owner,
+        address _storage,
         address _manager,
         bytes32 _contestName,
         uint _startTime,
@@ -28,6 +27,7 @@ contract ContestPoolMock is ContestPool {
         uint _managerFee,
         uint _ownerFee
     ) public
+
     ContestPool(_owner, _manager, _contestName, _startTime, _endTime, _graceTime, _maxBalance, _amountPerPlayer, _managerFee, _ownerFee) { }
 */
 
@@ -37,6 +37,7 @@ contract ContestPoolMock is ContestPool {
     function setStartTime(uint _startTime) public {
         startTime = _startTime;
     }
+
 
     function setEndTime(uint _endTime) public {
         endTime = _endTime;
@@ -96,7 +97,7 @@ contract ContestPoolMock is ContestPool {
 
     function addPayment(address _address, bool state) public {
         payments[_address] = state;
-        if(state) {
+        if (state) {
             _address.transfer(_getWinnerAmount());
         }
     }
@@ -109,21 +110,8 @@ contract ContestPoolMock is ContestPool {
         return now;
     }
 
-    function getOwner() public view returns (address) {
-        return owner;
-    }
-
     function _getWinnerAmount() public view returns (uint) {
         return getWinnerAmount();
-    }
-
-    function getResult() internal view returns (uint8[] result, uint games) {
-        return (mockResult,mockNoGames);
-    }
-
-    function setMockResults(uint8[] _mockResult, uint _mockGames) public {
-        mockResult = _mockResult;
-        mockNoGames = _mockGames;
     }
     
     function _onlyWinner() public view onlyWinner {
@@ -131,4 +119,5 @@ contract ContestPoolMock is ContestPool {
 
     function _isAfterGraceTime() public view isAfterGraceTime {
     }
+
 }

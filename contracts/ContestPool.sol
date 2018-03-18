@@ -1,10 +1,13 @@
 pragma solidity ^0.4.19;
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./BbBase.sol";
+import "./interface/BbStorageInterface.sol";
+import "./interface/ResultsLookupInterface.sol";
+import "./AddressArray.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
-import './AddressArray.sol';
 
-contract ContestPool is Ownable {
+
+contract ContestPool is BbBase {
     using SafeMath for uint256;
     using AddressArray for address[];
 
@@ -17,6 +20,7 @@ contract ContestPool is Ownable {
     uint public    startTime;
     /** End time in seconds. */
     uint public     endTime;
+
     /** Time (in seconds) after finishing this contest pool which allows the winners to claim the prize. */
     uint public    graceTime;
     uint public    maxBalance;
@@ -28,6 +32,10 @@ contract ContestPool is Ownable {
     uint public     highestScore;
 
     mapping(address => uint8[]) public  predictions;
+
+    uint public     numberOfParticipants;
+    uint256 private    pendingWinnerPayments;
+    
 
     /**
      * It contains all the current winners for this contest pool.
@@ -111,12 +119,12 @@ contract ContestPool is Ownable {
         _;
     }
     modifier onlyForPlayers() {
-        require(msg.sender != owner && msg.sender != manager);
+        require(!roleHas("owner", msg.sender) && msg.sender != manager);
         _;
     }
 
     modifier onlyActivePlayers() {
-        require(msg.sender != owner && msg.sender != manager);
+        require(!roleHas("owner", msg.sender) && msg.sender != manager);
         require(predictions[msg.sender].length != 0);
         _;
     }
@@ -132,7 +140,7 @@ contract ContestPool is Ownable {
     }
 
     function ContestPool(
-        address _owner,
+        address _storage,
         address _manager,
         bytes32 _contestName,
         uint _startTime,
@@ -142,9 +150,9 @@ contract ContestPool is Ownable {
         uint _amountPerPlayer,
         uint _managerFee,
         uint _ownerFee
-    ) public
+    ) public BbBase(_storage)
     {
-        owner = _owner;
+
         manager = _manager;
         contestName = _contestName;
         startTime = _startTime;
@@ -176,10 +184,12 @@ contract ContestPool is Ownable {
         require(winners.length > 0);
         uint totalFee = uint(100).mul(AVOID_DECIMALS);
         
-        if(!payments[owner]) {
+        address owner = bbStorage.getAddress(keccak256("contract.name", "owner"));
+
+        if (!payments[owner]) {
             totalFee = totalFee.sub(ownerFee.mul(AVOID_DECIMALS));
         }
-        if(!payments[manager]) {
+        if (!payments[manager]) {
             totalFee = totalFee.sub(managerFee.mul(AVOID_DECIMALS));
         }
 
@@ -188,7 +198,7 @@ contract ContestPool is Ownable {
 
         uint pendingWinners = 0;
         for (uint i = 0; i < winners.length - 1; i++){
-            if(!payments[winners[i]]) {
+            if (!payments[winners[i]]) {
                 pendingWinners++;
             }
         }
@@ -245,14 +255,14 @@ contract ContestPool is Ownable {
         LogClaimPaymentByOwner(this, msg.sender, ownerFeeAmount);
     }
 
-    function publishHighScore() onlyActivePlayers isAfterStartTime external returns (bool) {
+    function publishHighScore() external onlyActivePlayers isAfterStartTime  returns (bool) {
         //check sender is a player and has prediction
         
         //check pool graceTime has not ended
         // require(isContestActive());
 
         //check current results
-        var (result,games) = getResult();
+        var (result, games) = getResult();
         uint8[] memory prediction = predictions[msg.sender];
 
         //compare players prediction to current results
@@ -280,8 +290,9 @@ contract ContestPool is Ownable {
 
     }
 
-    function calculatePlayerScore(uint8[] results, uint8[] prediction, uint games) private pure returns (uint) {
+    function calculatePlayerScore(uint8[100] results, uint8[] prediction, uint games) private pure returns (uint) {
         assert(games <= results.length);
+        assert(games <= prediction.length);
         uint score = 0;
         for (uint i = 0; i < games; i++) {
             if (results[i] == prediction[i]) {
@@ -291,8 +302,9 @@ contract ContestPool is Ownable {
         return score;
     }
 
-    function getResult() internal view returns (uint8[] result, uint games) {
-        return (new uint8[](0),0);
+    function getResult() internal view returns (uint8[100], uint) {
+        address resultLookupAddress = bbStorage.getAddress(keccak256("contract.name", "resultsLookup"));
+        return ResultsLookupInterface(resultLookupAddress).getResult(contestName);
     }
 
     function sendPredictionSet(uint8[] _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer payable {

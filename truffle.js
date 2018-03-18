@@ -1,6 +1,9 @@
+const Web3 = require("web3");
+
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
+  web3: Web3
   // networks : {
   //   development: {
   //     host: "localhost",

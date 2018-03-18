@@ -1,5 +1,8 @@
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const dateUtil = require('./utils/DateUtil');
+const ResultsLookup = artifacts.require("./ResultsLookup.sol");
+const BbStorage = artifacts.require("./BbStorage.sol");
+
 const _ = require('lodash');
 const t = require('./utils/TestUtil').title;
 const { toBigNumberArray, assertBigNumberArrayIsEqual } = require('./utils/TestUtil');
@@ -7,8 +10,9 @@ const { getScoreWithArray } = require('./utils/ScoreUtil');
 
 contract('ContestPoolClaimPrizeTest', accounts => {
     let contestPoolInstance;
-    let owner = accounts[9];
-    let manager = accounts[0];
+    let resultsLookupInstance;
+    let owner = accounts[0];
+    let manager = accounts[9];
     let player1 = accounts[1];
     let player2 = accounts[2];
     let player3 = accounts[3];
@@ -35,8 +39,9 @@ contract('ContestPoolClaimPrizeTest', accounts => {
 
 /*
     beforeEach('setup contract for each test', async () => {
+        resultsLookupInstance = await ResultsLookup.deployed();
         contestPoolInstance = await ContestPoolMock.new(
-            owner,
+            BbStorage.address,
             manager,
             "Rusia2018",
             startTime,
@@ -56,8 +61,14 @@ contract('ContestPoolClaimPrizeTest', accounts => {
         await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
         //start the contest
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 6, 5));
-        // setting mock results
-        await contestPoolInstance.setMockResults(result, 4);
+        // setting results
+        // await contestPoolInstance.setMockResults(result, 4);
+        await resultsLookupInstance.registerResult(
+            "Rusia2018", 
+            result, 
+            4, 
+            { from:  owner}
+        );
         
         const success = await contestPoolInstance.publishHighScore({from: player1});
 

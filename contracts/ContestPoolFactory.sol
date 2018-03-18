@@ -1,10 +1,11 @@
 pragma solidity ^0.4.19;
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./ContestPool.sol";
+import "./interface/BbStorageInterface.sol";
+import "./BbBase.sol";
 
 
-contract ContestPoolFactory is Ownable {
+contract ContestPoolFactory is BbBase {
 
      /*** events ***************/
     event CreateContestPoolDefinition(
@@ -29,6 +30,7 @@ contract ContestPoolFactory is Ownable {
         uint graceTime;
         uint maxBalance;
         uint fee;
+        //uint totalNumberOfGames;
         bool exists;
         uint ownerFee;
         uint managerFee;
@@ -52,8 +54,10 @@ contract ContestPoolFactory is Ownable {
 
     /**** methods ***********/
 
-    function ContestPoolFactory() public {
-        
+
+    function ContestPoolFactory(address _storageAddress) public BbBase(_storageAddress) {
+        // set version
+        version = 1;
     }
 
     function createContestPoolDefinition(
@@ -94,7 +98,8 @@ contract ContestPoolFactory is Ownable {
         definitions[_contestName] = newDefinition;
     }
         
-    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) public payable exists(_contestName) returns (address) {
+    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) 
+        public payable exists(_contestName) returns (address) {
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
         require(definition.fee == msg.value);
@@ -102,7 +107,7 @@ contract ContestPoolFactory is Ownable {
 
         address manager = msg.sender;
         ContestPool newContestPoolAddress = new ContestPool(
-            owner,
+            address(bbStorage),
             manager,
             definition.contestName,
             definition.startTime,
@@ -118,8 +123,8 @@ contract ContestPoolFactory is Ownable {
         return newContestPoolAddress;
     }
 
-    function withdrawFee() onlyOwner public {
+    function withdrawFee() public onlyOwner {
         require(this.balance > 0);
-        owner.transfer(this.balance);
+        msg.sender.transfer(this.balance);
     }
 }
