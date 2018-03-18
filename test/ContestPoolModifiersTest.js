@@ -1,6 +1,8 @@
+const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
+const BbStorage = artifacts.require("./BbStorage.sol");
+
 const leche = require('leche');
 const withData = leche.withData;
-const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const t = require('./utils/TestUtil').title;
 const daysToSeconds = require('./utils/DateUtil').daysToSeconds;
 const Builder = require('./utils/ContestPoolBuilder');
@@ -25,7 +27,7 @@ contract('ContestPoolModifiersTest', accounts => {
 
     beforeEach('Deploying contract for each test', async () => {
         contestPoolInstance = await ContestPoolMock.new(
-            owner,
+            BbStorage.address,
             manager
         );
     });
