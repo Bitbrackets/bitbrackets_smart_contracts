@@ -16,6 +16,9 @@ contract ContestPoolMock is ContestPool {
 /*
     function ContestPoolMock2 (
         address _owner,
+=======
+        address _storage,
+>>>>>>> refactor contest pool mock for Storage
         address _manager,
         bytes32 _contestName,
         uint _startTime,
@@ -26,6 +29,7 @@ contract ContestPoolMock is ContestPool {
         uint _managerFee,
         uint _ownerFee
     ) public
+<<<<<<< HEAD
     ContestPool(_owner, _manager, _contestName, _startTime, _endTime, _graceTime, _maxBalance, _amountPerPlayer, _managerFee, _ownerFee) { }
 */
 
@@ -35,6 +39,7 @@ contract ContestPoolMock is ContestPool {
     function setStartTime(uint _startTime) public {
         startTime = _startTime;
     }
+
 
     function setEndTime(uint _endTime) public {
         endTime = _endTime;
@@ -87,6 +92,7 @@ contract ContestPoolMock is ContestPool {
     function addPaymentFalse(address _address) public {
         addPayment(_address, false);
     }
+
 
     function addPaymentTrue(address _address) public {
         addPayment(_address, true);
