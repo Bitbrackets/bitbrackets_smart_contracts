@@ -13,23 +13,6 @@ contract ContestPoolMock is ContestPool {
         address _storage,
         address _manager) public
     ContestPool(_storage, _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
-/*
-    function ContestPoolMock2 (
-        address _owner,
-        address _storage,
-        address _manager,
-        bytes32 _contestName,
-        uint _startTime,
-        uint _endTime,
-        uint _graceTime,
-        uint _maxBalance,
-        uint _amountPerPlayer,
-        uint _managerFee,
-        uint _ownerFee
-    ) public
-
-    ContestPool(_owner, _manager, _contestName, _startTime, _endTime, _graceTime, _maxBalance, _amountPerPlayer, _managerFee, _ownerFee) { }
-*/
 
     /**
      * @dev Setter methods ONLY for testing purposes. https://ethereum.stackexchange.com/questions/25498/solidity-private-vs-public-variables

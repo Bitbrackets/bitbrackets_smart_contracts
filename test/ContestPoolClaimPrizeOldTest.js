@@ -55,30 +55,7 @@ contract('ContestPoolClaimPrizeTest', accounts => {
     });
     */
 
-    xit(t('anUser', 'publishScore', 'Player should be able to publish score'), async () => {
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 12));
-
-        await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
-        //start the contest
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 6, 5));
-        // setting results
-        // await contestPoolInstance.setMockResults(result, 4);
-        await resultsLookupInstance.registerResult(
-            "Rusia2018", 
-            result, 
-            4, 
-            { from:  owner}
-        );
-        
-        const success = await contestPoolInstance.publishHighScore({from: player1});
-
-        const highScore = await contestPoolInstance.highScore();
-        console.log("high score", highScore.toNumber());
-
-        assert(success, "should update score to high score");
-
-        assert.equal(getScoreWithArray(prediction, result,4), highScore.toNumber(), 'Player 1 should have high score');
-    });
+    
 
     xit(t('anUser', 'claimThePrize', 'Winner should be able to claim prize.'), async () => {
 
@@ -188,100 +165,8 @@ contract('ContestPoolClaimPrizeTest', accounts => {
         }
     });
     
-    xit(t('aPlayer', 'sendPrediction', 'Should take contributions from players'), async () => {
-        const contribution = web3.toWei(0.3, "ether");
-
-        const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
-
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
-
-        await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
-
-        const contractPrediction = await contestPoolInstance.getPredictionSet(player1);
-        const finalBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber();
-
-        assertBigNumberArrayIsEqual(contractPrediction, toBigNumberArray(prediction));
-        assert.equal(initialBalance + contribution, finalBalance);
-    });
-
-    xit(t('aPlayer', 'sendPrediction', 'Should not be able to contributes twice.', true), async () => {
-        const contribution = web3.toWei(0.3, "ether");
-   
-        const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
-
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
-        await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
-        const finalBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber();
-
-        try {
-            await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
-            assert(false, "should have failed when trying to contribute two times ");
-        } catch (error) {
-            assert(error);
-            assert(error.message.includes("revert"));
-            assert.equal(initialBalance + contribution, finalBalance);
-        }
-    });
-
-    xit(t('aPlayer', 'sendPrediction', 'Should not able to take contributions higher than max balance.', true), async () => {
-        const contribution = web3.toWei(2, "ether");//Max Balance: 1 eth
-
-        const initialBalance = web3.eth.getBalance(contestPoolInstance.address).toNumber()
-
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
-
-        try {
-            await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
-            asser(false, 'It should have failed because contribution is higher than max balance.');
-        } catch (error) {
-            assert(error);
-            assert(error.message.includes("revert"));
-        }
-    });
-
-    xit(t('aPlayer', 'sendPrediction', 'Should not able to take contributions equals to max balance.', true), async () => {
-        const contribution = web3.toWei(1, "ether");//Max Balance: 1 eth
-
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
-
-        try {
-            await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
-            asser(false, 'It should have failed because contribution is higher than max balance.');
-        } catch (error) {
-            assert(error);
-            assert(error.message.includes("revert"));
-        }
-    });
-
-    xit(t('aManager', 'sendPrediction', 'Should not be able to contribute to his contest pool.', true), async () => {
-        const contribution = web3.toWei(0.2, "ether");
 
 
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
-        try {
-            await contestPoolInstance.sendPredictionSet(prediction, {from: manager, value: contribution});
-            assert(false, 'It should have failed because a manager must not participate in his own contest pool.');
-        } catch (error) {
-            assert(error);
-            assert(error.message.includes("revert"));
-        }
-    });
-
-    xit(t('aManager', 'claimCommissionByManager', 'Should not be able to claim commission before all winner have claimed the prize', true), async () => {
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
-        await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
-        await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 7, 12));
-        await contestPoolInstance.addWinner(player1, prizeValue, {from: owner});
-
-        // await contestPoolInstance.claimThePrize({from: player1});
-        try {
-            await contestPoolInstance.claimCommissionByManager({from: manager});
-            assert(false, 'It should have failed because a manager can not claim his commission before the winners.');
-        } catch (error) {
-            assert(error);
-            assert(error.message.includes("revert"));
-        }
-    });
 
     xit(t('aManager', 'claimCommissionByManager', 'Should  be able to claim commission after all winner have claimed the prize'), async () => {
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
@@ -299,9 +184,7 @@ contract('ContestPoolClaimPrizeTest', accounts => {
         const managerFinalBalance = web3.eth.getBalance(manager).toNumber();
         assert(managerFinalBalance > managerInitialBalance);
 
-    });
-
-    xit(t('theOwner', 'claimCommissionByOwner', 'Owner should  be able to claim commission'), async () => {
+    });    xit(t('theOwner', 'claimCommissionByOwner', 'Owner should  be able to claim commission'), async () => {
         await contestPoolInstance.setCurrentTime(dateUtil.toMillis(2018, 5, 1));
         await contestPoolInstance.sendPredictionSet(prediction, {from: player1, value: contribution});
         await contestPoolInstance.sendPredictionSet(prediction, {from: player2, value: contribution});
