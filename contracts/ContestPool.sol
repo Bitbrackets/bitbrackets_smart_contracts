@@ -1,10 +1,12 @@
 pragma solidity ^0.4.19;
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./BbBase.sol";
+import "./interface/BbStorageInterface.sol";
+import "./interface/ResultsLookupInterface.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import './AddressArray.sol';
 
-contract ContestPool is Ownable {
+contract ContestPool is BbBase {
     using SafeMath for uint256;
     using AddressArray for address[];
 
@@ -116,12 +118,12 @@ contract ContestPool is Ownable {
         _;
     }
     modifier onlyForPlayers() {
-        require(msg.sender != owner && msg.sender != manager);
+        require(!roleHas("owner", msg.sender) && msg.sender != manager);
         _;
     }
 
     modifier onlyActivePlayers() {
-        require(msg.sender != owner && msg.sender != manager);
+        require(!roleHas("owner", msg.sender) && msg.sender != manager);
         require(predictions[msg.sender].length != 0);
         _;
     }
@@ -137,7 +139,7 @@ contract ContestPool is Ownable {
     }
 
     function ContestPool(
-        address _owner,
+        address _storage,
         address _manager,
         bytes32 _contestName,
         uint _startTime,
@@ -147,9 +149,9 @@ contract ContestPool is Ownable {
         uint _amountPerPlayer,
         uint _managerFee,
         uint _ownerFee
-    ) public
+    ) public BbBase(_storage)
     {
-        owner = _owner;
+
         manager = _manager;
         contestName = _contestName;
         startTime = _startTime;
@@ -250,14 +252,14 @@ contract ContestPool is Ownable {
         LogClaimPaymentByOwner(this, msg.sender, ownerFeeAmount);
     }
 
-    function publishHighScore() onlyActivePlayers isAfterStartTime external returns (bool) {
+    function publishHighScore() external onlyActivePlayers isAfterStartTime  returns (bool) {
         //check sender is a player and has prediction
         
         //check pool graceTime has not ended
         // require(isContestActive());
 
         //check current results
-        var (result,games) = getResult();
+        var (result, games) = getResult();
         uint8[] memory prediction = predictions[msg.sender];
 
         //compare players prediction to current results

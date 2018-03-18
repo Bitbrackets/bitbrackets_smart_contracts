@@ -1,5 +1,6 @@
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ContestPool = artifacts.require("./ContestPool.sol");
+const BbStorage = artifacts.require("./BbStorage.sol");
 
 const dateUtil = require('./DateUtil');
 const t = require('./TestUtil').title;
@@ -8,6 +9,7 @@ const stringUtils = require('./StringUtil');
 
 // test suite
 contract('ContestPool', accounts => {
+    let bbStorageInstance;
     let contestPoolInstance;
     let contestPoolFactoryInstance;
     let owner = accounts[0];
@@ -31,6 +33,7 @@ contract('ContestPool', accounts => {
 
     before('setup suite', async () => {
         contestPoolFactoryInstance = await ContestPoolFactory.deployed();
+        bbStorageInstance = await BbStorage.deployed();
 
         await contestPoolFactoryInstance.createContestPoolDefinition(
             contestName, 
@@ -55,29 +58,29 @@ contract('ContestPool', accounts => {
             }
         );
         
-        contestPoolAddress = tx.logs[0].args.contestPoolAddress;
-        console.log('Contest Pool Address', contestPoolAddress);
-        constestPoolInstance = ContestPool(contestPoolAddress);
+        // contestPoolAddress = tx.logs[0].args.contestPoolAddress;
+        // console.log('Contest Pool Address', contestPoolAddress);
+        // constestPoolInstance = ContestPool(contestPoolAddress);
 
-        console.log("contest pool instance", contestPoolInstance);
+        // console.log("contest pool instance", contestPoolInstance);
 
     });
 
     beforeEach('setup contract for each test', async () => {
 
-        // contestPoolInstance = await ContestPool.new(
-        //     owner,
-        //     manager,
-        //     "Rusia2018",
-        //     startTime,
-        //     endTime,
-        //     graceTime,
-        //     maxBalance,
-        //     amountPerPlayer
-        // );
+        contestPoolInstance = await ContestPool.new(
+            BbStorage.address,
+            manager,
+            "Rusia2018",
+            startTime,
+            endTime,
+            graceTime,
+            maxBalance,
+            amountPerPlayer
+        );
     })
 
-    xit(t('AnyUser', 'setup', 'should have valid instance of ContestPoolFactory'), async () => {
+    it(t('AnyUser', 'setup', 'should have valid instance of ContestPoolFactory'), async () => {
 
         assert(contestPoolFactoryInstance);
         assert(contestPoolFactoryInstance.address);
@@ -85,7 +88,7 @@ contract('ContestPool', accounts => {
         assert(contestPoolInstance.address);
     });
 
-    xit(t('AnyUser', 'new', 'Should be initialized with correct values'), async () => {
+    it(t('AnyUser', 'new', 'Should be initialized with correct values'), async () => {
         const startTimeContract = await contestPoolInstance.startTime();
         const endTimeContract = await contestPoolInstance.endTime();
         const graceTimeContract = await contestPoolInstance.graceTime();
