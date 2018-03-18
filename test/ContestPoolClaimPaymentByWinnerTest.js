@@ -1,7 +1,7 @@
 const leche = require('leche');
 const withData = leche.withData;
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
-const assertEvent = require("./utils/utils.js").assertEvent;
+const {assertEvent, emptyCallback} = require("./utils/utils.js");
 const t = require('./utils/TestUtil').title;
 const amount = require('./utils/AmountUtil').expected;
 const Builder = require('./utils/ContestPoolBuilder');
@@ -92,18 +92,22 @@ contract('ContestPoolClaimPaymentByWinnerTest', accounts => {
             
             const afterPredictionWinnerBalance = await web3.eth.getBalance(winner).toNumber();
             const afterPredictionContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
-            //TODO REMOVE
-            const amountForPlayer = await contestPoolInstance._getWinnerAmount({from: winner});
 
             //Invocation
             await contestPoolInstance.claimPaymentByWinner({from: winner});
-            
+
             //Assertions
+            //Assert event
+            assertEvent(contestPoolInstance, {event: 'LogClaimPaymentByWinner', args: {
+                contractAddress: contestPoolInstance.address,
+                winner: winner
+            }}, 1, emptyCallback);
+
             const finalWinnerBalance = await web3.eth.getBalance(winner).toNumber();
             const finalContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
-            
+
             //Assert contract balances between before and after claiming payment by the winner. 
-            const expectedContractBalance = finalContractBalance + parseInt(amountForPlayer);
+            const expectedContractBalance = finalContractBalance + expectedAmount;
             assert.equal(afterPredictionContractBalance, expectedContractBalance);
 
             //Assert payment was done for the winner.
@@ -111,7 +115,7 @@ contract('ContestPoolClaimPaymentByWinnerTest', accounts => {
             assert.ok(paymentsResult);
 
             //Assert winner balance between 'after sending prediction' and final one.
-            assert.ok(afterPredictionWinnerBalance, finalWinnerBalance + amountForPlayer);
+            assert.ok(afterPredictionWinnerBalance, finalWinnerBalance + expectedAmount);
         });
     });
 });

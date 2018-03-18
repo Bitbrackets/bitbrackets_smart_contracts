@@ -2,7 +2,9 @@ var _ = require("lodash");
 var Promise = require("bluebird");
 
 module.exports = {
-    defaultCallback: async function (log) {
+    emptyCallback: function (log) {
+    },
+    defaultCallback: function (log) {
         console.log('Default event callback:');
         console.log(log);
     },
