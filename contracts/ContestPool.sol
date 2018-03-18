@@ -78,6 +78,7 @@ contract ContestPool is BbBase {
     );
 
     event LogPublishedScore (
+        address indexed contractAddress,
         address indexed player,
         uint score,
         uint highScore
@@ -139,6 +140,13 @@ contract ContestPool is BbBase {
         _;
     }
 
+    modifier allWinnerHaveClaimedPayment() {
+        for (uint i = 0; i < winners.length; i++){
+            require(payments[winners[i]]);
+        }
+        _;
+    }
+
     function ContestPool(
         address _storage,
         address _manager,
@@ -197,7 +205,7 @@ contract ContestPool is BbBase {
         uint feePerPlayer = AVOID_DECIMALS.mul(totalFee).div(totalWinners);
 
         uint pendingWinners = 0;
-        for (uint i = 0; i < winners.length - 1; i++){
+        for (uint i = 0; i < winners.length; i++){
             if (!payments[winners[i]]) {
                 pendingWinners++;
             }
@@ -229,7 +237,7 @@ contract ContestPool is BbBase {
         LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
     }
 
-    function claimPaymentByManager() public onlyManager {
+    function claimPaymentByManager() public onlyManager allWinnerHaveClaimedPayment {
         uint managerFeeAmount = getFeeFor(managerFee, msg.sender);
 
         payments[manager] = true;
@@ -241,7 +249,22 @@ contract ContestPool is BbBase {
     function getFeeFor(uint fee, address _address) internal view returns (uint amount){
         require(fee > 0);
         require(!payments[_address]);
-        uint feeAmount = fee.div(100).mul(this.balance);
+        //All winners have claimed the payment.
+        uint totalFee = managerFee;
+        if(!payments[owner]) {
+            totalFee = totalFee + ownerFee;
+        }
+        uint avoidDecimalsTotalFee = AVOID_DECIMALS.mul(totalFee);
+        uint avoidDecimalsFee = AVOID_DECIMALS.mul(fee);
+
+        uint currentFee = avoidDecimalsFee.mul(100).div(avoidDecimalsTotalFee);
+
+        uint avoidDecimalsCurrentFee = AVOID_DECIMALS.mul(currentFee);
+
+        uint total = avoidDecimalsCurrentFee.mul(this.balance);
+
+        uint quotient = AVOID_DECIMALS.mul(100);
+        uint feeAmount = total.div(quotient);
         require(feeAmount > 0);
         return feeAmount;
     }
@@ -276,7 +299,7 @@ contract ContestPool is BbBase {
 
         //if player has higher score we update high score
         //add player to the winners array
-        LogPublishedScore(msg.sender, score, highestScore);
+        LogPublishedScore(this, msg.sender, score, highestScore);
 
         if (score >= highestScore) {
             if (score > highestScore) {
