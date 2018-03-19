@@ -68,8 +68,10 @@ contract('ContestPoolPublishScoreTest', accounts => {
             
             assert(success, "Should update score to the highest score.");
             const highestScore = await contestPoolInstance.highestScore();
+            const winner1 = await contestPoolInstance.winners(0);
 
-            //assert.equal(getScoreWithArray(prediction.prediction, score, 4), highestScore.toNumber(), 'Player should have the highest score.');
+            assert.equal(player1, winner1);
+            assert.equal(getScoreWithArray(prediction.prediction, score, 4), highestScore.toNumber(), 'Player should have the highest score.');
         });
     });
 });
