@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test-ganache": "truffle test --network ganache"
+    "test-ganache": "truffle test --network ganache",
+    "coverage": "./node_modules/.bin/solidity-coverage"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "ganache-cli": "^6.0.3",
     "leche": "^2.2.3",
     "mocha": "^5.0.4",
+    "solidity-coverage": "^0.4.14",
     "solium": "^1.1.2",
     "truffle": "4.1.0",
     "truffle-config": "^1.0.4",
