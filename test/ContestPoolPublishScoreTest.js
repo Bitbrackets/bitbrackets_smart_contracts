@@ -58,16 +58,17 @@ contract('ContestPoolPublishScoreTest', accounts => {
             await builder.currentTime(owner, 2018, 01, 12);
 
             //Invocation
-            const success = await contestPoolInstance.publishHighScore({from: prediction.player});
+            const tx = await contestPoolInstance.publishHighScore({from: prediction.player});
 
             //Assertions
             assertEvent(contestPoolInstance, {event: 'LogPublishedScore', args: {
                 contractAddress: contestPoolInstance.address,
                 player: prediction.player
-            }}, 1, emptyCallback);
+            }}, 1, (log) => console.log("calculated score",log[0].args.score.toNumber()));
+
             
-            assert(success, "Should update score to the highest score.");
             const highestScore = await contestPoolInstance.highestScore();
+            console.log("high score", highestScore.toNumber());
             const winner1 = await contestPoolInstance.winners(0);
 
             assert.equal(player1, winner1);

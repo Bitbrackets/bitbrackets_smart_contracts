@@ -79,6 +79,13 @@ contract ContestPool is BbBase {
         uint score,
         uint highScore
     );
+    
+    event LogNewHighScore (
+        address indexed contractAddress,
+        address indexed player,
+        uint previousHighScore,
+        uint newHighScore
+    );
 
     /*** Modifiers ***************/
 
@@ -289,6 +296,8 @@ contract ContestPool is BbBase {
         // and compute player score
         uint score = calculatePlayerScore(result, prediction, games);
 
+        require(score > 0);
+
         //update player score in contract if its different from
         //his last score
         // TODO we need to keep track of players score and games counted to save gas
@@ -300,7 +309,8 @@ contract ContestPool is BbBase {
 
         if (score >= highestScore) {
             if (score > highestScore) {
-                highestScore = score;
+                LogNewHighScore(this, msg.sender, highestScore, score );
+                highestScore = score;        
             }  
             winners.push(msg.sender);
             return true;
