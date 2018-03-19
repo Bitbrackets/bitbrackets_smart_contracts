@@ -37,6 +37,9 @@ contract ResultsLookup is BbBase {
         uint games = bbStorage.getUint(keccak256("contest.playedGames", contestName));
         uint8[100] memory result = bbStorage.getInt8Array(keccak256("contest.result", contestName));   
 
+        require(games > 0);
+        require(result.length > 0);
+
         return (result, games);
         
     }

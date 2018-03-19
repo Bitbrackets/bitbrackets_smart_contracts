@@ -21,6 +21,7 @@ contract('ContestPoolPublishScoreTest', accounts => {
     const player6 = accounts[7];
     const player7 = accounts[8];
     const player8 = accounts[9];
+    const contestName = "Rusia2018";
 
     beforeEach('Deploying contract for each test', async () => {
         resultsLookupInstance = await ResultsLookup.deployed();
@@ -40,6 +41,7 @@ contract('ContestPoolPublishScoreTest', accounts => {
             //Setup
             const amountPerPlayer = web3.toWei(0.001, 'ether');
             const builder = new Builder(contestPoolInstance);
+            await builder.contestName(owner, contestName);
             await builder.startTime(owner, 2018, 01, 5);
             await builder.endTime(owner, 2018, 01, 10);//5 days to wait for the match results.
             await builder.graceTimeDays(owner, 5);//5 days to publish your scores.
@@ -50,7 +52,7 @@ contract('ContestPoolPublishScoreTest', accounts => {
                 {from: prediction.player, value: amountPerPlayer}
             );
             await resultsLookupInstance.registerResult(
-                "Rusia2018", 
+                contestName, 
                 score, 
                 4, 
                 { from:  owner}
