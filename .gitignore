@@ -3,3 +3,6 @@ package-lock.json
 build/
 .idea
 .vscode
+coverage/
+coverageEnv/
+coverage.json
