@@ -33,10 +33,6 @@ contract ContestPool is BbBase {
 
     mapping(address => uint8[]) public  predictions;
 
-    uint public     numberOfParticipants;
-    uint256 private    pendingWinnerPayments;
-    
-
     /**
      * It contains all the current winners for this contest pool.
      * It may be updated when a player attempts to publish a score, and 
@@ -59,7 +55,7 @@ contract ContestPool is BbBase {
         address indexed player
     );
 
-    event LogClaimPrize (
+    event LogClaimPaymentByWinner (
         address indexed contractAddress,
         address indexed winner,
         uint prize
@@ -78,9 +74,17 @@ contract ContestPool is BbBase {
     );
 
     event LogPublishedScore (
+        address indexed contractAddress,
         address indexed player,
         uint score,
         uint highScore
+    );
+    
+    event LogNewHighScore (
+        address indexed contractAddress,
+        address indexed player,
+        uint previousHighScore,
+        uint newHighScore
     );
 
     /*** Modifiers ***************/
@@ -136,6 +140,13 @@ contract ContestPool is BbBase {
 
     modifier onlyManager() {
         require(msg.sender == manager);
+        _;
+    }
+
+    modifier allWinnerHaveClaimedPayment() {
+        for (uint i = 0; i < winners.length; i++){
+            require(payments[winners[i]]);
+        }
         _;
     }
 
@@ -197,7 +208,7 @@ contract ContestPool is BbBase {
         uint feePerPlayer = AVOID_DECIMALS.mul(totalFee).div(totalWinners);
 
         uint pendingWinners = 0;
-        for (uint i = 0; i < winners.length - 1; i++){
+        for (uint i = 0; i < winners.length; i++){
             if (!payments[winners[i]]) {
                 pendingWinners++;
             }
@@ -218,7 +229,7 @@ contract ContestPool is BbBase {
     *   https://consensys.github.io/smart-contract-best-practices/
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/    
-    function claimThePrize() public isAfterGraceTime onlyWinner {
+    function claimPaymentByWinner() public isAfterGraceTime onlyWinner {
         require(!payments[msg.sender]);
         uint winnersAmount = getWinnerAmount();
         require(winnersAmount > 0);
@@ -226,10 +237,10 @@ contract ContestPool is BbBase {
 		payments[msg.sender] = true;        
         msg.sender.transfer(winnersAmount);
 
-        LogClaimPrize(this, msg.sender, winnersAmount);
+        LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
     }
 
-    function claimPaymentByManager() public onlyManager {
+    function claimPaymentByManager() public onlyManager allWinnerHaveClaimedPayment {
         uint managerFeeAmount = getFeeFor(managerFee, msg.sender);
 
         payments[manager] = true;
@@ -241,7 +252,23 @@ contract ContestPool is BbBase {
     function getFeeFor(uint fee, address _address) internal view returns (uint amount){
         require(fee > 0);
         require(!payments[_address]);
-        uint feeAmount = fee.div(100).mul(this.balance);
+        //All winners have claimed the payment.
+        uint totalFee = managerFee;
+        address owner = bbStorage.getAddress(keccak256("contract.name", "owner"));
+        if(!payments[owner]) {
+            totalFee = totalFee + ownerFee;
+        }
+        uint avoidDecimalsTotalFee = AVOID_DECIMALS.mul(totalFee);
+        uint avoidDecimalsFee = AVOID_DECIMALS.mul(fee);
+
+        uint currentFee = avoidDecimalsFee.mul(100).div(avoidDecimalsTotalFee);
+
+        uint avoidDecimalsCurrentFee = AVOID_DECIMALS.mul(currentFee);
+
+        uint total = avoidDecimalsCurrentFee.mul(this.balance);
+
+        uint quotient = AVOID_DECIMALS.mul(100);
+        uint feeAmount = total.div(quotient);
         require(feeAmount > 0);
         return feeAmount;
     }
@@ -269,6 +296,8 @@ contract ContestPool is BbBase {
         // and compute player score
         uint score = calculatePlayerScore(result, prediction, games);
 
+        require(score > 0);
+
         //update player score in contract if its different from
         //his last score
         // TODO we need to keep track of players score and games counted to save gas
@@ -276,11 +305,12 @@ contract ContestPool is BbBase {
 
         //if player has higher score we update high score
         //add player to the winners array
-        LogPublishedScore(msg.sender, score, highestScore);
+        LogPublishedScore(this, msg.sender, score, highestScore);
 
         if (score >= highestScore) {
             if (score > highestScore) {
-                highestScore = score;
+                LogNewHighScore(this, msg.sender, highestScore, score );
+                highestScore = score;        
             }  
             winners.push(msg.sender);
             return true;
