@@ -1,6 +1,7 @@
 const leche = require('leche');
 const withData = leche.withData;
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
+const BbStorage = artifacts.require("./BbStorage.sol");
 const {assertEvent, emptyCallback} = require("./utils/utils.js");
 const t = require('./utils/TestUtil').title;
 const { getScoreWithArray } = require('./utils/ScoreUtil');
@@ -21,7 +22,7 @@ contract('ContestPoolPublishScoreTest', accounts => {
 
     beforeEach('Deploying contract for each test', async () => {
         contestPoolInstance = await ContestPoolMock.new(
-            owner,
+            BbStorage.address,
             manager
         );
     });

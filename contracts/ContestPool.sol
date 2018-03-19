@@ -33,10 +33,6 @@ contract ContestPool is BbBase {
 
     mapping(address => uint8[]) public  predictions;
 
-    uint public     numberOfParticipants;
-    uint256 private    pendingWinnerPayments;
-    
-
     /**
      * It contains all the current winners for this contest pool.
      * It may be updated when a player attempts to publish a score, and 
@@ -251,6 +247,7 @@ contract ContestPool is BbBase {
         require(!payments[_address]);
         //All winners have claimed the payment.
         uint totalFee = managerFee;
+        address owner = bbStorage.getAddress(keccak256("contract.name", "owner"));
         if(!payments[owner]) {
             totalFee = totalFee + ownerFee;
         }
