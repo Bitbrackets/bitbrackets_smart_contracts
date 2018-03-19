@@ -1,6 +1,5 @@
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
-
 const leche = require('leche');
 const withData = leche.withData;
 const dateUtil = require('./utils/DateUtil');

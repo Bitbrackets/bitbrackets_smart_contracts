@@ -1,15 +1,14 @@
 const leche = require('leche');
 const withData = leche.withData;
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
+const BbStorage = artifacts.require("./BbStorage.sol");
 const {assertEvent, emptyCallback} = require("./utils/utils.js");
 const t = require('./utils/TestUtil').title;
 const amount = require('./utils/AmountUtil').expected;
 const Builder = require('./utils/ContestPoolBuilder');
 
 /**
- * Using 'Leche' for multiple data provider.
  * 
- * @dev https://github.com/box/leche
  * @author Guillermo Salazar
  */
 contract('ContestPoolClaimPaymentByWinnerTest', accounts => {
@@ -29,17 +28,15 @@ contract('ContestPoolClaimPaymentByWinnerTest', accounts => {
 
     beforeEach('Deploying contract for each test', async () => {
         contestPoolInstance = await ContestPoolMock.new(
-            owner,
+            BbStorage.address,
             manager
         );
     });
-
     // _1_1Winners
     const _1_players = [player1];
     const _1_winners = [player1];
     const _1_payments = [];
     const _1_expectedAmount = amount(amountPerPlayer, _1_winners, _1_players, 10, 10);
-
     // _2_1Winners2Players
     const _2_players = [player1, player2];
     const _2_winners = [player1];
@@ -73,6 +70,7 @@ contract('ContestPoolClaimPaymentByWinnerTest', accounts => {
     }, function(managerFee, ownerFee, winner, winners, players, payments, expectedAmount) {
         it(t('aWinner', 'claimPaymentByWinner', 'Winner should be able to claim prize.'), async function() {
             //Setup
+
             const builder = new Builder(contestPoolInstance);
             await builder.startTime(owner, 2018, 01, 5);
             await builder.endTime(owner, 2018, 01, 10);//5 days to wait for the match results.
@@ -83,7 +81,7 @@ contract('ContestPoolClaimPaymentByWinnerTest', accounts => {
             await builder.winners(owner, winners);
             await builder.paymentsTrue(owner, payments);
             await builder.currentTime(owner, 2018, 01, 01);
-            
+
             const initialWinnerBalance = await web3.eth.getBalance(winner).toNumber();
             const initialContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
 

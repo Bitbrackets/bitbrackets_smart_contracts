@@ -30,7 +30,6 @@ contract ContestPoolFactory is BbBase {
         uint graceTime;
         uint maxBalance;
         uint fee;
-        //uint totalNumberOfGames;
         bool exists;
         uint ownerFee;
         uint managerFee;
