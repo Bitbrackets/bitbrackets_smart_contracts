@@ -9,7 +9,7 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract ContestPool is BbBase {
     using SafeMath for uint256;
-    using AddressArray for address[];
+    using AddressArray for AddressArray.Addresses;
 
     uint constant private AVOID_DECIMALS = 100000000000000000;
 
@@ -45,8 +45,8 @@ contract ContestPool is BbBase {
      * @dev https://ethereum.stackexchange.com/questions/12740/truffle-console-return-array-of-addresses-issue
      * @dev https://ethereum.stackexchange.com/questions/3373/how-to-clear-large-arrays-without-blowing-the-gas-limit
      */
-    address[] public    winners;
-
+    AddressArray.Addresses public winners;
+    
     /**
      * This is used to identify if an address has claimed its prize.
      */
@@ -101,7 +101,7 @@ contract ContestPool is BbBase {
     /*** Modifiers ***************/
 
     modifier onlyWinner() {
-        require(winners.contains(msg.sender));
+        require(winners.containsItem(msg.sender));
         _;
     }
 
@@ -155,7 +155,7 @@ contract ContestPool is BbBase {
     }
 
     modifier allWinnerHaveClaimedPayment() {
-        require(winnerPayments == winners.length);
+        require(winnerPayments == winners.count);
         _;
     }
 
@@ -193,11 +193,11 @@ contract ContestPool is BbBase {
     /*** Methods ***************/
 
     function getWinners() public view returns (address[] ) {
-        return winners;
+        return winners.items;
     }
 
     function getTotalWinners() public view returns (uint _totalWinners) {
-        return winners.length;
+        return winners.count;
     }
 
     function getMaxUsersCount() public view returns (uint usersCount) {
@@ -205,7 +205,7 @@ contract ContestPool is BbBase {
     }
 
     function getPendingPayments() internal view returns (uint _pendingPayments) {
-        return winners.length - winnerPayments;
+        return winners.count - winnerPayments;
     }
 
     function getOwnerAndManagerFees() internal view returns (uint _ownerManagerFees) {
@@ -258,7 +258,7 @@ contract ContestPool is BbBase {
      *  - Whether other winners (when there are multiple winner) withdraw the fee.
     */
     function getWinnerAmount() internal view returns (uint winnersAmount) {
-        require(winners.length > 0);
+        require(winners.count > 0);
         uint feePerWinner = getFeePerWinner();//Includes AVOID_DECIMALS.
         uint partialBalance = getPartialBalance();//NOT AVOID_DECIMALS.
         uint winnerAmount = partialBalance.mul(feePerWinner).div(uint(100).mul(AVOID_DECIMALS));
@@ -271,7 +271,7 @@ contract ContestPool is BbBase {
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/    
     function claimPaymentByWinner() public isAfterGraceTime onlyWinner {
-        require(winners.length >= winnerPayments);
+        require(winners.count >= winnerPayments);
         require(!payments[msg.sender]);
         uint winnersAmount = getWinnerAmount();
         require(winnersAmount > 0);
@@ -318,17 +318,15 @@ contract ContestPool is BbBase {
         if(_aScore >= highestScore) {
             if(_aScore == highestScore) {
                 // The _potentialWinner is a "real" winner with the same highest score.
-                winners.push(_potentialWinner);
+                winners.addItem(_potentialWinner);
+                LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
             } else {
                 // The _potentialWinner is a "real" and unique winner with the highest score.
-                /*
-				TODO Implements using dev comment in winners array.
-                address[] storage newWinners;
-                newWinners.push(_potentialWinner);
-                winners = newWinners;
-                */
+                winners.clear();
+                winners.addItem(_potentialWinner);
+                LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
+                highestScore = _aScore;
             }
-            LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
             return true;
         }
         return false;
@@ -358,17 +356,8 @@ contract ContestPool is BbBase {
         //if player has higher score we update high score
         //add player to the winners array
         LogPublishedScore(this, msg.sender, score, highestScore);
-
-        if (score >= highestScore) {
-            if (score > highestScore) {
-                LogNewHighScore(this, msg.sender, highestScore, score );
-                highestScore = score;        
-            }  
-            winners.push(msg.sender);
-            return true;
-        }
         
-        return false;
+        return addWinnerDependingOnScore(msg.sender, score);
     }
 
     function calculatePlayerScore(uint8[100] results, uint8[] prediction, uint games) private pure returns (uint) {

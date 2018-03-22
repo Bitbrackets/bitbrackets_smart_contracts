@@ -67,7 +67,7 @@ contract ContestPoolMock is ContestPool {
     }
 
     function addWinner(address _address) public {
-        winners.push(_address);
+        winners.addItem(_address);
     }
 
     function addPaymentTrue(address _address) public {

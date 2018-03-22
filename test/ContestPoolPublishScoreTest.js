@@ -71,9 +71,9 @@ contract('ContestPoolPublishScoreTest', accounts => {
             
             const highestScore = await contestPoolInstance.highestScore();
             console.log("high score", highestScore.toNumber());
-            const winner1 = await contestPoolInstance.winners(0);
+            const winner1 = await contestPoolInstance.getWinners();
 
-            assert.equal(player1, winner1);
+            assert.equal(player1, winner1[0]);
             assert.equal(getScoreWithArray(prediction.prediction, score, 4), highestScore.toNumber(), 'Player should have the highest score.');
         });
     });

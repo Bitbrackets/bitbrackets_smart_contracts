@@ -32,24 +32,27 @@ contract('ContestPoolAddWinnerDependingOnScoreTest', accounts => {
     });
 
     withData({
-        _1_: [20, 20, player1, true],
-        _2_: [25, 25, player2, true]
+        _1_newHighestScore: [10, 20, player1, true],
+        _2_equalHighestScore: [25, 25, player2, true],
+        _3_newHighestScore: [25, 30, player2, true],
+        _4_notHighestScore: [25, 24, player2, false]
     }, function(highestScore, newScore, player, expectedResult) {
         it(t('aPlayer', 'addWinnerDependingOnScore', 'Should be valid.'), async function() {
             //Setup
             const builder = new Builder(contestPoolInstance);
-            await builder.highestScore(owner, 5);
+            await builder.highestScore(owner, highestScore);
             
             //Invocation
-            const result = await contestPoolInstance._addWinnerDependingOnScore(player, newScore, {from: player});
+            await contestPoolInstance._addWinnerDependingOnScore(player, newScore, {from: player});
             
             //Assertions
             //Assert event
+            const eventCount = expectedResult ? 1 : 0;
+
             await assertEvent(contestPoolInstance, {event: 'LogNewHighScore', args: {
                 contractAddress: contestPoolInstance.address,
                 player: player
-            }}, 1, emptyCallback);
-            
+            }}, eventCount, emptyCallback);
         });
     });
 });
