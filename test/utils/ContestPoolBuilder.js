@@ -64,49 +64,56 @@ ContestPoolBuilder.prototype.currentTime = async function currentTime(who, year,
 
 ContestPoolBuilder.prototype.winners = async function winners(who, winners) {
     const _contestPool = this.contestPool;
-    await winners.forEach( async function(winner) {
-        await _contestPool.addWinner(winner, {from: who});
-    });
+    for (var winner in winners) {
+        await _contestPool.addWinner(winners[winner], {from: who});
+    };
 };
 
 ContestPoolBuilder.prototype.paymentsTrue = async function paymentsTrue(who, payments) {
     const _contestPool = this.contestPool;
-    await payments.forEach( async function(payment) {
-        await _contestPool.addPaymentTrue(payment, {from: who});
-    });
+    for (var payment in payments) {
+        await _contestPool.addPaymentTrue(payments[payment], {from: who});
+    }
 };
 
 ContestPoolBuilder.prototype.paymentsFalse = async function paymentsFalse(who, payments) {
     const _contestPool = this.contestPool;
-    await payments.forEach( async function(payment) {
-        await _contestPool.addPaymentsFalse(payment, {from: who});
-    });
+    for (var payment in payments) {
+        await _contestPool.addPaymentsFalse(payments[payment], {from: who});
+    };
 };
 
 ContestPoolBuilder.prototype.predictions = async function predictions(who, amount, predictions) {
     const _contestPool = this.contestPool;
-    await predictions.forEach( async function(prediction) {
+    for (var prediction in predictions) {
         await _contestPool.sendPredictionSet(
-            prediction.prediction,
+            predictions[prediction].prediction,
             {
-                from: prediction.player,
+                from: predictions[prediction].player,
                 value: amount
             }
         );
-    });
+    };
 };
 
 ContestPoolBuilder.prototype.predictionsDef = async function predictionsDef(amount, defaultPredictions, players) {
     const _contestPool = this.contestPool;
-    await players.forEach( async function(player) {
+    for (var player in players) {
         await _contestPool.sendPredictionSet(
             defaultPredictions,
             {
-                from: player,
+                from: players[player],
                 value: amount
             }
         );
-    });
+    }
+};
+
+ContestPoolBuilder.prototype.claimPaymentByWinner = async function claimPaymentByWinner(winners) {
+    const _contestPool = this.contestPool;
+    for (var winner in winners) {
+        await _contestPool.claimPaymentByWinner({from: winners[winner]});
+    }
 };
 
 module.exports = ContestPoolBuilder;

@@ -30,6 +30,10 @@ contract ContestPool is BbBase {
     /** Percentage (between 0 and 100) that represents the owner fee. */
     uint public     ownerFee;
     uint public     highestScore;
+    /** Total winner payments made. It is for optimizing payments for winners. */
+    uint public     winnerPayments;
+    /** Current players playing this contest pool. */
+    uint public     players;
 
     mapping(address => uint8[]) public  predictions;
 
@@ -39,6 +43,7 @@ contract ContestPool is BbBase {
      *  it is higher than the current one(s). 
      *
      * @dev https://ethereum.stackexchange.com/questions/12740/truffle-console-return-array-of-addresses-issue
+     * @dev https://ethereum.stackexchange.com/questions/3373/how-to-clear-large-arrays-without-blowing-the-gas-limit
      */
     address[] public    winners;
 
@@ -85,6 +90,12 @@ contract ContestPool is BbBase {
         address indexed player,
         uint previousHighScore,
         uint newHighScore
+    );
+
+    event LogFallbackEvent (
+        address indexed contractAddress,
+        address indexed player,
+        uint value
     );
 
     /*** Modifiers ***************/
@@ -144,9 +155,7 @@ contract ContestPool is BbBase {
     }
 
     modifier allWinnerHaveClaimedPayment() {
-        for (uint i = 0; i < winners.length; i++){
-            require(payments[winners[i]]);
-        }
+        require(winnerPayments == winners.length);
         _;
     }
 
@@ -175,16 +184,73 @@ contract ContestPool is BbBase {
         managerFee = _managerFee;
     }
 
+    /*** Fallback Method ***************/
+
+    function () public payable {
+        LogFallbackEvent(address(this), msg.sender, msg.value);
+    }
+
     /*** Methods ***************/
 
     function getWinners() public view returns (address[] ) {
         return winners;
     }
 
+    function getTotalWinners() public view returns (uint _totalWinners) {
+        return winners.length;
+    }
+
     function getMaxUsersCount() public view returns (uint usersCount) {
         return maxBalance.div(amountPerPlayer);
     }
 
+    function getPendingPayments() internal view returns (uint _pendingPayments) {
+        return winners.length - winnerPayments;
+    }
+
+    function getOwnerAndManagerFees() internal view returns (uint _ownerManagerFees) {
+        uint totalFees = 0;
+        if (!payments[getOwner()]) {
+            totalFees = totalFees.add(ownerFee);
+        }
+        if (!payments[manager]) {
+            totalFees = totalFees.add(managerFee);
+        }
+        return totalFees;
+    }
+    
+    function getTotalWinnersFee() internal view returns (uint _totalWinnersFee) {
+        return uint(100).sub(getOwnerAndManagerFees());
+    }
+
+    function getOwner() internal view returns (address _owner) {
+        return bbStorage.getAddress(keccak256("contract.name", "owner"));
+    }
+
+    /**
+     * @dev gets the fee per a winner multiplicated by AVOID_DECIMALS constant to avoid lossing decimals precision.
+     */
+    function getFeePerWinner() internal view returns (uint _feePerWinner) {
+        uint totalWinnersFee = getTotalWinnersFee();
+        uint totalWinners = getTotalWinners();
+        return AVOID_DECIMALS.mul(totalWinnersFee).div(totalWinners);
+    }
+
+    function getPartialBalanceFee() internal view returns (uint _partialBalanceFee) {
+        uint feePerWinner = getFeePerWinner();//Includes AVOID_DECIMALS. 0 - 100
+        uint pendingPayments = getPendingPayments();
+        uint ownerManagerFees = getOwnerAndManagerFees().mul(AVOID_DECIMALS);
+        uint partialBalanceFee = ownerManagerFees + pendingPayments.mul(feePerWinner);//Includes AVOID_DECIMALS
+        return partialBalanceFee;
+    }
+
+    function getPartialBalance() internal view returns (uint _partialBalance) {
+        uint currentBalance = getPoolBalance().mul(AVOID_DECIMALS);
+        uint partialBalanceFee = getPartialBalanceFee();//Includes AVOID_DECIMALS. * 100
+        uint partialBalance = currentBalance.mul(100).div(partialBalanceFee);//NOT AVOID_DECIMALS.
+        return partialBalance;
+    }
+    
     /**
      * Gets the prize amount for ONLY one winner based on:
      *  - Whether owner withdraw his/her fee.
@@ -193,35 +259,10 @@ contract ContestPool is BbBase {
     */
     function getWinnerAmount() internal view returns (uint winnersAmount) {
         require(winners.length > 0);
-        uint totalFee = uint(100).mul(AVOID_DECIMALS);
-        
-        address owner = bbStorage.getAddress(keccak256("contract.name", "owner"));
-
-        if (!payments[owner]) {
-            totalFee = totalFee.sub(ownerFee.mul(AVOID_DECIMALS));
-        }
-        if (!payments[manager]) {
-            totalFee = totalFee.sub(managerFee.mul(AVOID_DECIMALS));
-        }
-
-        uint totalWinners = AVOID_DECIMALS.mul(winners.length);
-        uint feePerPlayer = AVOID_DECIMALS.mul(totalFee).div(totalWinners);
-
-        uint pendingWinners = 0;
-        for (uint i = 0; i < winners.length; i++){
-            if (!payments[winners[i]]) {
-                pendingWinners++;
-            }
-        }
-
-        totalFee = totalFee.sub(pendingWinners.mul(feePerPlayer));
-
-        uint total = address(this).balance;
-
-        uint quotient = AVOID_DECIMALS.mul(100);
-
-        uint semiTotal = total.mul(feePerPlayer);
-        return semiTotal.div(quotient);
+        uint feePerWinner = getFeePerWinner();//Includes AVOID_DECIMALS.
+        uint partialBalance = getPartialBalance();//NOT AVOID_DECIMALS.
+        uint winnerAmount = partialBalance.mul(feePerWinner).div(uint(100).mul(AVOID_DECIMALS));
+        return winnerAmount;
     }
 
     /**
@@ -230,56 +271,67 @@ contract ContestPool is BbBase {
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/    
     function claimPaymentByWinner() public isAfterGraceTime onlyWinner {
+        require(winners.length >= winnerPayments);
         require(!payments[msg.sender]);
         uint winnersAmount = getWinnerAmount();
         require(winnersAmount > 0);
 
-		payments[msg.sender] = true;        
+		payments[msg.sender] = true;
+        winnerPayments = winnerPayments.add(1);
         msg.sender.transfer(winnersAmount);
 
         LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
     }
 
-    function claimPaymentByManager() public onlyManager allWinnerHaveClaimedPayment {
-        uint managerFeeAmount = getFeeFor(managerFee, msg.sender);
+    function getAmount(uint currentFee) internal view returns (uint _partialBalance){
+        uint currentBalance = getPoolBalance().mul(AVOID_DECIMALS);
+        uint partialBalanceFee = getPartialBalanceFee();//Includes AVOID_DECIMALS. * 100
+        uint partialBalance = currentBalance.mul(100).div(partialBalanceFee);//NOT AVOID_DECIMALS.
+        return partialBalance.mul(currentFee).div(uint(100));
+    }
+
+    function claimPaymentByManager() public onlyManager isAfterGraceTime allWinnerHaveClaimedPayment {
+        require(!payments[manager]);
+        uint managerAmount = getAmount(managerFee);
 
         payments[manager] = true;
-        msg.sender.transfer(managerFeeAmount);
+        msg.sender.transfer(managerAmount);
         
-        LogClaimPaymentByManager(this, msg.sender, managerFeeAmount);
+        LogClaimPaymentByManager(this, msg.sender, managerAmount);
     }
 
-    function getFeeFor(uint fee, address _address) internal view returns (uint amount){
-        require(fee > 0);
-        require(!payments[_address]);
-        //All winners have claimed the payment.
-        uint totalFee = managerFee;
-        address owner = bbStorage.getAddress(keccak256("contract.name", "owner"));
-        if(!payments[owner]) {
-            totalFee = totalFee + ownerFee;
-        }
-        uint avoidDecimalsTotalFee = AVOID_DECIMALS.mul(totalFee);
-        uint avoidDecimalsFee = AVOID_DECIMALS.mul(fee);
-
-        uint currentFee = avoidDecimalsFee.mul(100).div(avoidDecimalsTotalFee);
-
-        uint avoidDecimalsCurrentFee = AVOID_DECIMALS.mul(currentFee);
-
-        uint total = avoidDecimalsCurrentFee.mul(this.balance);
-
-        uint quotient = AVOID_DECIMALS.mul(100);
-        uint feeAmount = total.div(quotient);
-        require(feeAmount > 0);
-        return feeAmount;
+    function getPoolBalance() internal view returns (uint _poolBalance) {
+        return this.balance;//TODO change to players.mul(amountPerPlayer);
     }
 
-    function claimPaymentByOwner() public onlyOwner {
-        uint ownerFeeAmount = getFeeFor(ownerFee, msg.sender);
+    function claimPaymentByOwner() public onlyOwner isAfterStartTime {
+        require(!payments[getOwner()]);
+        uint ownerAmount = getAmount(ownerFee);
 
         payments[msg.sender] = true;
-        msg.sender.transfer(ownerFeeAmount);
+        msg.sender.transfer(ownerAmount);
         
-        LogClaimPaymentByOwner(this, msg.sender, ownerFeeAmount);
+        LogClaimPaymentByOwner(this, msg.sender, ownerAmount);
+    }
+
+    function addWinnerDependingOnScore(address _potentialWinner, uint _aScore) internal returns (bool _newHighScore){
+        if(_aScore >= highestScore) {
+            if(_aScore == highestScore) {
+                // The _potentialWinner is a "real" winner with the same highest score.
+                winners.push(_potentialWinner);
+            } else {
+                // The _potentialWinner is a "real" and unique winner with the highest score.
+                /*
+				TODO Implements using dev comment in winners array.
+                address[] storage newWinners;
+                newWinners.push(_potentialWinner);
+                winners = newWinners;
+                */
+            }
+            LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
+            return true;
+        }
+        return false;
     }
 
     function publishHighScore() external onlyActivePlayers isAfterStartTime  returns (bool) {
@@ -317,7 +369,6 @@ contract ContestPool is BbBase {
         }
         
         return false;
-
     }
 
     function calculatePlayerScore(uint8[100] results, uint8[] prediction, uint games) private pure returns (uint) {
@@ -341,6 +392,7 @@ contract ContestPool is BbBase {
         require(_prediction.length > 0);
         require(predictions[msg.sender].length == 0);
         predictions[msg.sender] = _prediction;
+        players = players.add(1);
         LogSendPrediction(this, _prediction, msg.sender);
     }
 

@@ -10,7 +10,7 @@ const Builder = require('./utils/ContestPoolBuilder');
 /**
  * @author Guillermo Salazar
  */
-contract('ContestPoolClaimPaymentByManagerTest', accounts => {
+contract('ContestPoolClaimPaymentByOwnerTest', accounts => {
     let contestPoolInstance;
     const defaultPrediction = [10101010, 01010101];
     const owner = accounts[0];
@@ -55,7 +55,7 @@ contract('ContestPoolClaimPaymentByManagerTest', accounts => {
         _3_Fee_10_05_Win_2_Pla_4: [10,  5, _3_winners, _3_players, _3_payments],
         _4_Fee_05_05_Win_3_Pla_8: [5,  5, _4_winners, _4_players, _4_payments],
     }, function(managerFee, ownerFee, winners, players, payments) {
-        it(t('aManager', 'claimPaymentByManager', 'Should be able to claim the payment.'), async function() {
+        it(t('aOwner', 'claimPaymentByOwner', 'Should be able to claim the payment.'), async function() {
             //Setup
             const builder = new Builder(contestPoolInstance);
             await builder.startTime(owner, 2018, 01, 5);
@@ -68,48 +68,45 @@ contract('ContestPoolClaimPaymentByManagerTest', accounts => {
             await builder.paymentsTrue(owner, payments);
             await builder.currentTime(owner, 2018, 01, 01);
             
-            const initialManagerBalance = await web3.eth.getBalance(manager).toNumber();
+            const initialOwnerBalance = await web3.eth.getBalance(owner).toNumber();
             const initialContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
 
             await builder.predictionsDef(amountPerPlayer, defaultPrediction, players);
             await builder.currentTime(owner, 2018, 01, 16);
 
-            const afterPredictionManagerBalance = await web3.eth.getBalance(manager).toNumber();
+            const afterPredictionOwnerBalance = await web3.eth.getBalance(owner).toNumber();
             const afterPredictionContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
-            const expectedManagerAmount = afterPredictionContractBalance * managerFee / 100;
             const expectedOwnerAmount = afterPredictionContractBalance * ownerFee / 100;
 
-            await builder.claimPaymentByWinner(winners);
-
             //Invocation
-            await contestPoolInstance.claimPaymentByManager({from: manager});
+            await contestPoolInstance.claimPaymentByOwner({from: owner});
 
             //Assertions
             //Assert event
-            await assertEvent(contestPoolInstance, {event: 'LogClaimPaymentByManager', args: {
+            await assertEvent(contestPoolInstance, {event: 'LogClaimPaymentByOwner', args: {
                 contractAddress: contestPoolInstance.address,
-                manager: manager
+                owner: owner
             }}, 1, emptyCallback);
 
-            const finalManagerBalance = await web3.eth.getBalance(manager).toNumber();
+            const finalOwnerBalance = await web3.eth.getBalance(owner).toNumber();
             const finalContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
 
-            //Assert contract balances between before and after claiming payment by the manager (and winners). 
-            assert.equal(finalContractBalance, expectedOwnerAmount);
+            //Assert contract balance between before and after claiming payment by the owner. 
+            assert.equal(finalContractBalance, afterPredictionContractBalance - expectedOwnerAmount);
 
             //Assert payment was done for the winner.
-            const paymentsResult = await contestPoolInstance.payments(manager);
+            const paymentsResult = await contestPoolInstance.payments(owner);
             assert.ok(paymentsResult);
 
-            //Assert manager balance between 'after sending prediction' and final one.
-            assert.ok(afterPredictionManagerBalance, finalManagerBalance + expectedManagerAmount);
+            //Assert owner balance between 'after sending prediction' and final one.
+            assert.ok(finalOwnerBalance, afterPredictionOwnerBalance + expectedOwnerAmount);
         });
     });
 
     withData({
         _1_Fee_10_10_Win_1_Pla_1_claimTwice: [10, 10, _1_winners, _1_players, _1_payments]
     }, function(managerFee, ownerFee, winners, players, payments) {
-        it(t('aManager', 'claimPaymentByManager', 'Should not be able to claim the payment twice.', true), async function() {
+        it(t('aOwner', 'claimPaymentByOwner', 'Should not be able to claim the payment twice.', true), async function() {
             //Setup
             const builder = new Builder(contestPoolInstance);
             await builder.startTime(owner, 2018, 01, 5);
@@ -126,17 +123,17 @@ contract('ContestPoolClaimPaymentByManagerTest', accounts => {
             await builder.claimPaymentByWinner(winners);
 
             //Invocation
-            await contestPoolInstance.claimPaymentByManager({from: manager});
+            await contestPoolInstance.claimPaymentByOwner({from: owner});
 
             //Assertions
-            await assertEvent(contestPoolInstance, {event: 'LogClaimPaymentByManager', args: {
+            await assertEvent(contestPoolInstance, {event: 'LogClaimPaymentByOwner', args: {
                 contractAddress: contestPoolInstance.address,
-                manager: manager
+                owner: owner
             }}, 1, emptyCallback);
 
             try {
-                await contestPoolInstance.claimPaymentByManager({from: manager});
-                assert(false, "It should have failed because manager have already claimed the payment.")
+                await contestPoolInstance.claimPaymentByOwner({from: owner});
+                assert(false, "It should have failed because owner have already claimed the payment.")
             } catch (error) {
                 assert(error);
                 assert(error.message.includes("revert"));
@@ -145,9 +142,9 @@ contract('ContestPoolClaimPaymentByManagerTest', accounts => {
     });
 
     withData({
-        _1_Fee_10_10_Win_1_Pla_1_claimBeforeWinners: [10, 10, _1_winners, _1_players, _1_payments]
+        _1_Fee_10_10_Win_1_Pla_1_claimTwice: [10, 10, _1_winners, _1_players, _1_payments]
     }, function(managerFee, ownerFee, winners, players, payments) {
-        it(t('aManager', 'claimPaymentByManager', 'Should not be able to claim the payment before all winners.', true), async function() {
+        it(t('aOwner', 'claimPaymentByOwner', 'Should not be able to claim the payment because pool has not started.', true), async function() {
             //Setup
             const builder = new Builder(contestPoolInstance);
             await builder.startTime(owner, 2018, 01, 5);
@@ -160,44 +157,12 @@ contract('ContestPoolClaimPaymentByManagerTest', accounts => {
             await builder.paymentsTrue(owner, payments);
             await builder.currentTime(owner, 2018, 01, 01);
             await builder.predictionsDef(amountPerPlayer, defaultPrediction, players);
-            await builder.currentTime(owner, 2018, 01, 16);
+            await builder.currentTime(owner, 2018, 01, 5);
 
             //Invocation
             try {
-                await contestPoolInstance.claimPaymentByManager({from: manager});
-                assert(false, "It should have failed because manager cannot claim the payment before all winners.")
-            } catch (error) {
-                assert(error);
-                assert(error.message.includes("revert"));
-            }
-        });
-    });
-
-
-    withData({
-        _1_Fee_10_10_Win_1_Pla_1_claimBeforeWinners: [10, 10, _1_winners, _1_players, _1_payments]
-    }, function(managerFee, ownerFee, winners, players, payments) {
-        it(t('aManager', 'claimPaymentByManager', 'Should not be able to claim the payment before end date (before grace date).', true), async function() {
-            //Setup
-            const builder = new Builder(contestPoolInstance);
-            await builder.startTime(owner, 2018, 01, 5);
-            await builder.endTime(owner, 2018, 01, 10);//5 days to wait for the match results.
-            await builder.graceTimeDays(owner, 5);//5 days to publish your scores.
-            await builder.managerFee(owner, managerFee);
-            await builder.ownerFee(owner, ownerFee);
-            await builder.amountPerPlayer(owner, amountPerPlayer);
-            await builder.winners(owner, winners);
-            await builder.paymentsTrue(owner, payments);
-            await builder.currentTime(owner, 2018, 01, 01);
-            await builder.predictionsDef(amountPerPlayer, defaultPrediction, players);
-            await builder.currentTime(owner, 2018, 01, 16);
-            await builder.claimPaymentByWinner(winners);
-            await builder.currentTime(owner, 2018, 01, 15);
-
-            //Invocation
-            try {
-                await contestPoolInstance.claimPaymentByManager({from: manager});
-                assert(false, "It should have failed because manager cannot claim the payment before end date.")
+                await contestPoolInstance.claimPaymentByOwner({from: owner});
+                assert(false, "It should have failed because the contest pool has not started yet.")
             } catch (error) {
                 assert(error);
                 assert(error.message.includes("revert"));
