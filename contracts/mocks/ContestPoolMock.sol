@@ -67,11 +67,7 @@ contract ContestPoolMock is ContestPool {
     }
 
     function addWinner(address _address) public {
-        winners.push(_address);
-    }
-
-    function addPaymentFalse(address _address) public {
-        addPayment(_address, false);
+        winners.addItem(_address);
     }
 
     function addPaymentTrue(address _address) public {
@@ -80,9 +76,7 @@ contract ContestPoolMock is ContestPool {
 
     function addPayment(address _address, bool state) public {
         payments[_address] = state;
-        if (state) {
-            _address.transfer(_getWinnerAmount());
-        }
+        winnerPayments = winnerPayments.add(1);
     }
 
     function addPrediction(address _address, uint8[] _prediction) public {
@@ -96,7 +90,35 @@ contract ContestPoolMock is ContestPool {
     function _getWinnerAmount() public view returns (uint) {
         return getWinnerAmount();
     }
-    
+
+    function _getOwner() public view returns (address _owner) {
+        return getOwner();
+    }
+
+    function _getTotalWinnersFee() public view returns (uint) {
+        return getTotalWinnersFee();
+    }
+
+    function _getFeePerWinner() public view returns (uint) {
+        return getFeePerWinner();
+    }
+
+    function _getPendingPayments() public view returns (uint) {
+        return getPendingPayments();
+    }
+
+    function _getOwnerAndManagerFees() public view returns (uint) {
+        return getOwnerAndManagerFees();
+    }
+
+    function _addWinnerDependingOnScore(address _potentialWinner, uint _aScore) public returns (bool) {
+        return addWinnerDependingOnScore(_potentialWinner, _aScore);
+    }
+
+    function getBalance() public view returns (uint) {
+        return this.balance;
+    }
+
     function _onlyWinner() public view onlyWinner {
     }
 
