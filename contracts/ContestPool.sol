@@ -34,6 +34,8 @@ contract ContestPool is BbBase {
     uint public     winnerPayments;
     /** Current players playing this contest pool. */
     uint public     players;
+    /** Current amount of weis paid to winners, manager, and owner. */
+    uint public    amountPaid;
 
     mapping(address => uint8[]) public  predictions;
 
@@ -278,6 +280,7 @@ contract ContestPool is BbBase {
 
 		payments[msg.sender] = true;
         winnerPayments = winnerPayments.add(1);
+        addAmountPaid(winnersAmount);
         msg.sender.transfer(winnersAmount);
 
         LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
@@ -295,13 +298,18 @@ contract ContestPool is BbBase {
         uint managerAmount = getAmount(managerFee);
 
         payments[manager] = true;
+        addAmountPaid(managerAmount);
         msg.sender.transfer(managerAmount);
         
         LogClaimPaymentByManager(this, msg.sender, managerAmount);
     }
 
+    function addAmountPaid(uint _amountPaid) internal {
+        amountPaid = amountPaid.add(_amountPaid);
+    }
+
     function getPoolBalance() internal view returns (uint _poolBalance) {
-        return this.balance;//TODO change to players.mul(amountPerPlayer);
+        return players.mul(amountPerPlayer).sub(amountPaid);
     }
 
     function claimPaymentByOwner() public onlyOwner isAfterStartTime {
@@ -309,6 +317,7 @@ contract ContestPool is BbBase {
         uint ownerAmount = getAmount(ownerFee);
 
         payments[msg.sender] = true;
+        addAmountPaid(ownerAmount);
         msg.sender.transfer(ownerAmount);
         
         LogClaimPaymentByOwner(this, msg.sender, ownerAmount);
