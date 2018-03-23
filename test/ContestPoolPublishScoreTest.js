@@ -8,6 +8,8 @@ const t = require('./utils/TestUtil').title;
 const { getScoreWithArray } = require('./utils/ScoreUtil');
 const Builder = require('./utils/ContestPoolBuilder');
 
+
+//TODO add tests with complete set of games
 contract('ContestPoolPublishScoreTest', accounts => {
     let contestPoolInstance;
     let resultsLookupInstance;
