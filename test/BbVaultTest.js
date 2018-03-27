@@ -49,7 +49,7 @@ contract('BbVaultTest', accounts => {
         _2_request2: ['Request2', 0.01, player2],
         _3_request3: ['Request3', 0.01, player3]
     }, function(name, amountInEther, toAccount) {
-        it(t('anUser', 'createRequestTransaction', 'Should able to create request transaction.'), async function() {
+        it(t('anOwner', 'createRequestTransaction', 'Should able to create request transaction.'), async function() {
             //Setup
             await bbVault.createRequestTransaction(
                 name,
@@ -64,11 +64,33 @@ contract('BbVaultTest', accounts => {
     });
 
     withData({
+        _1_request1: ['PlayerRequest1', 0.01, player1],
+        _2_request2: ['PlayerRequest2', 0.01, player2],
+        _3_request3: ['PlayerRequest3', 0.01, player3]
+    }, function(name, amountInEther, toAccount) {
+        it(t('anUser', 'createRequestTransaction', 'Should not able to create request transaction.'), async function() {
+            try {
+                //Invocation
+                await bbVault.createRequestTransaction(
+                    name,
+                    web3.toWei(amountInEther, 'ether'),
+                    toAccount,
+                    {from: toAccount}
+                );
+                assert.ok(false, "It should have failed because an user cannot create a request transaction.");
+            } catch (error) {
+                assert(error);
+                assert(error.message.includes("revert"));
+            }
+        });
+    });
+
+    withData({
         _1_requestIsEmpty: ['', 0.01, player1],
         _2_amountIs0: ['Value1', 0, player2],
         _3_toAccountIs0x0: ['Value2', 0.01, "0x0"]
     }, function(name, amountInEther, toAccount) {
-        it(t('anUser', 'createRequestTransaction', 'Should not able to create request transaction.', true), async function() {
+        it(t('anOwner', 'createRequestTransaction', 'Should not able to create request transaction with invalid data.', true), async function() {
             //Invocation
             try {
                 await bbVault.createRequestTransaction(
@@ -90,7 +112,7 @@ contract('BbVaultTest', accounts => {
         _2_request2: ['Request12', 0.01, player2],
         _3_request3: ['Request13', 0.01, player3]
     }, function(name, amountInEther, toAccount) {
-        it(t('anUser', 'getRequestTransaction', 'Should able to get a request transaction.'), async function() {
+        it(t('anOwner', 'getRequestTransaction', 'Should able to get a request transaction.'), async function() {
             //Invocation
             await bbVault.createRequestTransaction(
                 name,
@@ -117,7 +139,7 @@ contract('BbVaultTest', accounts => {
     withData({
         _1_request1: [owner, 1]
     }, function(who, votesExpected) {
-        it(t('anUser', 'voteRequestTransaction', 'Should able to get a request transaction.'), async function() {
+        it(t('anOwner', 'voteRequestTransaction', 'Should able to get a request transaction.'), async function() {
             //Setup
             const name = 'CustomValue1';
             await bbVault.createRequestTransaction(
@@ -131,7 +153,7 @@ contract('BbVaultTest', accounts => {
             await bbVault.voteRequestTransaction(name, {from: owner});
 
             //Assertions
-            const result = await bbVault.getVotes(name);
+            const result = await bbVault.getVotesRequestTransaction(name);
             assert.equal(result, votesExpected);
         });
     });
@@ -139,7 +161,7 @@ contract('BbVaultTest', accounts => {
     withData({
         _1_request1: [owner]
     }, function(who) {
-        it(t('anUser', 'voteRequestTransaction', 'Should not able to vote a request transaction twice.', true), async function() {
+        it(t('anOwner', 'voteRequestTransaction', 'Should not able to vote a request transaction twice.', true), async function() {
             //Setup
             const name = 'CustomValue2';
             await bbVault.createRequestTransaction(
@@ -163,10 +185,132 @@ contract('BbVaultTest', accounts => {
         });
     });
 
-    //Deposit
+    withData({
+        _1_owner: ['nameOwner1', owner],
+        _2_owner: ['nameCeo1', ceo],
+        _3_manager: ['nameManager1', manager]
+    }, function(name, who) {
+        it(t('anOwner', 'voteRequestTransaction', 'Should not able to vote a request transaction done.', true), async function() {
+            //Setup
+            await bbVault.createRequestTransaction(
+                name,
+                web3.toWei(0.001, 'ether'),
+                player1,
+                {from: who}
+            );
+
+            //Done
+            await bbVault.doneRequestTransaction(name);
+            const isDone = await bbVault.isDoneRequestTransaction(name, {from: who});
+            assert.equal(isDone, true);
+
+            //Invocation
+            try {
+                await bbVault.voteRequestTransaction(name, {from: who});
+                assert.ok(false, "It should have failed because request transaction is done.");
+            } catch(error) {
+                assert(error);
+                assert(error.message.includes("revert"));
+            }
+        });
+    });
+
+    withData({
+        _1_owner: ['invalidNameOwner1', owner],
+        _2_owner: ['invalidNameCeo1', ceo],
+        _3_manager: ['invalidNameManager1', manager]
+    }, function(name, who) {
+        it(t('anOwner', 'voteRequestTransaction', 'Should not able to vote a request transaction does NOT exist.', true), async function() {
+            //Invocation
+            try {
+                await bbVault.voteRequestTransaction(name, {from: who});
+                assert.ok(false, "It should have failed because request transaction does not exist.");
+            } catch(error) {
+                assert(error);
+                assert(error.message.includes("revert"));
+            }
+        });
+    });
+
+    withData({
+        _1_deposit_0_001: ['anUser', player1, 0.001],
+        _1_deposit_1_000: ['anUser', player3, 1.000],
+        _1_deposit_1_000: ['aOwner', owner, 1.000]
+    }, function(whoTitle, who, amountInEther) {
+        it(t(whoTitle, 'deposit', 'Should able to deposit.'), async function() {
+            //Setup
+            const amountInWei = web3.toWei(amountInEther, 'ether');
+            const initialBalance = await web3.eth.getBalance(bbVault.address).toNumber();
+            
+            //Invocation
+            await bbVault.deposit(
+                {
+                    from: who,
+                    value: amountInWei
+                }
+            );
+
+            //Assertions
+            const finalBalance = await web3.eth.getBalance(bbVault.address).toNumber();
+            assert.equal(finalBalance, parseInt(initialBalance) + parseInt(amountInWei));
+        })
+    });
+
+    withData({
+        _1_deposit_0_001: ['anUser', player1],
+        _1_deposit_1_000: ['anUser', player3],
+        _1_deposit_1_000: ['aOwner', owner]
+    }, function(whoTitle, who, amountInEther) {
+        it(t(whoTitle, 'deposit', 'Should not able to deposit zero weis.', true), async function() {
+            //Setup
+            const amountInWei = web3.toWei(amountInEther, 'ether');
+            const initialBalance = await web3.eth.getBalance(bbVault.address).toNumber();
+            
+            //Invocation
+            try {
+                await bbVault.deposit(
+                    {
+                        from: who,
+                        value: 0
+                    }
+                );
+                assert.ok(false, "It should have failed because amount is zero.");
+            } catch(error) {
+                assert(error);
+                assert(error.message.includes("revert"));
+                //Assertions
+                const finalBalance = await web3.eth.getBalance(bbVault.address).toNumber();
+                assert.equal(finalBalance, parseInt(initialBalance));
+            }
+        })
+    });
+
+    withData({
+        _1_request1: ['ANewRequest1', 0.01, player1],
+        _2_request2: ['ANewRequest2', 0.01, player2],
+        _3_request3: ['ANewRequest3', 0.01, player3]
+    }, function(name, amountInEther, toAccount) {
+        it(t('anUser', 'voteRequestTransaction', 'Should not able to vote a request transaction.'), async function() {
+            //Setup
+            await bbVault.createRequestTransaction(
+                name,
+                web3.toWei(amountInEther, 'ether'),
+                toAccount,
+                {from: owner}
+            );
+
+            try {
+                //Invocation
+                await bbVault.voteRequestTransaction(name, {from: toAccount});
+                assert.ok(false, "It should have failed because an user cannot vote a request transaction.");
+            } catch (error) {
+                assert(error);
+                assert(error.message.includes("revert"));
+            }
+        });
+    });
     //Withdrawal
-    //Vote a request done.
-    //Vote a request doesn't exist.
     //withdrawal a request done.
     //withdrawal a request doesn't exist.
+    //Deposit-Vote-Withdrawal
 });

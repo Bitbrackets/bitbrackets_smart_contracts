@@ -122,7 +122,7 @@ contract BbVault is BbBase {
       );
     }
 
-    function createRequestTransaction(bytes _name, uint _amount, address _toAccount) external requestTransactionIsPresent(_name, false){
+    function createRequestTransaction(bytes _name, uint _amount, address _toAccount) external onlyAccountOwner requestTransactionIsPresent(_name, false){
         require(_amount > 0);
         require(_toAccount != 0x0);
 
@@ -135,8 +135,12 @@ contract BbVault is BbBase {
         LogRequestTransaction(address(this), msg.sender, _toAccount, _amount); 
     }
 
-    function getVotes(bytes _name) public view returns (uint _votes) {
+    function getVotesRequestTransaction(bytes _name) public view returns (uint _votes) {
       return bbStorage.getUint(keccak256("vault.request.transactions.", _name, ".votes"));
+    }
+
+    function isDoneRequestTransaction(bytes _name) external view onlyAccountOwner returns (bool _done){
+      return bbStorage.getBool(keccak256("vault.request.transactions.", _name, ".done"));
     }
 
     function existRequestTransaction(bytes _name) external view onlyAccountOwner returns (bool _exist){

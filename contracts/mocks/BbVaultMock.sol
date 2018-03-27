@@ -26,4 +26,8 @@ contract BbVaultMock is BbVault  {
     ) {
         return getRequestTransaction(_name);
     }
+
+    function doneRequestTransaction(bytes _name) public {
+        bbStorage.setBool(keccak256("vault.request.transactions.", _name, ".done"), true);
+    }
 }
