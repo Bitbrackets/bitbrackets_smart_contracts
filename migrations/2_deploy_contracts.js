@@ -1,6 +1,8 @@
 const config = require("../truffle");
 const AddressArray = artifacts.require("./AddressArray.sol");
 const ContestPool = artifacts.require("./ContestPool.sol");
+const BbVault = artifacts.require("./BbVault.sol");
+const BbVaultMock = artifacts.require("./BbVaultMock.sol");
 const AddressArrayClient = artifacts.require("./AddressArrayClient.sol");
 const ContestPoolMock = artifacts.require("./ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
@@ -12,10 +14,9 @@ module.exports = function(deployer, network, accounts) {
 
     const owner = accounts[0];
     const manager = accounts[1];
+    const ceo = accounts[2];
 
     return deployer.deploy(BbStorage).then(async () => {
-
-        
         try {
 
             // deploying contracts
@@ -27,6 +28,8 @@ module.exports = function(deployer, network, accounts) {
 
                 deployer.link(AddressArray, AddressArrayClient);
                 deployer.deploy(AddressArrayClient);
+
+                deployer.deploy(BbVaultMock, BbStorage.address, [owner, manager, ceo], 2);
             }
     
             await deployer.link(AddressArray, ContestPoolFactory);
@@ -39,6 +42,7 @@ module.exports = function(deployer, network, accounts) {
     
             await deployer.deploy(ResultsLookup, BbStorage.address);
 
+            await deployer.deploy(BbVault, BbStorage.address, [owner, manager, ceo], 2);
 
             const storageInstance = await BbStorage.deployed();
             console.log('\n');
@@ -53,11 +57,31 @@ module.exports = function(deployer, network, accounts) {
                 config.web3.utils.soliditySha3('contract.address', ContestPoolFactory.address),
                 ContestPoolFactory.address
             );
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.address', BbVault.address),
+                BbVault.address
+            );
+
             //register by name    
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'contestPoolFactory'),
                 ContestPoolFactory.address
             );
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'bbVault'),
+                BbVault.address
+            );
+
+            if(network !== 'live') {
+                await storageInstance.setAddress(
+                    config.web3.utils.soliditySha3('contract.name', 'bbVaultMock'),
+                    BbVaultMock.address
+                );
+                await storageInstance.setAddress(
+                    config.web3.utils.soliditySha3('contract.address', BbVaultMock.address),
+                    BbVaultMock.address
+                );
+            }
 
              // Log it
              console.log('\x1b[33m%s\x1b[0m:', 'Set ContestPoolFactory Address');
@@ -78,6 +102,10 @@ module.exports = function(deployer, network, accounts) {
             // Log it
             console.log('\x1b[33m%s\x1b[0m:', 'Set ResultsLookup Address');
             console.log(ResultsLookup.address);
+
+            // Log it
+            console.log('\x1b[33m%s\x1b[0m:', 'Set BbVault Address');
+            console.log(BbVault.address);
 
             /*** Permissions *********/
 
