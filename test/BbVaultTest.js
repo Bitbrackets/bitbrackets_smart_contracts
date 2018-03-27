@@ -309,8 +309,75 @@ contract('BbVaultTest', accounts => {
             }
         });
     });
-    //Withdrawal
-    //withdrawal a request done.
-    //withdrawal a request doesn't exist.
-    //Deposit-Vote-Withdrawal
+
+    withData({
+        _1_request1: ['AWithdrawalRequest1', 0.01, [player1, player2], owner],
+        _2_request2: ['AWithdrawalRequest2', 0.02, [player2], manager],
+        _3_request3: ['AWithdrawalRequest3', 0.03, [player3], ceo]
+    }, function(name, amountInEther, whoDeposits, whoWithdraw) {
+        it(t('anOwner', 'withdrawal', 'Should able to withdrawal a request transaction.'), async function() {
+            //Setup
+            const initialBalance = await web3.eth.getBalance(bbVault.address).toNumber();
+            const amountInWeis = web3.toWei(amountInEther, 'ether');
+            const totalDeposit = whoDeposits.length * amountInWeis;
+            
+            for(whoDeposit in whoDeposits) {
+                await bbVault.deposit({from: whoDeposits[whoDeposit], value: amountInWeis});    
+            }
+
+            const afterDepositBalance = await web3.eth.getBalance(bbVault.address).toNumber();
+            await bbVault.createRequestTransaction(
+                name,
+                totalDeposit,
+                player3,
+                {from: owner}
+            );
+            await bbVault.voteRequestTransaction(name, {from: owner});
+            await bbVault.voteRequestTransaction(name, {from: manager});
+
+            //Invocation
+            await bbVault.withdraw(name, {from: owner});
+
+            assert.equal(afterDepositBalance - initialBalance, totalDeposit);
+            
+            const finalBalance = await web3.eth.getBalance(bbVault.address).toNumber();
+
+            assert.equal(finalBalance, initialBalance);
+        });
+    });
+
+    withData({
+        _1_request1: ['InvalidTransactionRequest1', owner],
+        _2_request2: ['InvalidTransactionRequest2', manager],
+        _3_request3: ['InvalidTransactionRequest3', ceo]
+    }, function(name, who) {
+        it(t('anOwner', 'withdrawal', 'Should not able to withdrawal a invalid request transaction.', true), async function() {
+            //Invocation
+            try {
+                await bbVault.withdraw(name, {from: who});
+                assert.ok(false, "It should have failed because transaction request does not exist.");
+            } catch(error) {
+                assert(error);
+                assert(error.message.includes("revert"));
+            }
+        });
+    });
+
+    withData({
+        _1_request1: ['DoneTransactionRequest1', owner],
+        _2_request2: ['DoneTransactionRequest2', manager],
+        _3_request3: ['DoneTransactionRequest3', ceo]
+    }, function(name, who) {
+        it(t('anOwner', 'withdrawal', 'Should not able to withdrawal a request transaction done.', true), async function() {
+            await bbVault.doneRequestTransaction(name);
+            //Invocation
+            try {
+                await bbVault.withdraw(name, {from: who});
+                assert.ok(false, "It should have failed because transaction request is done.");
+            } catch(error) {
+                assert(error);
+                assert(error.message.includes("revert"));
+            }
+        });
+    });
 });
