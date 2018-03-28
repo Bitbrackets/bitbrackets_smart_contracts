@@ -124,5 +124,4 @@ contract ContestPoolMock is ContestPool {
 
     function _isAfterGraceTime() public view isAfterGraceTime {
     }
-
 }

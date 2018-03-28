@@ -1,5 +1,6 @@
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
+const BbVault = artifacts.require("./BbVault.sol");
 const leche = require('leche');
 const withData = leche.withData;
 const dateUtil = require('./utils/DateUtil');
@@ -45,12 +46,12 @@ contract('ContestPoolGetTotalWinnersFeeTest', accounts => {
         _1_0Pay_fee_10_10: [10, 10, emptyPayments, 80],
         _2_0Pay_fee_05_00: [ 5,  0, emptyPayments, 95],
         _3_0Pay_fee_00_00: [ 0,  0, emptyPayments, 100],
-        _4_1Pay_fee_10_00: [10,  0, [owner], 100],
+        _4_1Pay_fee_10_00: [10,  0, [BbVault.address], 100],
         _5_1Pay_fee_10_00: [ 0,  10, [owner], 90],
         _6_1Pay_fee_10_00: [10,  0, [manager], 90],
         _7_1Pay_fee_10_00: [ 0,  10, [manager], 100],
         _8_1Pay_fee_10_10: [10,  10, [manager], 90],
-        _9_2Pay_fee_05_05: [ 5,   5, [manager, owner], 100] 
+        _9_2Pay_fee_05_05: [ 5,   5, [manager, BbVault.address], 100] 
     }, function(ownerFee, managerFee, payments, expectedTotalWinnersFee) {
         it(t('anUser', 'getTotalWinnersFee', 'Should be equals to ' + expectedTotalWinnersFee + '.'), async function() {
             //Setup

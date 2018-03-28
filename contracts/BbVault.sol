@@ -1,12 +1,18 @@
 pragma solidity ^0.4.19;
 
 import "./BbBase.sol";
+import "./interface/BbVaultInterface.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 
-/// @title Ether held by BitBrackets Pool are stored here in the vault for safe keeping
-/// @author Guillermo Salazar
-contract BbVault is BbBase {
+/**
+ * This contract is the BbVaultInterface's implementation for BitBrackets.
+ * This contract stores the ethers transferred from other BitBrackets' contracts for safe keeping.
+ * It also implements a multiple signatures logic for transfering ether to other accounts based on votes from the owners.
+ *
+ * @author Guillermo Salazar
+ */
+contract BbVault is BbBase, BbVaultInterface {
 
     /**** Libs *****************/    
     using SafeMath for uint;
@@ -50,7 +56,6 @@ contract BbVault is BbBase {
 
     /*** Modifiers *************/
 
-
     /// @dev Only allow access from the owner of that account
     modifier onlyAccountOwner() {
         // Check it's the account owner or the top level owner
@@ -70,7 +75,6 @@ contract BbVault is BbBase {
       require(bbStorage.getBool(keccak256("vault.request.transactions.", _name, ".done")) == _done);
       _;
     }
-
 
     /*** Constructor ***********/    
     function BbVault(address _bbStorageAddress, address[] _owners, uint _required) BbBase(_bbStorageAddress) public {
@@ -100,7 +104,7 @@ contract BbVault is BbBase {
       LogAddOwner(address(this), _owner);
     }
 
-    function deposit() payable external returns(uint256) {
+    function deposit() payable external {
         require(msg.value > 0);
 
         LogDeposit(address(this), msg.sender, msg.value, now);
