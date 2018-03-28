@@ -2,6 +2,7 @@ pragma solidity ^0.4.19;
 
 import "./ContestPool.sol";
 import "./interface/BbStorageInterface.sol";
+import "./interface/BbVaultInterface.sol";
 import "./BbBase.sol";
 
 
@@ -122,8 +123,17 @@ contract ContestPoolFactory is BbBase {
         return newContestPoolAddress;
     }
 
-    function withdrawFee() public onlyOwner {
+    function getOwner() internal view returns (address _owner) {
+        return bbStorage.getAddress(keccak256("contract.name", "bbVault"));
+    }
+
+    function getBbVault() internal view returns (BbVaultInterface _vault) {
+        return BbVaultInterface(getOwner());
+    }
+
+    function withdrawFee() public onlySuperUser {
         require(this.balance > 0);
-        msg.sender.transfer(this.balance);
+        BbVaultInterface bbVault = getBbVault();
+        bbVault.deposit.value(this.balance)();
     }
 }

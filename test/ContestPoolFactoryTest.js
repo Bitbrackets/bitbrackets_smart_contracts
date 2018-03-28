@@ -1,5 +1,6 @@
 var ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 var ContestPool = artifacts.require("./ContestPool.sol");
+var BbVault = artifacts.require("./BbVault.sol");
 const t = require('./utils/TestUtil').title;
 const stringUtils = require('./utils/StringUtil');
 const toMillis = require('./utils/DateUtil').toMillis;
@@ -245,7 +246,7 @@ contract('ContestPoolFactory', function (accounts) {
             ownerFee
         );
 
-        const initialOwnerBalance = await web3.eth.getBalance(owner).toNumber();
+        const initialBbVaultBalance = await web3.eth.getBalance(BbVault.address).toNumber();
         
         const initialBalanceFactory = await web3.eth.getBalance(instance.address).toNumber();
         
@@ -264,12 +265,12 @@ contract('ContestPoolFactory', function (accounts) {
         const finalBalanceFactory = await web3.eth.getBalance(instance.address).toNumber();
         assert.equal(finalBalanceFactory, 0);
 
-        const finalOwnerBalance = await web3.eth.getBalance(owner).toNumber();
-        assert.ok(finalOwnerBalance >= initialOwnerBalance);
+        const finalBbVaultBalance = await web3.eth.getBalance(BbVault.address).toNumber();
+        assert.ok(finalBbVaultBalance >= initialBbVaultBalance);
         
-        const expectedFinalOwnerBalance = parseInt(initialBalanceFactory) + parseInt(initialOwnerBalance);
+        const expectedFinalBbVaultBalance = parseInt(initialBalanceFactory) + parseInt(initialBbVaultBalance);
         
-        assert.ok(finalOwnerBalance >= expectedFinalOwnerBalance);
+        assert.ok(finalBbVaultBalance >= expectedFinalBbVaultBalance);
     });
     
     it(t('aPlayer', 'withdrawFee', 'Should not able to withdraw balance from factory.', true), async function () {
