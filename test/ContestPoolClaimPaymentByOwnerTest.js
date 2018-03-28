@@ -2,6 +2,7 @@ const leche = require('leche');
 const withData = leche.withData;
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
+const BbVault = artifacts.require("./BbVault.sol");
 const {assertEvent, emptyCallback} = require("./utils/utils.js");
 const t = require('./utils/TestUtil').title;
 const amount = require('./utils/AmountUtil').expected;
@@ -68,13 +69,13 @@ contract('ContestPoolClaimPaymentByOwnerTest', accounts => {
             await builder.paymentsTrue(owner, payments);
             await builder.currentTime(owner, 2018, 01, 01);
             
-            const initialOwnerBalance = await web3.eth.getBalance(owner).toNumber();
+            const initialBbVaultBalance = await web3.eth.getBalance(BbVault.address).toNumber();
             const initialContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
 
             await builder.predictionsDef(amountPerPlayer, defaultPrediction, players);
             await builder.currentTime(owner, 2018, 01, 16);
 
-            const afterPredictionOwnerBalance = await web3.eth.getBalance(owner).toNumber();
+            const afterPredictionBbVaultBalance = await web3.eth.getBalance(BbVault.address).toNumber();
             const afterPredictionContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
             const expectedOwnerAmount = afterPredictionContractBalance * ownerFee / 100;
 
@@ -85,21 +86,21 @@ contract('ContestPoolClaimPaymentByOwnerTest', accounts => {
             //Assert event
             await assertEvent(contestPoolInstance, {event: 'LogClaimPaymentByOwner', args: {
                 contractAddress: contestPoolInstance.address,
-                owner: owner
+                owner: BbVault.address
             }}, 1, emptyCallback);
 
-            const finalOwnerBalance = await web3.eth.getBalance(owner).toNumber();
+            const finalBbVaultBalance = await web3.eth.getBalance(BbVault.address).toNumber();
             const finalContractBalance = await web3.eth.getBalance(contestPoolInstance.address).toNumber();
 
             //Assert contract balance between before and after claiming payment by the owner. 
             assert.equal(finalContractBalance, afterPredictionContractBalance - expectedOwnerAmount);
 
             //Assert payment was done for the winner.
-            const paymentsResult = await contestPoolInstance.payments(owner);
+            const paymentsResult = await contestPoolInstance.payments(BbVault.address);
             assert.ok(paymentsResult);
 
             //Assert owner balance between 'after sending prediction' and final one.
-            assert.ok(finalOwnerBalance, afterPredictionOwnerBalance + expectedOwnerAmount);
+            assert.ok(finalBbVaultBalance, afterPredictionBbVaultBalance + expectedOwnerAmount);
         });
     });
 
@@ -128,7 +129,7 @@ contract('ContestPoolClaimPaymentByOwnerTest', accounts => {
             //Assertions
             await assertEvent(contestPoolInstance, {event: 'LogClaimPaymentByOwner', args: {
                 contractAddress: contestPoolInstance.address,
-                owner: owner
+                owner: BbVault.address
             }}, 1, emptyCallback);
 
             try {

@@ -2,6 +2,7 @@ pragma solidity ^0.4.19;
 
 import "./BbBase.sol";
 import "./interface/BbStorageInterface.sol";
+import "./interface/BbVaultInterface.sol";
 import "./interface/ResultsLookupInterface.sol";
 import "./AddressArray.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
@@ -194,6 +195,10 @@ contract ContestPool is BbBase {
 
     /*** Methods ***************/
 
+    function getBbVault() internal view returns (BbVaultInterface _vault) {
+        return BbVaultInterface(getOwner());
+    }
+
     function getWinners() public view returns (address[] ) {
         return winners.items;
     }
@@ -226,7 +231,7 @@ contract ContestPool is BbBase {
     }
 
     function getOwner() internal view returns (address _owner) {
-        return bbStorage.getAddress(keccak256("contract.name", "owner"));
+        return bbStorage.getAddress(keccak256("contract.name", "bbVault"));
     }
 
     /**
@@ -312,15 +317,18 @@ contract ContestPool is BbBase {
         return players.mul(amountPerPlayer).sub(amountPaid);
     }
 
-    function claimPaymentByOwner() public onlyOwner isAfterStartTime {
-        require(!payments[getOwner()]);
+    function claimPaymentByOwner() public onlySuperUser isAfterStartTime {
+        address bbVaultAddress = getOwner();
+        require(!payments[bbVaultAddress]);
         uint ownerAmount = getAmount(ownerFee);
 
-        payments[msg.sender] = true;
+        payments[bbVaultAddress] = true;
         addAmountPaid(ownerAmount);
-        msg.sender.transfer(ownerAmount);
+
+        BbVaultInterface bbVault = getBbVault();
+        bbVault.deposit.value(ownerAmount)();
         
-        LogClaimPaymentByOwner(this, msg.sender, ownerAmount);
+        LogClaimPaymentByOwner(this, bbVaultAddress, ownerAmount);
     }
 
     function addWinnerDependingOnScore(address _potentialWinner, uint _aScore) internal returns (bool _newHighScore){
