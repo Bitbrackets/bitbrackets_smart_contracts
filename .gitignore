@@ -3,6 +3,11 @@ package-lock.json
 build/
 .idea
 .vscode
+.env
 coverage/
 coverageEnv/
 coverage.json
+private_network/chaindata
+/.soliumignore
+/.soliumrc.json
+/.node*

@@ -8,9 +8,16 @@ const ContestPoolMock = artifacts.require("./ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
+const jsonfile = require('jsonfile');
+const contractsJson = './build/contracts.json';
 
+const contracts = {};
+const networksForMocks = ["test"];
 
 module.exports = function(deployer, network, accounts) {
+    const deployMocks = networksForMocks.indexOf(network) > -1;
+    console.log(`Starting deploy contracts in '${network}' network.`);
+    console.log(`Deploying mock contracts? ${deployMocks}`);
 
     const owner = accounts[0];
     const manager = accounts[1];
@@ -18,11 +25,9 @@ module.exports = function(deployer, network, accounts) {
 
     return deployer.deploy(BbStorage).then(async () => {
         try {
-
-            // deploying contracts
             await deployer.deploy(AddressArray);
     
-            if(network !== 'live') {
+            if(deployMocks) {
                 deployer.link(AddressArray, ContestPool);
                 deployer.deploy(ContestPool, owner, manager, "", 0,0,0,10, 10000, 10, 10);
 
@@ -34,17 +39,22 @@ module.exports = function(deployer, network, accounts) {
     
             await deployer.link(AddressArray, ContestPoolFactory);
             await deployer.deploy(ContestPoolFactory, BbStorage.address);
-    
-            if(network !== 'live') {
+   
+            contracts.contestPoolFactory = ContestPoolFactory.address;
+            
+            if(deployMocks) {
                 deployer.link(AddressArray, ContestPoolMock);
                 deployer.deploy(ContestPoolMock, owner, manager);
             }
     
             await deployer.deploy(ResultsLookup, BbStorage.address);
+            contracts.resultsLookup = ResultsLookup.address;
 
             await deployer.deploy(BbVault, BbStorage.address, [owner, manager, ceo], 2);
+			contracts.vault = BbVault.address;
 
             const storageInstance = await BbStorage.deployed();
+            contracts.storage = BbStorage.address;
             console.log('\n');
             
             // Log it
@@ -123,10 +133,14 @@ module.exports = function(deployer, network, accounts) {
             // Log it
             console.log('\x1b[32m%s\x1b[0m', 'Post - Storage Direct Access Removed');
 
+            jsonfile.writeFile(contractsJson, contracts, {spaces: 2, EOL: '\r\n'}, function (err) {
+                console.log(`JSON file created at '${contractsJson}'.`);
+                console.error("Errors: " + err);
+            });
+
         } catch (error) {
             console.error("Error on deploy: ", error);
         }
-
         return deployer;
     }); 
 
