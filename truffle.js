@@ -4,7 +4,13 @@ const web3 = new Web3();
 const HDWalletProvider = require("truffle-hdwallet-provider");
 const Wallet = require('ethereumjs-wallet');
 
-const infuraKey = new Buffer(process.env["INFURA_KEY"], "hex");
+const infuraKeyValue = process.env["INFURA_KEY"] || '';
+
+if(infuraKeyValue === '') {
+  console.log('WARNING: The infura key is empty. It should not be empty.');
+}
+
+const infuraKey = new Buffer(infuraKeyValue, "hex");
 
 // You can get the current gasLimit by running
 // truffle deploy --network rinkeby
