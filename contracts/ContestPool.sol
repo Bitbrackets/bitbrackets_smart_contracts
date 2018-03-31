@@ -5,7 +5,7 @@ import "./interface/BbStorageInterface.sol";
 import "./interface/BbVaultInterface.sol";
 import "./interface/ResultsLookupInterface.sol";
 import "./AddressArray.sol";
-import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./SafeMath.sol";
 
 
 contract ContestPool is BbBase {
