@@ -27,8 +27,7 @@ contract BbVault is BbBase, BbVaultInterface {
     event LogDeposit (
         address indexed contractAddress,
         address indexed from,
-        uint256 value,
-        uint256 when
+        uint256 value
     );
 
     event LogRequestTransaction (
@@ -49,8 +48,7 @@ contract BbVault is BbBase, BbVaultInterface {
         address indexed contractAddress,
         address indexed toAccount,
         uint256 indexed value,
-        bytes name,
-        uint256 when
+        bytes name
     );
 
 
@@ -91,7 +89,7 @@ contract BbVault is BbBase, BbVaultInterface {
     /**** Methods ***********/
 
     function () payable public {
-      LogDeposit(address(this), msg.sender, msg.value, now);
+      LogDeposit(address(this), msg.sender, msg.value);
     }
 
     function setRequired(uint _required) internal {
@@ -107,7 +105,7 @@ contract BbVault is BbBase, BbVaultInterface {
     function deposit() payable external {
         require(msg.value > 0);
 
-        LogDeposit(address(this), msg.sender, msg.value, now);
+        LogDeposit(address(this), msg.sender, msg.value);
     }
 
     function getRequestTransaction(bytes _name) internal view requestTransactionIsPresent(_name, true) returns (
@@ -182,6 +180,6 @@ contract BbVault is BbBase, BbVaultInterface {
 
       _toAccount.transfer(_amount);
 
-      LogWithdrawal(address(this), _toAccount, _amount, _name, now);
+      LogWithdrawal(address(this), _toAccount, _amount, _name);
     }
 }

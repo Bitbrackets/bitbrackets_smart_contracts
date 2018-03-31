@@ -24,7 +24,27 @@ truffle test
 * Project uses Open Zepellin Contracts
 https://github.com/OpenZeppelin/zeppelin-solidity
 
-* Deployment instructions
+### Deployment instructions ###
+
+* Download and install Geth (https://geth.ethereum.org/downloads/)
+* The folder **./private_network** contains all the data and commands for the private network.
+
+* #### 1 - Configure your Private Network ####
+    * Run the file **1_config** located in **private_network** folder.
+* #### 2 - Start Geth ####
+    * Run the file **2_start_geth** located in **private_network** folder.
+* #### 3 - Attach Geth to your Private Network ####
+
+In order to can deploy our smart contract into Geth, we need to start mining in our private network. To do that, first we need to create an account and unlock it following these steps.
+
+* In a new console run the file ***3_attach_geth*** located in ***private_network*** folder.
+    * It will show you a *Geth Console* with *>* prompted. 
+        * You need to create a new account typing **personal.newAccount()** command. It will ask you for a password. Or you can type **personal.newAccount("password")** command.
+        * Once you press enter and type the password, it will show you your new address.
+        * Now we have to unlock the new account, in order to mine in our private network. To do so, type the **personal.unlockAccount(eth.accounts[0])** command. It will ask you the password you wrote before.
+        * Finally, we can start mining. Type: **miner.start(1)**. After that you will see the message ***Update mining threads*** in the first console we opened.
+* The last step is deploy our contracts. Now we need to open a new console, and type **truffle migrate --reset --network geth**.
+
 
 ### Contribution guidelines ###
 
