@@ -2,7 +2,7 @@ pragma solidity ^0.4.19;
 
 import "./BbBase.sol";
 import "./interface/BbVaultInterface.sol";
-import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./SafeMath.sol";
 
 
 /**
