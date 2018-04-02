@@ -64,7 +64,7 @@ contract ContestPoolUpgradable is BbProxyBase {
         uint _managerFee,
         uint _ownerFee
         // bytes32 _targetId
-    ) public BbBase(_storage) BbProxyBase(_storage, "ContestPoolBase")
+    ) public BbBase(_storage) BbProxyBase(_storage, "contestPoolBase")
     {
         manager = _manager;
         contestName = _contestName;
