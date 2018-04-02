@@ -1,28 +1,24 @@
 pragma solidity ^0.4.18;
 
-/// @title It looks for a specific result.
-/// @author Guillermo Salazar
-
 import "./interface/BbStorageInterface.sol";
 import "./BbBase.sol";
 
-
-
+/// @title It looks for a specific result.
+/// @author Guillermo Salazar
 contract ResultsLookup is BbBase {
+
+    // Events
 
     event LogRegisterResult (
         bytes32 indexed contestName,
         uint8[100] result,
-        uint numberOfGames,
-        uint whenDateTime
+        uint numberOfGames
     );
 
-    // Modifier
-
+    // Functions
 
     function ResultsLookup(address _storageAddress) public BbBase(_storageAddress) {
         version = 1;
-        // owner = msg.sender;
     }
     
     
@@ -30,7 +26,7 @@ contract ResultsLookup is BbBase {
         bbStorage.setUint(keccak256("contest.playedGames", contestName), games);
         bbStorage.setInt8Array(keccak256("contest.result", contestName), result);
 
-        LogRegisterResult(contestName, result, games, now);
+        LogRegisterResult(contestName, result, games);
     }
 
     function getResult(bytes32 contestName) public view returns (uint8[100], uint ) {
@@ -41,6 +37,5 @@ contract ResultsLookup is BbBase {
         require(result.length > 0);
 
         return (result, games);
-        
     }
 }
