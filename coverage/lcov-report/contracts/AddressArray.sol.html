@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">44.44% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>4/9</span>
+        <span class='fraction'>10/10</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">50% </span>
+        <span class="strong">75% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>2/4</span>
+        <span class='fraction'>3/4</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">50% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>1/2</span>
+        <span class='fraction'>3/3</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">44.44% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>4/9</span>
+        <span class='fraction'>10/10</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -66,51 +66,81 @@
 21
 22
 23
-24</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">42×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-yes">100×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity ^0.4.19;
 &nbsp;
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
+&nbsp;
 library AddressArray {
+    using SafeMath for uint256;
 &nbsp;
-<span class="fstat-no" title="function not covered" >    function remove(address[] storage array, uint index) public returns(address[]</span>) {
-<span class="cstat-no" title="statement not covered" >        if (index &gt;= array.length) <span class="cstat-no" title="statement not covered" >return;</span></span>
+    struct Addresses {
+        address[]   items;
+        uint        count;
+    }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        for (uint i = index; i &lt; array.length-1; i++){</span>
-<span class="cstat-no" title="statement not covered" >            array[i] = array[i+1]</span>;
-        }
-        array.length--;
-<span class="cstat-no" title="statement not covered" >        return array;</span>
-    }    
-&nbsp;
-    function contains(address[] array, address item) public pure returns(bool) {
-&nbsp;
-        for (uint i = 0; i &lt; array.length-1; i++){
-            if(array[i] == item) {
+    function containsItem(Addresses storage array, address item) public view returns(bool) {
+        for (uint i = 0; i &lt; array.count; i++){
+            if(array.items[i] == item) {
                 return true;
             }
         }
         return false;
+    }
+&nbsp;
+    function addItem(Addresses storage array, address value) public {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if(array.count == array.items.length) {
+            array.items.length = array.items.length.add(1);
+        }
+        array.items[array.count] = value;
+        array.count = array.count.add(1);
+    }
+&nbsp;
+    function clear(Addresses storage array) public {
+        array.count = 0;
+        array.items.length = 0;
     }
 } </pre></td></tr>
 </table></pre>
@@ -118,7 +148,7 @@ library AddressArray {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sun Mar 18 2018 10:38:27 GMT-0600 (CST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Mar 22 2018 18:23:42 GMT-0600 (CST)
 </div>
 </div>
 <script src="../prettify.js"></script>

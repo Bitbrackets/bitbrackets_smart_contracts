@@ -8,6 +8,7 @@ const ContestPoolMock = artifacts.require("./ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
+const ContestPoolBase = artifacts.require("./ContestPoolBase.sol");
 const jsonfile = require('jsonfile');
 const contractsJson = './build/contracts.json';
 
@@ -51,6 +52,9 @@ module.exports = function(deployer, network, accounts) {
     
             await deployer.link(AddressArray, ContestPoolFactory);
             await deployer.deploy(ContestPoolFactory, BbStorage.address);
+
+            deployer.link(AddressArray, ContestPoolBase);
+            deployer.deploy(ContestPoolBase, BbStorage.address);
    
             contracts.contestPoolFactory = ContestPoolFactory.address;
             
@@ -75,6 +79,11 @@ module.exports = function(deployer, network, accounts) {
                 config.web3.utils.soliditySha3('contract.address', BbVault.address),
                 BbVault.address
             );
+            // possible security risk we only want this contract to be lookup by name
+            // await storageInstance.setAddress(
+            //     config.web3.utils.soliditySha3('contract.address', ContestPoolBase.address),
+            //     ContestPoolBase.address
+            // );
 
             //register by name    
             await storageInstance.setAddress(
@@ -84,6 +93,10 @@ module.exports = function(deployer, network, accounts) {
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'bbVault'),
                 BbVault.address
+            );
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'contestPoolBase'),
+                ContestPoolBase.address
             );
 
             if(deployMocks) {
@@ -131,7 +144,9 @@ module.exports = function(deployer, network, accounts) {
             console.log('\x1b[33m%s\x1b[0m:', 'Set ResultsLookup Address');
             console.log(ResultsLookup.address);
             console.log('\x1b[33m%s\x1b[0m:', 'Set BbVault Address');
-            console.log(BbVault.address);            
+            console.log(BbVault.address);   
+            console.log('\x1b[33m%s\x1b[0m:', 'Set ContestPoolBase Address');
+            console.log(ContestPoolBase.address);           
             console.log('\x1b[32m%s\x1b[0m', 'Post - Storage Direct Access Removed');
 
             jsonfile.writeFile(contractsJson, contracts, {spaces: 2, EOL: '\r\n'}, function (err) {
