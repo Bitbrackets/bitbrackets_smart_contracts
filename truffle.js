@@ -23,8 +23,8 @@ module.exports = {
     geth: {
       host: "localhost",
       port: 8045,
-      network_id: "*",
-      gas: "7000000000"
+      network_id: "*"/*,
+      gas: "7000000000"*/
     },
     ganache: {
       host: "127.0.0.1",
