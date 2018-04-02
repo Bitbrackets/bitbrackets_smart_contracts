@@ -8,7 +8,7 @@ import "./AddressArray.sol";
 import "./SafeMath.sol";
 
 
-contract ContestPool is BbBase {
+contract ContestPoolBase is BbBase {
     using SafeMath for uint256;
     using AddressArray for AddressArray.Addresses;
 
@@ -162,7 +162,7 @@ contract ContestPool is BbBase {
         _;
     }
 
-    function ContestPool(
+    function ContestPoolBase(
         address _storage
         // address _manager,
         // bytes32 _contestName,
