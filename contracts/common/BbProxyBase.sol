@@ -8,19 +8,19 @@ import "../interface/BbStorageInterface.sol";
 /// @author Doug Molina
 contract BbProxyBase is DelegateProxy, BbBase {
     
-    bytes32 public targetId;
+    string public targetId;
 
     /**
     * @dev Constructor BbProxyBase
     * @param _storage Reference for Global storage
     * @param _targetId Identifier for Forward Contract
     */
-    function BbProxyBase(address _storage, bytes32 _targetId) public BbBase(_storage) {
+    function BbProxyBase(address _storage, string _targetId) public BbBase(_storage) {
         targetId = _targetId;
 
         // Check that targetAddress is a contract to delegate
         address targetAddress = getTargetAddress(_targetId);
-        require(isContract(targetAddress));
+        //require(isContract(targetAddress));
     }
 
     function () public payable {
@@ -29,9 +29,15 @@ contract BbProxyBase is DelegateProxy, BbBase {
         delegatedFwd(target, msg.data);
     }
 
-    function getTargetAddress(bytes32 _targetId) internal view returns (address) {
+    function getTargetId() external view returns (string) {
+        return targetId;
+    }
+
+    function getTargetAddress(string _targetId) internal view returns (address) {
         return bbStorage.getAddress(keccak256("contract.name", _targetId));
     }
+
+
 
 
 }

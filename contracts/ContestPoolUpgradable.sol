@@ -76,4 +76,10 @@ contract ContestPoolUpgradable is BbProxyBase {
         ownerFee = _ownerFee;
         managerFee = _managerFee;
     }
+
+    function getVersion() public view returns (uint256 ) {
+        address target = getTargetAddress(targetId);
+        require(target != 0); // if contract code hasn't been set yet, don't call
+        delegatedFwd(target, msg.data);
+    }
 }

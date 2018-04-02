@@ -1,7 +1,7 @@
 pragma solidity ^0.4.19;
 
-//import "./ContestPool.sol";
-import "./ContestPoolUpgradable.sol";
+import "./ContestPool.sol";
+//import "./ContestPoolUpgradable.sol";
 import "./interface/BbStorageInterface.sol";
 import "./interface/BbVaultInterface.sol";
 import "./BbBase.sol";
@@ -107,7 +107,7 @@ contract ContestPoolFactory is BbBase {
         require(definition.maxBalance > _amountPerPlayer);
 
         address manager = msg.sender;
-        ContestPoolUpgradable newContestPoolAddress = new ContestPoolUpgradable(
+        ContestPool newContestPoolAddress = new ContestPool(
             address(bbStorage),
             manager,
             definition.contestName,
