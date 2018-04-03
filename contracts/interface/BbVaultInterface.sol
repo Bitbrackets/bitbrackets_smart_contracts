@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 /**
  * This contract is used as a vault for all the contracts in BitBrackets.
