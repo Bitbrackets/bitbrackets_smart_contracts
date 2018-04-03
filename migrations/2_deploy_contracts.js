@@ -20,17 +20,19 @@ module.exports = function(deployer, network, accounts) {
         throw new Error(`The deployment needs at least 3 accounts. Actual accounts ${accounts.length}.`);
     }
 
-    const deployMocks = networksForMocks.indexOf(network) > -1;
-    console.log(`Starting deploy contracts in '${network}' network.`);
-    console.log(`Deploying mock contracts? ${deployMocks}`);
-
     const owner = accounts[0];
     const manager = accounts[1];
     const ceo = accounts[2];
 
+    const deployMocks = networksForMocks.indexOf(network) > -1;
+
+    console.log('\n\n\n==================================================');
+    console.log(`Starting deploy contracts in '${network}' network.`);
+    console.log(`Deploying mock contracts? ${deployMocks}`);
     console.log('Owner: ' + owner);
     console.log('Manager: ' + manager);
     console.log('CEO: ' + ceo);
+    console.log('==================================================\n\n\n');
 
     return deployer.deploy(BbStorage).then(async () => {
         try {
