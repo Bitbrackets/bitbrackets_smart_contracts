@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity 0.4.21;
 
 import "./interface/BbStorageInterface.sol";
 import "./BbBase.sol";
@@ -25,8 +25,7 @@ contract ResultsLookup is BbBase {
     function registerResult(bytes32 contestName, uint8[100] result, uint games) public onlySuperUser {
         bbStorage.setUint(keccak256("contest.playedGames", contestName), games);
         bbStorage.setInt8Array(keccak256("contest.result", contestName), result);
-
-        LogRegisterResult(contestName, result, games);
+        emit LogRegisterResult(contestName, result, games);
     }
 
     function getResult(bytes32 contestName) public view returns (uint8[100], uint ) {

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 import "./ContestPool.sol";
 import "./interface/BbStorageInterface.sol";
@@ -89,13 +89,13 @@ contract ContestPoolFactory is BbBase {
             managerFee: _managerFee,
             ownerFee: _ownerFee
         });
-        CreateContestPoolDefinition(
+        definitions[_contestName] = newDefinition;
+        emit CreateContestPoolDefinition(
             _contestName, 
             _startTime, 
             _endTime, 
             _graceTime
         );
-        definitions[_contestName] = newDefinition;
     }
         
     function createContestPool(bytes32 _contestName, uint _amountPerPlayer) 
@@ -119,7 +119,7 @@ contract ContestPoolFactory is BbBase {
             definition.ownerFee
         );
 
-        CreateContestPool(definition.contestName, manager, newContestPoolAddress);
+        emit CreateContestPool(definition.contestName, manager, newContestPoolAddress);
         return newContestPoolAddress;
     }
 
@@ -132,8 +132,9 @@ contract ContestPoolFactory is BbBase {
     }
 
     function withdrawFee() public onlySuperUser {
-        require(this.balance > 0);
+        address _this = address(this);
+        require(_this.balance > 0);
         BbVaultInterface bbVault = getBbVault();
-        bbVault.deposit.value(this.balance)();
+        bbVault.deposit.value(_this.balance)();
     }
 }

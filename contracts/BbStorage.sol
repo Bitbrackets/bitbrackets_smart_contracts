@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 
 /// @title Eternal Storage for Bit Brackets Contracts

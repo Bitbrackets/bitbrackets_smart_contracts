@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity 0.4.21;
 
 import "../../contracts/ContestPool.sol";
 
@@ -116,7 +116,7 @@ contract ContestPoolMock is ContestPool {
     }
 
     function getBalance() public view returns (uint) {
-        return this.balance;
+        return address(this).balance;
     }
 
     function _onlyWinner() public view onlyWinner {
