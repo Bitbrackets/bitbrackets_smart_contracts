@@ -45,6 +45,28 @@ In order to can deploy our smart contract into Geth, we need to start mining in 
         * Finally, we can start mining. Type: **miner.start(1)**. After that you will see the message ***Update mining threads*** in the first console we opened.
 * The last step is deploy our contracts. Now we need to open a new console, and type **truffle migrate --reset --network geth**.
 
+### Deployment to Testnets or Mainnet ###
+
+In order to can deploy the smart contracts to testnets (Rinkeby, Kovan, or Ropsten), mainnet, or infura net using the Infura service, you need to configure some parameters.
+
+To do that, it needs to create a ``.env`` file in the root folder with some key/values.
+
+```
+INFURA_KEY="INFURA_KEY"
+GAS_PRICE_GWEI_KEY="20"
+GAS_WEI_KEY=4600000
+MNEMONIC_KEY="mnemonic 12 phrases"
+ADDRESS_COUNT_KEY=3
+```
+
+The **optional** key/values are:
+```
+GAS_PRICE_GWEI_KEY="20"
+GAS_WEI_KEY=4600000
+ADDRESS_COUNT_KEY=3
+```
+If some of them are not defined in ``.env``, the process will take those values by default.
+
 
 ### Contribution guidelines ###
 
@@ -58,3 +80,9 @@ Using Solium for Linter Solidity https://github.com/duaraghav8/Solium
 
 * Repo owner or admin
 Slack
+
+### TODO List ##
+
+* Fix warnings in smart contracts.
+* Remove ^ in the dependencies in package.json file.
+* Remove ^ in smart contracts.
