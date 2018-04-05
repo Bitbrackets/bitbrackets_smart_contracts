@@ -7,10 +7,12 @@
     "test": "test"
   },
   "scripts": {
-    "win-test-ganache": "truffle.cmd test --network ganache",
-    "test-ganache": "truffle test --network ganache",
-    "win-deploy-geth": "truffle.cmd migrate --reset --network geth",
-    "deploy-geth": "truffle migrate --reset --network geth",
+    "test-ganache-win": "truffle.cmd test --network ganache",
+    "test-ganache-os": "truffle test --network ganache",
+    "deploy-geth-win": "truffle.cmd migrate --reset --network geth",
+    "deploy-geth-os": "truffle migrate --reset --network geth",
+    "deploy-rinkeby-win": "truffle.cmd migrate --network infuraRinkeby",
+    "deploy-rinkeby-os": "truffle migrate --network infuraRinkeby",
     "coverage": "./node_modules/.bin/solidity-coverage"
   },
   "repository": {
@@ -22,24 +24,24 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/bitbrackets/bitbrackets_smart_contracts#readme",
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "ethereumjs-util": "^5.1.5",
-    "jsonfile": "^4.0.0",
-    "lodash": "^4.17.5",
-    "moment": "^2.21.0",
-    "truffle-core": "^4.1.5",
+    "bluebird": "3.5.1",
+    "ethereumjs-util": "5.1.5",
+    "jsonfile": "4.0.0",
+    "lodash": "4.17.5",
+    "moment": "2.21.0",
+    "truffle-core": "4.1.5",
     "zeppelin-solidity": "1.7.0",
-    "web3": "^1.0.0-beta.33",
-    "web3-utils": "^1.0.0-beta.33"
+    "web3": "1.0.0-beta.33",
+    "web3-utils": "1.0.0-beta.33"
   },
   "devDependencies": {
-    "dotenv": "^5.0.1",
-    "ethereumjs-wallet": "^0.6.0",
-    "ganache-cli": "^6.0.3",
-    "leche": "^2.2.3",
-    "mocha": "^5.0.4",
+    "dotenv": "5.0.1",
+    "ethereumjs-wallet": "0.6.0",
+    "ganache-cli": "6.0.3",
+    "leche": "2.2.3",
+    "mocha": "5.0.4",
     "solidity-coverage": "0.4.14",
-    "solium": "^1.1.2",
+    "solium": "1.1.2",
     "truffle": "4.1.5",
     "truffle-config": "1.0.4",
     "truffle-hdwallet-provider": "git+https://github.com/trufflesuite/truffle-hdwallet-provider.git#71520a2"
