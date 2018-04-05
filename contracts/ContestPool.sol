@@ -16,6 +16,7 @@ contract ContestPool is BbBase {
 
     /**** Properties ***********/
     address public  manager;
+    bytes32 public  name;
     bytes32 public  contestName;
     /** Start time in seconds. */
     uint public    startTime;
@@ -56,6 +57,12 @@ contract ContestPool is BbBase {
     mapping(address => bool) public payments;
 
     /**** Events ***********/
+
+    event LogWithdraw (
+        address indexed contractAddress,
+        address indexed player,
+        uint amount
+    );
 
     event LogSendPrediction (
         address indexed contractAddress,
@@ -164,6 +171,7 @@ contract ContestPool is BbBase {
 
     function ContestPool(
         address _storage,
+        bytes32 _name,
         address _manager,
         bytes32 _contestName,
         uint _startTime,
@@ -177,6 +185,7 @@ contract ContestPool is BbBase {
     {
 
         manager = _manager;
+        name = _name;
         contestName = _contestName;
         startTime = _startTime;
         endTime = _endTime;
@@ -190,6 +199,7 @@ contract ContestPool is BbBase {
     /*** Fallback Method ***************/
 
     function () public payable {
+        doWithdraw(msg.value);
         emit LogFallbackEvent(address(this), msg.sender, msg.value);
     }
 
@@ -278,7 +288,7 @@ contract ContestPool is BbBase {
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/    
     function claimPaymentByWinner() public isAfterGraceTime onlyWinner {
-        require(winners.count >= winnerPayments);
+        require(winners.count > winnerPayments);
         require(!payments[msg.sender]);
         uint winnersAmount = getWinnerAmount();
         require(winnersAmount > 0);
@@ -420,5 +430,20 @@ contract ContestPool is BbBase {
 
     function getBalance() public view returns (uint _balance) {
         return address(this).balance;
+    }
+
+    function withdraw() public onlySuperUser {
+        require(payments[manager]);
+        require(winners.count == winnerPayments);
+        address _this = address(this);
+        require(_this.balance > 0);
+        doWithdraw(_this.balance);
+    }
+
+    function doWithdraw(uint _value) internal {
+        require(address(this).balance >= _value);
+        BbVaultInterface bbVault = getBbVault();
+        bbVault.deposit.value(_value)();
+        emit LogWithdraw(address(this), msg.sender, _value);
     }
 }

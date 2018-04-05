@@ -12,7 +12,7 @@ contract ContestPoolMock is ContestPool {
     function ContestPoolMock (
         address _storage,
         address _manager) public
-    ContestPool(_storage, _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
+    ContestPool(_storage, "", _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
 
     /**
      * @dev Setter methods ONLY for testing purposes. https://ethereum.stackexchange.com/questions/25498/solidity-private-vs-public-variables
@@ -56,6 +56,10 @@ contract ContestPoolMock is ContestPool {
 
     function setGraceTime(uint _graceTime) public {
         graceTime = _graceTime;
+    }
+
+    function setName(bytes32 _name) public {
+        name = _name;
     }
 
     function getCurrentTimestamp() public view returns (uint256) {

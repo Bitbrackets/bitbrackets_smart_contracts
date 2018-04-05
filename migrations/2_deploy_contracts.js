@@ -43,7 +43,7 @@ module.exports = function(deployer, network, accounts) {
     
             if(deployMocks) {
                 deployer.link(AddressArray, ContestPool);
-                deployer.deploy(ContestPool, owner, manager, "", 0,0,0,10, 10000, 10, 10);
+                deployer.deploy(ContestPool, owner, "", manager, "", 0,0,0,10, 10000, 10, 10);
 
                 deployer.link(AddressArray, AddressArrayClient);
                 deployer.deploy(AddressArrayClient);
