@@ -10,6 +10,7 @@ let instance;
 
 contract('ContestPoolFactory', function (accounts) {
 
+    const defaultName = "MyContestPool";
     const owner = accounts[0];
     const player1 = accounts[1];
     const player2 = accounts[2];
@@ -108,7 +109,7 @@ contract('ContestPoolFactory', function (accounts) {
 
         await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
-        await instance.createContestPool(contestName, amountPerPlayer, {
+        await instance.createContestPool(defaultName, contestName, amountPerPlayer, {
             from: accounts[3],
             value: fee
         });
@@ -147,7 +148,7 @@ contract('ContestPoolFactory', function (accounts) {
         const amountPerPlayer = web3.toWei(2, 'ether');
         const fee = web3.toWei(0.01, 'ether');
         try {
-            await instance.createContestPool(contestName, amountPerPlayer, {
+            await instance.createContestPool(defaultName, contestName, amountPerPlayer, {
                 value: fee
             });
             assert(false, 'It should fail because contest name is invalid.');
@@ -170,7 +171,7 @@ contract('ContestPoolFactory', function (accounts) {
         await instance.createContestPoolDefinition(contestNameBytes32, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
         try {
-            await instance.createContestPool(contestNameBytes32, amountPerPlayer, {
+            await instance.createContestPool(defaultName, contestNameBytes32, amountPerPlayer, {
                 from: accounts[3],
                 value: 0
             });
@@ -195,7 +196,7 @@ contract('ContestPoolFactory', function (accounts) {
         const previousBalanceFactory = parseInt(fee) + parseInt(initialBalanceFactory);
         await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
-        await instance.createContestPool(contestName, amountPerPlayer, {
+        await instance.createContestPool(defaultName, contestName, amountPerPlayer, {
             from: accounts[3],
             value: fee
         });
@@ -218,7 +219,7 @@ contract('ContestPoolFactory', function (accounts) {
         await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
         try {
-            await instance.createContestPool(contestName, amountPerPlayer, {
+            await instance.createContestPool(defaultName, contestName, amountPerPlayer, {
                 from: accounts[3],
                 value: myFee
             });
@@ -251,6 +252,7 @@ contract('ContestPoolFactory', function (accounts) {
         const initialBalanceFactory = await web3.eth.getBalance(instance.address).toNumber();
         
         await instance.createContestPool(
+            defaultName,
             contestName,
             amountPerPlayer, {
                 from: accounts[3],
@@ -291,6 +293,7 @@ contract('ContestPoolFactory', function (accounts) {
         );
 
         await instance.createContestPool(
+            defaultName,
             contestName,
             amountPerPlayer, {
                 from: accounts[3],

@@ -19,7 +19,8 @@ contract ContestPoolFactory is BbBase {
     event CreateContestPool(
         bytes32 indexed contestName,
         address indexed manager,
-        address indexed contestPoolAddress
+        address indexed contestPoolAddress,
+        bytes32 name
     );
 
     /**** Structs ***********/
@@ -98,8 +99,9 @@ contract ContestPoolFactory is BbBase {
         );
     }
         
-    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) 
+    function createContestPool(bytes32 _name, bytes32 _contestName, uint _amountPerPlayer) 
         public payable exists(_contestName) returns (address) {
+        require(_name != bytes32(0x0));
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
         require(definition.fee == msg.value);
@@ -108,6 +110,7 @@ contract ContestPoolFactory is BbBase {
         address manager = msg.sender;
         ContestPool newContestPoolAddress = new ContestPool(
             address(bbStorage),
+            _name,
             manager,
             definition.contestName,
             definition.startTime,
@@ -119,7 +122,7 @@ contract ContestPoolFactory is BbBase {
             definition.ownerFee
         );
 
-        emit CreateContestPool(definition.contestName, manager, newContestPoolAddress);
+        emit CreateContestPool(definition.contestName, manager, newContestPoolAddress, _name);
         return newContestPoolAddress;
     }
 
