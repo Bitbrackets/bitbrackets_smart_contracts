@@ -77,9 +77,24 @@ contract ContestPoolUpgradable is BbProxyBase {
         managerFee = _managerFee;
     }
 
+
     function getVersion() public view returns (uint256 ) {
         address target = getTargetAddress(targetId);
         require(target != 0); // if contract code hasn't been set yet, don't call
         delegatedFwd(target, msg.data);
+    }
+
+    /**
+    * @dev ERC897, the address the proxy would delegate calls to
+    */
+    function implementation() public view returns (address) {
+        return getTargetAddress(targetId);
+    }
+
+    /**
+     * @dev ERC897, whether it is a forwarding (1) or an upgradeable (2) proxy
+     */
+    function proxyType() public pure returns (uint256 proxyTypeId) {
+        return UPGRADEABLE;
     }
 }

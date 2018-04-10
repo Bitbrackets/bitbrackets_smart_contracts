@@ -199,6 +199,10 @@ contract ContestPool is BbBase {
         return BbVaultInterface(getOwner());
     }
 
+
+
+
+
     function getWinners() public view returns (address[] ) {
         return winners.items;
     }

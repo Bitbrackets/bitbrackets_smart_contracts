@@ -3,10 +3,10 @@ pragma solidity ^0.4.19;
 import "../BbBase.sol";
 import "./DelegateProxy.sol";
 import "../interface/BbStorageInterface.sol";
-
+import "../ERCProxy.sol";
 /// @title Base Proxy Implementation for Contracts
 /// @author Doug Molina
-contract BbProxyBase is DelegateProxy, BbBase {
+contract BbProxyBase is ERCProxy, DelegateProxy, BbBase {
     
     string public targetId;
 
