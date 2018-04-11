@@ -137,9 +137,17 @@ module.exports = function(deployer, network, accounts) {
                 config.web3.utils.soliditySha3('contract.name', 'manager'),
                 manager
             );
+            await storageInstance.setBool(
+                config.web3.utils.soliditySha3('access.role', 'admin', manager),
+                manager
+            );
             // Register ceo by name
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'ceo'),
+                ceo
+            );
+            await storageInstance.setBool(
+                config.web3.utils.soliditySha3('access.role', 'admin', ceo),
                 ceo
             );
             // Register required votes to approve a transaction request.

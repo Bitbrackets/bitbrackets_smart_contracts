@@ -50,9 +50,8 @@ contract BbVault is BbBase, BbVaultInterface {
     /*** Modifiers *************/
 
     /// @dev Only allow access from the owner of that account
-    modifier onlyAccountOwner() {
-        // Check it's the account owner or the top level owner
-        require(bbStorage.getBool(keccak256("vault.account.owner", msg.sender)) == true || 
+    modifier onlyOwnerOrAdmin() {
+        require(roleHas("admin", msg.sender) == true || 
               roleHas("owner", msg.sender) == true);
         _;
     } 
@@ -103,7 +102,7 @@ contract BbVault is BbBase, BbVaultInterface {
       );
     }
 
-    function createRequestTransaction(bytes _name, uint _amount, address _toAccount) external onlyAccountOwner requestTransactionIsPresent(_name, false){
+    function createRequestTransaction(bytes _name, uint _amount, address _toAccount) external onlyOwnerOrAdmin requestTransactionIsPresent(_name, false){
         require(_amount > 0);
         require(_toAccount != 0x0);
 
@@ -120,16 +119,16 @@ contract BbVault is BbBase, BbVaultInterface {
       return bbStorage.getUint(keccak256("vault.request.transactions.", _name, ".votes"));
     }
 
-    function isDoneRequestTransaction(bytes _name) external view onlyAccountOwner returns (bool _done){
+    function isDoneRequestTransaction(bytes _name) external view onlyOwnerOrAdmin returns (bool _done){
       return bbStorage.getBool(keccak256("vault.request.transactions.", _name, ".done"));
     }
 
-    function existRequestTransaction(bytes _name) external view onlyAccountOwner returns (bool _exist){
+    function existRequestTransaction(bytes _name) external view onlyOwnerOrAdmin returns (bool _exist){
       return bbStorage.getBool(keccak256("vault.request.transactions.", _name, ".exist"));
     }
 
     function voteRequestTransaction(bytes _name) external
-    onlyAccountOwner
+    onlyOwnerOrAdmin
     requestTransactionIsPresent(_name, true)
     requestTransactionIsDone(_name, false) {
       require(bbStorage.getBool(keccak256("vault.request.transactions.", _name, ".votes.", msg.sender)) == false);
@@ -142,7 +141,7 @@ contract BbVault is BbBase, BbVaultInterface {
     }
 
     function withdraw(bytes _name) external 
-      onlyAccountOwner
+      onlyOwnerOrAdmin
       requestTransactionIsPresent(_name, true)
       requestTransactionIsDone(_name, false) {
       var (
