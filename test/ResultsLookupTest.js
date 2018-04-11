@@ -12,7 +12,7 @@ let games;
 let value;
 let contestName;
 
-contract('ResultsLookup', function(accounts) {
+contract('ResultsLookupTest', function(accounts) {
 
   beforeEach('Setup contract for each test', async() => {
     instance = await ResultsLookup.deployed();
@@ -38,7 +38,7 @@ contract('ResultsLookup', function(accounts) {
   });
 
   it(t('aNonOwner', 'registerResult', 'Should not able to register a result.', true), async function() {
-    const player = accounts[1];
+    const player = accounts[4];
     
     try {
       await instance.registerResult(contestName, value, games, {from: player});
