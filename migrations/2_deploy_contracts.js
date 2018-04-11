@@ -12,8 +12,17 @@ const BbUpgrade = artifacts.require("./BbUpgrade.sol");
 const jsonfile = require('jsonfile');
 const contractsJson = './build/contracts.json';
 
-const contracts = {};
+const contracts = [];
 const networksForMocks = ["test"];
+
+const addContractInfo = (name, address) => {
+    contracts.push(
+        {
+            "address": address,
+            "contractName": name
+        }
+    );
+};
 
 module.exports = function(deployer, network, accounts) {
 
@@ -38,10 +47,10 @@ module.exports = function(deployer, network, accounts) {
     return deployer.deploy(BbStorage).then(async () => {
         try {
             const storageInstance = await BbStorage.deployed();
-            contracts.storage = BbStorage.address;
+            addContractInfo("BbStorage", BbStorage.address);
 
             await deployer.deploy(BbVault, BbStorage.address);
-			contracts.vault = BbVault.address;
+            addContractInfo("BbVault", BbVault.address);
 
             await deployer.deploy(AddressArray);
     
@@ -68,14 +77,13 @@ module.exports = function(deployer, network, accounts) {
     
             await deployer.link(AddressArray, ContestPoolFactory);
             await deployer.deploy(ContestPoolFactory, BbStorage.address);
-            contracts.contestPoolFactory = ContestPoolFactory.address;
+            addContractInfo("ContestPoolFactory", ContestPoolFactory.address);
 
             await deployer.deploy(BbUpgrade, BbStorage.address);
-            contracts.upgrade = BbUpgrade.address;
-            contracts.contractName = 'upgrade';
+            addContractInfo("BbUpgrade", BbUpgrade.address);
     
             await deployer.deploy(ResultsLookup, BbStorage.address);
-            contracts.resultsLookup = ResultsLookup.address;
+            addContractInfo("ResultsLookup", ResultsLookup.address);
 
             //BbUpgrade: Register address and name
             await storageInstance.setAddress(
