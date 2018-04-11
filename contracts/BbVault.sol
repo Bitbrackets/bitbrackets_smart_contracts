@@ -19,11 +19,6 @@ contract BbVault is BbBase, BbVaultInterface {
 
     /*** Events ****************/
 
-    event LogAddOwner (
-        address indexed contractAddress,
-        address indexed owner
-    );
-
     event LogDeposit (
         address indexed contractAddress,
         address indexed from,
@@ -75,31 +70,15 @@ contract BbVault is BbBase, BbVaultInterface {
     }
 
     /*** Constructor ***********/    
-    function BbVault(address _bbStorageAddress, address[] _owners, uint _required) BbBase(_bbStorageAddress) public {
-        require(_required > 0);
-        require(_owners.length >= _required);
+    function BbVault(address _bbStorageAddress) BbBase(_bbStorageAddress) public {
         // Set the version
         version = 1;
-        setRequired(_required);
-        for (uint i = 0; i < _owners.length; i++) {
-            addOwner(_owners[i]);
-        }
     }
 
     /**** Methods ***********/
 
     function () payable public {
       emit LogDeposit(address(this), msg.sender, msg.value);
-    }
-
-    function setRequired(uint _required) internal {
-      bbStorage.setUint(keccak256("vault.account.required"), _required);
-    }
-
-    function addOwner(address _owner) internal {
-      require(_owner != 0x0);
-      bbStorage.setBool(keccak256("vault.account.owner", _owner), true);
-      emit LogAddOwner(address(this), _owner);
     }
 
     function deposit() payable external {

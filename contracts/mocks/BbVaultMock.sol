@@ -4,12 +4,9 @@ import '../BbVault.sol';
 
 contract BbVaultMock is BbVault  {
 
-    function BbVaultMock (
-        address _storage, address[] _owners, uint _required) public
-    BbVault(_storage, _owners, _required) { }
+    function BbVaultMock (address _storage) public BbVault(_storage) { }
 
-    function _onlyAccountOwner() public view onlyAccountOwner {
-    }
+    function _onlyAccountOwner() public view onlyAccountOwner {}
 
     function _requestTransactionIsPresent(bytes _name) public view requestTransactionIsPresent(_name, true) {
     }
