@@ -5,6 +5,7 @@ import "./common/BbProxyBase.sol";
 
 
 
+
 contract ContestPoolUpgradable is BbProxyBase {
     using AddressArray for AddressArray.Addresses;
 
@@ -78,11 +79,11 @@ contract ContestPoolUpgradable is BbProxyBase {
     }
 
 
-    function getVersion() public view returns (uint256 ) {
-        address target = getTargetAddress(targetId);
-        require(target != 0); // if contract code hasn't been set yet, don't call
-        delegatedFwd(target, msg.data);
-    }
+//    function getVersion() public view returns (uint256 ) {
+//        address target = getTargetAddress(targetId);
+//        require(target != 0); // if contract code hasn't been set yet, don't call
+//        delegatedFwd(target, msg.data);
+//    }
 
     /**
     * @dev ERC897, the address the proxy would delegate calls to
@@ -95,6 +96,6 @@ contract ContestPoolUpgradable is BbProxyBase {
      * @dev ERC897, whether it is a forwarding (1) or an upgradeable (2) proxy
      */
     function proxyType() public pure returns (uint256 proxyTypeId) {
-        return UPGRADEABLE;
+        return 2;
     }
 }

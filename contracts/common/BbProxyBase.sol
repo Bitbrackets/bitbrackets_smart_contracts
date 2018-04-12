@@ -3,10 +3,10 @@ pragma solidity ^0.4.19;
 import "../BbBase.sol";
 import "./DelegateProxy.sol";
 import "../interface/BbStorageInterface.sol";
-import "../ERCProxy.sol";
+//import "../ERCProxy.sol";
 /// @title Base Proxy Implementation for Contracts
 /// @author Doug Molina
-contract BbProxyBase is ERCProxy, DelegateProxy, BbBase {
+contract BbProxyBase is  DelegateProxy, BbBase {
     
     string public targetId;
 
@@ -21,6 +21,7 @@ contract BbProxyBase is ERCProxy, DelegateProxy, BbBase {
         // Check that targetAddress is a contract to delegate
         address targetAddress = getTargetAddress(_targetId);
         //require(isContract(targetAddress));
+
     }
 
     function () public payable {

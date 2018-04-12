@@ -7,7 +7,9 @@ import "./interface/ResultsLookupInterface.sol";
 import "./AddressArray.sol";
 import "./SafeMath.sol";
 
-
+/**
+DEPRECATED
+**/
 contract ContestPool is BbBase {
     using SafeMath for uint256;
     using AddressArray for AddressArray.Addresses;

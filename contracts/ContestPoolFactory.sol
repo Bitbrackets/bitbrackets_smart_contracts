@@ -100,7 +100,7 @@ contract ContestPoolFactory is BbBase {
     }
         
     function createContestPool(bytes32 _contestName, uint _amountPerPlayer) 
-        public payable exists(_contestName) returns (address) {
+        public payable exists(_contestName) returns (ContestPoolUpgradable) {
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
         require(definition.fee == msg.value);

@@ -6,9 +6,9 @@ import "./interface/BbVaultInterface.sol";
 import "./interface/ResultsLookupInterface.sol";
 import "./AddressArray.sol";
 import "./SafeMath.sol";
+import "./interface/IContestPoolBase.sol";
 
-
-contract ContestPoolBase is BbBase {
+contract ContestPoolBase is IContestPoolBase {
     using SafeMath for uint256;
     using AddressArray for AddressArray.Addresses;
 
@@ -74,7 +74,7 @@ contract ContestPoolBase is BbBase {
         address indexed manager,
         uint prize
     );
-    
+
     event LogClaimPaymentByOwner (
         address indexed contractAddress,
         address indexed owner,
@@ -87,7 +87,7 @@ contract ContestPoolBase is BbBase {
         uint score,
         uint highScore
     );
-    
+
     event LogNewHighScore (
         address indexed contractAddress,
         address indexed player,
@@ -100,6 +100,8 @@ contract ContestPoolBase is BbBase {
         address indexed player,
         uint value
     );
+
+
 
     /*** Modifiers ***************/
 
@@ -199,7 +201,7 @@ contract ContestPoolBase is BbBase {
         return BbVaultInterface(getOwner());
     }
 
-    function getVersion() public view returns (uint256 ) {
+    function getVersion() public pure returns (uint256 ) {
         return 1;
     }
 
