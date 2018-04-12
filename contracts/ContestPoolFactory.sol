@@ -99,6 +99,22 @@ contract ContestPoolFactory is BbBase {
             _graceTime
         );
     }
+
+    function createContestPoolInstance(ContestPoolDefinition _definition, bytes32 _name, address _manager, uint _amountPerPlayer) internal returns (address _newContestPoolAddress) {
+        return new ContestPoolUpgradable(
+            address(bbStorage),
+            _name,
+            _manager,
+            _definition.contestName,
+            _definition.startTime,
+            _definition.endTime,
+            _definition.graceTime,
+            _definition.maxBalance,
+            _amountPerPlayer,
+            _definition.managerFee,
+            _definition.ownerFee
+        );
+    }
         
     function createContestPool(bytes32 _name, bytes32 _contestName, uint _amountPerPlayer)
         public payable exists(_contestName) returns (ContestPoolUpgradable) {
@@ -109,19 +125,7 @@ contract ContestPoolFactory is BbBase {
         require(definition.maxBalance > _amountPerPlayer);
 
         address manager = msg.sender;
-        ContestPoolUpgradable newContestPoolAddress = new ContestPoolUpgradable(
-            address(bbStorage),
-            _name,
-            manager,
-            definition.contestName,
-            definition.startTime,
-            definition.endTime,
-            definition.graceTime,
-            definition.maxBalance,
-            _amountPerPlayer,
-            definition.managerFee,
-            definition.ownerFee
-        );
+        address newContestPoolAddress = createContestPoolInstance(definition, _name, manager, _amountPerPlayer);
 
         emit CreateContestPool(definition.contestName, manager, newContestPoolAddress, _name);
         return newContestPoolAddress;

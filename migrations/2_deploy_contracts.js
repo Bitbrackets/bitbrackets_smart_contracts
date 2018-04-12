@@ -6,6 +6,7 @@ const AddressArrayClient = artifacts.require("./AddressArrayClient.sol");
 const ContestPoolMock = artifacts.require("./ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
+const ContestPoolFactoryMock = artifacts.require("./mocks/ContestPoolFactoryMock.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
 const BbUpgrade = artifacts.require("./BbUpgrade.sol");
 const ContestPoolBase = artifacts.require("./ContestPoolBase.sol");
@@ -63,6 +64,9 @@ module.exports = function(deployer, network, accounts) {
 
                 await deployer.link(AddressArray, ContestPoolMock);
                 await deployer.deploy(ContestPoolMock, owner, manager);
+
+                await deployer.link(AddressArray, ContestPoolFactoryMock);
+                await deployer.deploy(ContestPoolFactoryMock, BbStorage.address);
 
                 await deployer.deploy(BbVaultMock, BbStorage.address);
                 await storageInstance.setAddress(

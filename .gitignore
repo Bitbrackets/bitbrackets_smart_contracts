@@ -11,3 +11,4 @@ private_network/chaindata
 /.soliumignore
 /.soliumrc.json
 /.node*
+events.json
