@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 import "./BbBase.sol";
 import "./interface/BbVaultInterface.sol";
@@ -89,7 +89,7 @@ contract BbVault is BbBase, BbVaultInterface {
     /**** Methods ***********/
 
     function () payable public {
-      LogDeposit(address(this), msg.sender, msg.value);
+      emit LogDeposit(address(this), msg.sender, msg.value);
     }
 
     function setRequired(uint _required) internal {
@@ -99,13 +99,13 @@ contract BbVault is BbBase, BbVaultInterface {
     function addOwner(address _owner) internal {
       require(_owner != 0x0);
       bbStorage.setBool(keccak256("vault.account.owner", _owner), true);
-      LogAddOwner(address(this), _owner);
+      emit LogAddOwner(address(this), _owner);
     }
 
     function deposit() payable external {
         require(msg.value > 0);
 
-        LogDeposit(address(this), msg.sender, msg.value);
+        emit LogDeposit(address(this), msg.sender, msg.value);
     }
 
     function getRequestTransaction(bytes _name) internal view requestTransactionIsPresent(_name, true) returns (
@@ -134,7 +134,7 @@ contract BbVault is BbBase, BbVaultInterface {
         bbStorage.setUint(keccak256("vault.request.transactions.", _name, ".amount"), _amount);
         bbStorage.setAddress(keccak256("vault.request.transactions.", _name, ".toAccount"), _toAccount);
 
-        LogRequestTransaction(address(this), msg.sender, _toAccount, _amount); 
+        emit LogRequestTransaction(address(this), msg.sender, _toAccount, _amount); 
     }
 
     function getVotesRequestTransaction(bytes _name) public view returns (uint _votes) {
@@ -159,7 +159,7 @@ contract BbVault is BbBase, BbVaultInterface {
       uint newVotes = votes.add(1);
       bbStorage.setUint(keccak256("vault.request.transactions.", _name, ".votes"), newVotes);
       bbStorage.setBool(keccak256("vault.request.transactions.", _name, ".votes.", msg.sender), true);
-      LogVoteRequestTransaction(address(this), msg.sender, _name, newVotes);
+      emit LogVoteRequestTransaction(address(this), msg.sender, _name, newVotes);
     }
 
     function withdraw(bytes _name) external 
@@ -180,6 +180,6 @@ contract BbVault is BbBase, BbVaultInterface {
 
       _toAccount.transfer(_amount);
 
-      LogWithdrawal(address(this), _toAccount, _amount, _name);
+      emit LogWithdrawal(address(this), _toAccount, _amount, _name);
     }
 }

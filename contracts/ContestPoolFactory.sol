@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 //import "./ContestPool.sol";
 import "./ContestPoolUpgradable.sol";
@@ -20,7 +20,8 @@ contract ContestPoolFactory is BbBase {
     event CreateContestPool(
         bytes32 indexed contestName,
         address indexed manager,
-        address indexed contestPoolAddress
+        address indexed contestPoolAddress,
+        bytes32 name
     );
 
     /**** Structs ***********/
@@ -90,17 +91,18 @@ contract ContestPoolFactory is BbBase {
             managerFee: _managerFee,
             ownerFee: _ownerFee
         });
-        CreateContestPoolDefinition(
+        definitions[_contestName] = newDefinition;
+        emit CreateContestPoolDefinition(
             _contestName, 
             _startTime, 
             _endTime, 
             _graceTime
         );
-        definitions[_contestName] = newDefinition;
     }
         
-    function createContestPool(bytes32 _contestName, uint _amountPerPlayer) 
+    function createContestPool(bytes32 _name, bytes32 _contestName, uint _amountPerPlayer)
         public payable exists(_contestName) returns (ContestPoolUpgradable) {
+        require(_name != bytes32(0x0));
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
         require(definition.fee == msg.value);
@@ -109,6 +111,7 @@ contract ContestPoolFactory is BbBase {
         address manager = msg.sender;
         ContestPoolUpgradable newContestPoolAddress = new ContestPoolUpgradable(
             address(bbStorage),
+            _name,
             manager,
             definition.contestName,
             definition.startTime,
@@ -120,7 +123,7 @@ contract ContestPoolFactory is BbBase {
             definition.ownerFee
         );
 
-        CreateContestPool(definition.contestName, manager, newContestPoolAddress);
+        emit CreateContestPool(definition.contestName, manager, newContestPoolAddress, _name);
         return newContestPoolAddress;
     }
 
@@ -133,8 +136,9 @@ contract ContestPoolFactory is BbBase {
     }
 
     function withdrawFee() public onlySuperUser {
-        require(this.balance > 0);
+        address _this = address(this);
+        require(_this.balance > 0);
         BbVaultInterface bbVault = getBbVault();
-        bbVault.deposit.value(this.balance)();
+        bbVault.deposit.value(_this.balance)();
     }
 }

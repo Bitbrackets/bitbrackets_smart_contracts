@@ -1,21 +1,24 @@
 require('dotenv').config();
 const Web3 = require("web3");
+
+const DEFAULT_GAS_WEI = 4600000;
+const DEFAULT_ADDRESS_COUNT = 3;
+const DEFAULT_ADDRESS_INDEX = 0;
+const DEFAULT_GAS_GWEI_PRICE = "20";
+
 const web3 = new Web3();
 const HDWalletProvider = require("truffle-hdwallet-provider");
-const Wallet = require('ethereumjs-wallet');
 
+const addressCountValue = process.env["ADDRESS_COUNT_KEY"] || DEFAULT_ADDRESS_COUNT;
+const mnemonicKeyValue = process.env["MNEMONIC_KEY"] || '';
 const infuraKeyValue = process.env["INFURA_KEY"] || '';
 
-if(infuraKeyValue === '') {
-  console.log('WARNING: The infura key is empty. It should not be empty.');
+if(infuraKeyValue === '' || mnemonicKeyValue === '') {
+  console.log('WARNING: The infura key or/and mnemonic key are empty. They should not be empty.');
 }
 
-const infuraKey = new Buffer(infuraKeyValue, "hex");
-
-// You can get the current gasLimit by running
-// truffle deploy --network rinkeby
-// truffle(rinkeby)> web3.eth.getBlock("pending", (error, result) =>
-//   console.log(result.gasLimit))
+const gasKeyValue = process.env["GAS_WEI_KEY"] || DEFAULT_GAS_WEI;
+const gasPriceKeyValue = process.env["GAS_PRICE_GWEI_KEY"] || DEFAULT_GAS_GWEI_PRICE;
 
 module.exports = {
   web3: Web3,
@@ -23,8 +26,7 @@ module.exports = {
     geth: {
       host: "localhost",
       port: 8045,
-      network_id: "*"/*,
-      gas: "7000000000"*/
+      network_id: "*"
     },
     ganache: {
       host: "127.0.0.1",
@@ -34,52 +36,42 @@ module.exports = {
     },
     infuraRinkeby: {
       provider: function() {
-        const rinkebyPrivateKey = new Buffer(process.env["RINKEBY_PRIVATE_KEY"], "hex");
-        const rinkebyWallet = Wallet.fromPrivateKey(rinkebyPrivateKey);
-        return new HDWalletProvider(rinkebyWallet, `https://rinkeby.infura.io/${infuraKey}`);
+        return new HDWalletProvider(mnemonicKeyValue, `https://rinkeby.infura.io/${infuraKeyValue}`, DEFAULT_ADDRESS_INDEX, addressCountValue);
       },
-      gas: 4600000,
-      gasPrice: web3.utils.toWei("20", "gwei"),
+      gas: gasKeyValue,
+      gasPrice: web3.utils.toWei(gasPriceKeyValue, "gwei"),
       network_id: "5",
     },
     infuraKovan: {
       provider: function() {
-        const kovanPrivateKey = new Buffer(process.env["KOVAN_PRIVATE_KEY"], "hex");
-        const kovanWallet = Wallet.fromPrivateKey(kovanPrivateKey);
-        return new HDWalletProvider(kovanWallet, `https://kovan.infura.io/${infuraKey}`);
+        return new HDWalletProvider(mnemonicKeyValue, `https://kovan.infura.io/${infuraKeyValue}`, DEFAULT_ADDRESS_INDEX, addressCountValue);
       },
-      gas: 4600000,
-      gasPrice: web3.utils.toWei("20", "gwei"),
+      gas: gasKeyValue,
+      gasPrice: web3.utils.toWei(gasPriceKeyValue, "gwei"),
       network_id: "4",
     },
     infuraRopsten: {
       provider: function() {
-        const ropstenPrivateKey = new Buffer(process.env["ROPSTEN_PRIVATE_KEY"], "hex");
-        const ropstenWallet = Wallet.fromPrivateKey(ropstenPrivateKey);
-        return new HDWalletProvider(ropstenWallet, `https://ropsten.infura.io/${infuraKey}`);
+        return new HDWalletProvider(mnemonicKeyValue, `https://ropsten.infura.io/${infuraKeyValue}`, DEFAULT_ADDRESS_INDEX, addressCountValue);
       },
-      gas: 4600000,
-      gasPrice: web3.utils.toWei("20", "gwei"),
+      gas: gasKeyValue,
+      gasPrice: web3.utils.toWei(gasPriceKeyValue, "gwei"),
       network_id: "3",
     },
     infuraMainnet: {
       provider: function () {
-        const mainNetPrivateKey = new Buffer(process.env["MAINNET_PRIVATE_KEY"], "hex");
-        const mainNetWallet = Wallet.fromPrivateKey(mainNetPrivateKey);
-        return new HDWalletProvider(mainNetWallet, `https://mainnet.infura.io/${infuraKey}`);
+        return new HDWalletProvider(mnemonicKeyValue, `https://mainnet.infura.io/${infuraKeyValue}`, DEFAULT_ADDRESS_INDEX, addressCountValue);
       },
-      gas: 4600000,
-      gasPrice: web3.utils.toWei("20", "gwei"),
+      gas: gasKeyValue,
+      gasPrice: web3.utils.toWei(gasPriceKeyValue, "gwei"),
       network_id: "1",
     },
     infuraNet: {
       provider: function () {
-        const infuraNetPrivateKey = new Buffer(process.env["INFURANET_PRIVATE_KEY"], "hex");
-        const infuraNetWallet = Wallet.fromPrivateKey(infuraNetPrivateKey);
-        return new HDWalletProvider(infuraNetWallet, `https://infuranet.infura.io/${infuraKey}`);
+        return new HDWalletProvider(mnemonicKeyValue, `https://infuranet.infura.io/${infuraKeyValue}`, DEFAULT_ADDRESS_INDEX, addressCountValue);
       },
-      gas: 4600000,
-      gasPrice: web3.utils.toWei("20", "gwei"),
+      gas: gasKeyValue,
+      gasPrice: web3.utils.toWei(gasPriceKeyValue, "gwei"),
       network_id: "2",
     }
   }

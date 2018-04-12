@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 import "./BbBase.sol";
 import "./interface/BbStorageInterface.sol";
@@ -18,6 +18,7 @@ contract ContestPool is BbBase {
 
     /**** Properties ***********/
     address public  manager;
+    bytes32 public  name;
     bytes32 public  contestName;
     /** Start time in seconds. */
     uint public    startTime;
@@ -58,6 +59,12 @@ contract ContestPool is BbBase {
     mapping(address => bool) public payments;
 
     /**** Events ***********/
+
+    event LogWithdraw (
+        address indexed contractAddress,
+        address indexed player,
+        uint amount
+    );
 
     event LogSendPrediction (
         address indexed contractAddress,
@@ -166,6 +173,7 @@ contract ContestPool is BbBase {
 
     function ContestPool(
         address _storage,
+        bytes32 _name,
         address _manager,
         bytes32 _contestName,
         uint _startTime,
@@ -179,6 +187,7 @@ contract ContestPool is BbBase {
     {
 
         manager = _manager;
+        name = _name;
         contestName = _contestName;
         startTime = _startTime;
         endTime = _endTime;
@@ -192,7 +201,8 @@ contract ContestPool is BbBase {
     /*** Fallback Method ***************/
 
     function () public payable {
-        LogFallbackEvent(address(this), msg.sender, msg.value);
+        doWithdraw(msg.value);
+        emit LogFallbackEvent(address(this), msg.sender, msg.value);
     }
 
     /*** Methods ***************/
@@ -284,7 +294,7 @@ contract ContestPool is BbBase {
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/    
     function claimPaymentByWinner() public isAfterGraceTime onlyWinner {
-        require(winners.count >= winnerPayments);
+        require(winners.count > winnerPayments);
         require(!payments[msg.sender]);
         uint winnersAmount = getWinnerAmount();
         require(winnersAmount > 0);
@@ -294,7 +304,7 @@ contract ContestPool is BbBase {
         addAmountPaid(winnersAmount);
         msg.sender.transfer(winnersAmount);
 
-        LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
+        emit LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
     }
 
     function getAmount(uint currentFee) internal view returns (uint _partialBalance){
@@ -312,14 +322,14 @@ contract ContestPool is BbBase {
         addAmountPaid(managerAmount);
         msg.sender.transfer(managerAmount);
         
-        LogClaimPaymentByManager(this, msg.sender, managerAmount);
+        emit LogClaimPaymentByManager(this, msg.sender, managerAmount);
     }
 
     function addAmountPaid(uint _amountPaid) internal {
         amountPaid = amountPaid.add(_amountPaid);
     }
 
-    function getPoolBalance() internal view returns (uint _poolBalance) {
+    function getPoolBalance() public view returns (uint _poolBalance) {
         return players.mul(amountPerPlayer).sub(amountPaid);
     }
 
@@ -334,7 +344,7 @@ contract ContestPool is BbBase {
         BbVaultInterface bbVault = getBbVault();
         bbVault.deposit.value(ownerAmount)();
         
-        LogClaimPaymentByOwner(this, bbVaultAddress, ownerAmount);
+        emit LogClaimPaymentByOwner(this, bbVaultAddress, ownerAmount);
     }
 
     function addWinnerDependingOnScore(address _potentialWinner, uint _aScore) internal returns (bool _newHighScore){
@@ -342,12 +352,12 @@ contract ContestPool is BbBase {
             if(_aScore == highestScore) {
                 // The _potentialWinner is a "real" winner with the same highest score.
                 winners.addItem(_potentialWinner);
-                LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
+                emit LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
             } else {
                 // The _potentialWinner is a "real" and unique winner with the highest score.
                 winners.clear();
                 winners.addItem(_potentialWinner);
-                LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
+                emit LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
                 highestScore = _aScore;
             }
             return true;
@@ -378,7 +388,7 @@ contract ContestPool is BbBase {
 
         //if player has higher score we update high score
         //add player to the winners array
-        LogPublishedScore(this, msg.sender, score, highestScore);
+        emit LogPublishedScore(this, msg.sender, score, highestScore);
         
         return addWinnerDependingOnScore(msg.sender, score);
     }
@@ -405,7 +415,7 @@ contract ContestPool is BbBase {
         require(predictions[msg.sender].length == 0);
         predictions[msg.sender] = _prediction;
         players = players.add(1);
-        LogSendPrediction(this, _prediction, msg.sender);
+        emit LogSendPrediction(this, _prediction, msg.sender);
     }
 
     function getPredictionSet(address _playerAddress) public view returns (uint8[]) {
@@ -422,5 +432,24 @@ contract ContestPool is BbBase {
 
     function isContestActive() private view returns (bool) {
         return !hasContestEnded();
+    }
+
+    function getBalance() public view returns (uint _balance) {
+        return address(this).balance;
+    }
+
+    function withdraw() public onlySuperUser {
+        require(payments[manager]);
+        require(winners.count == winnerPayments);
+        address _this = address(this);
+        require(_this.balance > 0);
+        doWithdraw(_this.balance);
+    }
+
+    function doWithdraw(uint _value) internal {
+        require(address(this).balance >= _value);
+        BbVaultInterface bbVault = getBbVault();
+        bbVault.deposit.value(_value)();
+        emit LogWithdraw(address(this), msg.sender, _value);
     }
 }

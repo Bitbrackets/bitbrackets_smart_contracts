@@ -10,6 +10,10 @@ function ContestPoolBuilder(_contestPool) {
     this.contestPool = _contestPool;
 }
 
+ContestPoolBuilder.prototype.name = async function name(who, name) {
+    await this.contestPool.setName(name, {from: who});
+};
+
 ContestPoolBuilder.prototype.startTime = async function startTime(who, year, month, day) {
     const startTimeInMillis = dateUtil.toSeconds(year, month, day);
     await this.contestPool.setStartTime(startTimeInMillis, {from: who});

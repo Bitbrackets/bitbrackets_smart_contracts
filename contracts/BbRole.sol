@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 import "./BbBase.sol";
 import "./interface/BbStorageInterface.sol";
@@ -88,7 +88,7 @@ contract BbRole is BbBase {
         // Add it
         bbStorage.setBool(keccak256("access.role", _role, _address), true);
         // Log it
-        LogRoleAdded(_role, _address);
+        emit LogRoleAdded(_role, _address);
     }
 
     /**
@@ -100,7 +100,7 @@ contract BbRole is BbBase {
         // Remove from storage
         bbStorage.deleteBool(keccak256("access.role", _role, _address));
         // Log it
-        LogRoleRemoved(_role, _address);
+        emit LogRoleRemoved(_role, _address);
     }
 
 

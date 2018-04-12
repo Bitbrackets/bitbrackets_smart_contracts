@@ -29,6 +29,7 @@ contract('ContestPool', accounts => {
     const ownerFee = 10;
 
     const contestName = stringUtils.uniqueText('Rusia2018');
+    const name = stringUtils.uniqueText('MyName');
 
 
     before('setup suite', async () => {
@@ -49,6 +50,7 @@ contract('ContestPool', accounts => {
 
         let contestPoolAddress;
         const tx = await contestPoolFactoryInstance.createContestPool(
+            name,
             contestName, 
             amountPerPlayer,
             {
@@ -69,6 +71,7 @@ contract('ContestPool', accounts => {
 
         contestPoolInstance = await ContestPool.new(
             BbStorage.address,
+            "MyName",
             manager,
             "Rusia2018",
             startTime,
