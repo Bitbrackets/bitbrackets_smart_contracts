@@ -8,12 +8,22 @@ const ContestPoolMock = artifacts.require("./ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
+const BbUpgrade = artifacts.require("./BbUpgrade.sol");
 const ContestPoolBase = artifacts.require("./ContestPoolBase.sol");
 const jsonfile = require('jsonfile');
 const contractsJson = './build/contracts.json';
 
-const contracts = {};
+const contracts = [];
 const networksForMocks = ["test"];
+
+const addContractInfo = (name, address) => {
+    contracts.push(
+        {
+            "address": address,
+            "contractName": name
+        }
+    );
+};
 
 module.exports = function(deployer, network, accounts) {
 
@@ -37,71 +47,25 @@ module.exports = function(deployer, network, accounts) {
 
     return deployer.deploy(BbStorage).then(async () => {
         try {
-            await deployer.deploy(BbVault, BbStorage.address, [owner, manager, ceo], 2);
-			contracts.vault = BbVault.address;
+            const storageInstance = await BbStorage.deployed();
+            addContractInfo("BbStorage", BbStorage.address);
+
+            await deployer.deploy(BbVault, BbStorage.address);
+            addContractInfo("BbVault", BbVault.address);
 
             await deployer.deploy(AddressArray);
     
             if(deployMocks) {
-                deployer.link(AddressArray, ContestPool);
-                deployer.deploy(ContestPool, owner, "", manager, "", 0,0,0,10, 10000, 10, 10);
+                await deployer.link(AddressArray, ContestPool);
+                await deployer.deploy(ContestPool, owner, "", manager, "", 0,0,0,10, 10000, 10, 10);
 
-                deployer.link(AddressArray, AddressArrayClient);
-                deployer.deploy(AddressArrayClient);
+                await deployer.link(AddressArray, AddressArrayClient);
+                await deployer.deploy(AddressArrayClient);
 
-                deployer.deploy(BbVaultMock, BbStorage.address, [owner, manager, ceo], 2);
-            }
-    
-            await deployer.link(AddressArray, ContestPoolFactory);
-            await deployer.deploy(ContestPoolFactory, BbStorage.address);
+                await deployer.link(AddressArray, ContestPoolMock);
+                await deployer.deploy(ContestPoolMock, owner, manager);
 
-            deployer.link(AddressArray, ContestPoolBase);
-            deployer.deploy(ContestPoolBase, BbStorage.address);
-   
-            contracts.contestPoolFactory = ContestPoolFactory.address;
-            
-            if(deployMocks) {
-                deployer.link(AddressArray, ContestPoolMock);
-                deployer.deploy(ContestPoolMock, owner, manager);
-            }
-    
-            await deployer.deploy(ResultsLookup, BbStorage.address);
-            contracts.resultsLookup = ResultsLookup.address;
-
-            const storageInstance = await BbStorage.deployed();
-            contracts.storage = BbStorage.address;
-            
-            //ContestPoolFactory
-            //register address
-            await storageInstance.setAddress(
-                config.web3.utils.soliditySha3('contract.address', ContestPoolFactory.address),
-                ContestPoolFactory.address
-            );
-            await storageInstance.setAddress(
-                config.web3.utils.soliditySha3('contract.address', BbVault.address),
-                BbVault.address
-            );
-            // possible security risk we only want this contract to be lookup by name
-            // await storageInstance.setAddress(
-            //     config.web3.utils.soliditySha3('contract.address', ContestPoolBase.address),
-            //     ContestPoolBase.address
-            // );
-
-            //register by name    
-            await storageInstance.setAddress(
-                config.web3.utils.soliditySha3('contract.name', 'contestPoolFactory'),
-                ContestPoolFactory.address
-            );
-            await storageInstance.setAddress(
-                config.web3.utils.soliditySha3('contract.name', 'bbVault'),
-                BbVault.address
-            );
-            await storageInstance.setAddress(
-                config.web3.utils.soliditySha3('contract.name', 'contestPoolBase'),
-                ContestPoolBase.address
-            );
-
-            if(deployMocks) {
+                await deployer.deploy(BbVaultMock, BbStorage.address);
                 await storageInstance.setAddress(
                     config.web3.utils.soliditySha3('contract.name', 'bbVaultMock'),
                     BbVaultMock.address
@@ -111,14 +75,67 @@ module.exports = function(deployer, network, accounts) {
                     BbVaultMock.address
                 );
             }
+    
+            await deployer.link(AddressArray, ContestPoolFactory);
+            await deployer.deploy(ContestPoolFactory, BbStorage.address);
+            addContractInfo("ContestPoolFactory", ContestPoolFactory.address);
 
-            //ResultsLookup
-            //register address
+            await deployer.link(AddressArray, ContestPoolBase);
+            await deployer.deploy(ContestPoolBase, BbStorage.address);
+            addContractInfo("ContestPoolBase", ContestPoolBase.address);
+
+            await deployer.deploy(BbUpgrade, BbStorage.address);
+            addContractInfo("BbUpgrade", BbUpgrade.address);
+    
+            await deployer.deploy(ResultsLookup, BbStorage.address);
+            addContractInfo("ResultsLookup", ResultsLookup.address);
+
+            //BbUpgrade: Register address and name
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.address', BbUpgrade.address),
+                BbUpgrade.address
+            );
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'bbUpgrade'),
+                BbUpgrade.address
+            );
+
+            //ContestPoolFactory: Register address and name
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.address', ContestPoolFactory.address),
+                ContestPoolFactory.address
+            );
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'contestPoolFactory'),
+                ContestPoolFactory.address
+            );
+
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.address', ContestPoolBase.address),
+                ContestPoolBase.address
+            );
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'contestPoolBase'),
+                ContestPoolBase.address
+            );
+
+            //BbVault: Register address and name
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.address', BbVault.address),
+                BbVault.address
+            );
+
+
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'bbVault'),
+                BbVault.address
+            );
+
+            //ResultsLookup: Register address and name
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.address', ResultsLookup.address),
                 ResultsLookup.address
             );
-            //register by name    
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'resultsLookup'),
                 ResultsLookup.address
@@ -126,11 +143,35 @@ module.exports = function(deployer, network, accounts) {
 
             /*** Permissions *********/
 
-            //register owner by name    
+            // Register owner by name
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'owner'),
                 owner
-            );                     
+            );
+            // Register manager by name
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'manager'),
+                manager
+            );
+            await storageInstance.setBool(
+                config.web3.utils.soliditySha3('access.role', 'admin', manager),
+                manager
+            );
+            // Register ceo by name
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'ceo'),
+                ceo
+            );
+            await storageInstance.setBool(
+                config.web3.utils.soliditySha3('access.role', 'admin', ceo),
+                ceo
+            );
+            // Register required votes to approve a transaction request.
+            const requiredVotes = 2;
+            await storageInstance.setUint(
+                config.web3.utils.soliditySha3('vault.account.required'),
+                requiredVotes
+            );
 
             // Disable direct access to storage now
             await storageInstance.setBool(
@@ -146,9 +187,12 @@ module.exports = function(deployer, network, accounts) {
             console.log('\x1b[33m%s\x1b[0m:', 'Set ResultsLookup Address');
             console.log(ResultsLookup.address);
             console.log('\x1b[33m%s\x1b[0m:', 'Set BbVault Address');
-            console.log(BbVault.address);   
+            console.log(BbVault.address);
+            console.log('\x1b[33m%s\x1b[0m:', 'Set BbUpgrade Address');
+            console.log(BbUpgrade.address);
+            console.log(BbVault.address);
             console.log('\x1b[33m%s\x1b[0m:', 'Set ContestPoolBase Address');
-            console.log(ContestPoolBase.address);           
+            console.log(ContestPoolBase.address);
             console.log('\x1b[32m%s\x1b[0m', 'Post - Storage Direct Access Removed');
 
             jsonfile.writeFile(contractsJson, contracts, {spaces: 2, EOL: '\r\n'}, function (err) {

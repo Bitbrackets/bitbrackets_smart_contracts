@@ -12,7 +12,7 @@ contract('ContestPoolFactory', function (accounts) {
 
     const defaultName = "MyContestPool";
     const owner = accounts[0];
-    const player1 = accounts[1];
+    const player1 = accounts[5];
     const player2 = accounts[2];
     const managerFee = 10;
     const ownerFee = 10;
