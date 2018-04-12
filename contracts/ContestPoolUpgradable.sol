@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 import "./AddressArray.sol";
 import "./common/BbProxyBase.sol";
@@ -13,6 +13,7 @@ contract ContestPoolUpgradable is BbProxyBase {
 
     /**** Properties ***********/
     address public  manager;
+    bytes32 public  name;
     bytes32 public  contestName;
     /** Start time in seconds. */
     uint public    startTime;
@@ -55,6 +56,7 @@ contract ContestPoolUpgradable is BbProxyBase {
 
     function ContestPoolUpgradable(
         address _storage,
+        bytes32 _name,
         address _manager,
         bytes32 _contestName,
         uint _startTime,
@@ -68,6 +70,7 @@ contract ContestPoolUpgradable is BbProxyBase {
     ) public BbBase(_storage) BbProxyBase(_storage, "contestPoolBase")
     {
         manager = _manager;
+        name = _name;
         contestName = _contestName;
         startTime = _startTime;
         endTime = _endTime;

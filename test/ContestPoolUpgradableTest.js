@@ -69,6 +69,7 @@ contract('ContestPoolUpgradable', accounts => {
 
 
         const txA = await contestPoolFactoryInstance.createContestPool(
+            'nameA',
             contestName, 
             amountPerPlayer,
             {
@@ -78,6 +79,7 @@ contract('ContestPoolUpgradable', accounts => {
         );
 
         const txB = await contestPoolFactoryInstance.createContestPool(
+            'nameB',
             contestNameB,
             amountPerPlayer,
             {

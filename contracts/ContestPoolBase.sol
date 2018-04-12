@@ -12,96 +12,6 @@ contract ContestPoolBase is IContestPoolBase {
     using SafeMath for uint256;
     using AddressArray for AddressArray.Addresses;
 
-    uint constant private AVOID_DECIMALS = 100000000000000000;
-
-    /**** Properties ***********/
-    address public  manager;
-    bytes32 public  contestName;
-    /** Start time in seconds. */
-    uint public    startTime;
-    /** End time in seconds. */
-    uint public     endTime;
-
-    /** Time (in seconds) after finishing this contest pool which allows the winners to claim the prize. */
-    uint public    graceTime;
-    uint public    maxBalance;
-    uint public    amountPerPlayer;
-    /** Percentage (between 0 and 100) that represents the manager fee. */
-    uint public    managerFee;
-    /** Percentage (between 0 and 100) that represents the owner fee. */
-    uint public     ownerFee;
-    uint public     highestScore;
-    /** Total winner payments made. It is for optimizing payments for winners. */
-    uint public     winnerPayments;
-    /** Current players playing this contest pool. */
-    uint public     players;
-    /** Current amount of weis paid to winners, manager, and owner. */
-    uint public    amountPaid;
-
-    mapping(address => uint8[]) public  predictions;
-
-    /**
-     * It contains all the current winners for this contest pool.
-     * It may be updated when a player attempts to publish a score, and 
-     *  it is higher than the current one(s). 
-     *
-     * @dev https://ethereum.stackexchange.com/questions/12740/truffle-console-return-array-of-addresses-issue
-     * @dev https://ethereum.stackexchange.com/questions/3373/how-to-clear-large-arrays-without-blowing-the-gas-limit
-     */
-    AddressArray.Addresses public winners;
-    
-    /**
-     * This is used to identify if an address has claimed its prize.
-     */
-    mapping(address => bool) public payments;
-
-    /**** Events ***********/
-
-    event LogSendPrediction (
-        address indexed contractAddress,
-        uint8[] prediction,
-        address indexed player
-    );
-
-    event LogClaimPaymentByWinner (
-        address indexed contractAddress,
-        address indexed winner,
-        uint prize
-    );
-
-    event LogClaimPaymentByManager (
-        address indexed contractAddress,
-        address indexed manager,
-        uint prize
-    );
-
-    event LogClaimPaymentByOwner (
-        address indexed contractAddress,
-        address indexed owner,
-        uint prize
-    );
-
-    event LogPublishedScore (
-        address indexed contractAddress,
-        address indexed player,
-        uint score,
-        uint highScore
-    );
-
-    event LogNewHighScore (
-        address indexed contractAddress,
-        address indexed player,
-        uint previousHighScore,
-        uint newHighScore
-    );
-
-    event LogFallbackEvent (
-        address indexed contractAddress,
-        address indexed player,
-        uint value
-    );
-
-
 
     /*** Modifiers ***************/
 
@@ -166,33 +76,16 @@ contract ContestPoolBase is IContestPoolBase {
 
     function ContestPoolBase(
         address _storage
-        // address _manager,
-        // bytes32 _contestName,
-        // uint _startTime,
-        // uint _endTime,
-        // uint _graceTime,
-        // uint _maxBalance,
-        // uint _amountPerPlayer,
-        // uint _managerFee,
-        // uint _ownerFee
     ) public BbBase(_storage)
     {
 
-        // manager = _manager;
-        // contestName = _contestName;
-        // startTime = _startTime;
-        // endTime = _endTime;
-        // graceTime = _graceTime;
-        // maxBalance = _maxBalance;
-        // amountPerPlayer = _amountPerPlayer;
-        // ownerFee = _ownerFee;
-        // managerFee = _managerFee;
     }
 
     /*** Fallback Method ***************/
 
     function () public payable {
-        LogFallbackEvent(address(this), msg.sender, msg.value);
+        doWithdraw(msg.value);
+        emit LogFallbackEvent(address(this), msg.sender, msg.value);
     }
 
     /*** Methods ***************/
@@ -201,9 +94,11 @@ contract ContestPoolBase is IContestPoolBase {
         return BbVaultInterface(getOwner());
     }
 
+
     function getVersion() public pure returns (uint256 ) {
         return 1;
     }
+
 
     function getWinners() public view returns (address[] ) {
         return winners.items;
@@ -231,7 +126,7 @@ contract ContestPoolBase is IContestPoolBase {
         }
         return totalFees;
     }
-    
+
     function getTotalWinnersFee() internal view returns (uint _totalWinnersFee) {
         return uint(100).sub(getOwnerAndManagerFees());
     }
@@ -263,7 +158,7 @@ contract ContestPoolBase is IContestPoolBase {
         uint partialBalance = currentBalance.mul(100).div(partialBalanceFee);//NOT AVOID_DECIMALS.
         return partialBalance;
     }
-    
+
     /**
      * Gets the prize amount for ONLY one winner based on:
      *  - Whether owner withdraw his/her fee.
@@ -282,19 +177,19 @@ contract ContestPoolBase is IContestPoolBase {
     * @dev this function is used for a winner to claim the prize
     *   https://consensys.github.io/smart-contract-best-practices/
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
-    **/    
+    **/
     function claimPaymentByWinner() public isAfterGraceTime onlyWinner {
-        require(winners.count >= winnerPayments);
+        require(winners.count > winnerPayments);
         require(!payments[msg.sender]);
         uint winnersAmount = getWinnerAmount();
         require(winnersAmount > 0);
 
-		payments[msg.sender] = true;
+        payments[msg.sender] = true;
         winnerPayments = winnerPayments.add(1);
         addAmountPaid(winnersAmount);
         msg.sender.transfer(winnersAmount);
 
-        LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
+        emit LogClaimPaymentByWinner(this, msg.sender, winnersAmount);
     }
 
     function getAmount(uint currentFee) internal view returns (uint _partialBalance){
@@ -311,15 +206,15 @@ contract ContestPoolBase is IContestPoolBase {
         payments[manager] = true;
         addAmountPaid(managerAmount);
         msg.sender.transfer(managerAmount);
-        
-        LogClaimPaymentByManager(this, msg.sender, managerAmount);
+
+        emit LogClaimPaymentByManager(this, msg.sender, managerAmount);
     }
 
     function addAmountPaid(uint _amountPaid) internal {
         amountPaid = amountPaid.add(_amountPaid);
     }
 
-    function getPoolBalance() internal view returns (uint _poolBalance) {
+    function getPoolBalance() public view returns (uint _poolBalance) {
         return players.mul(amountPerPlayer).sub(amountPaid);
     }
 
@@ -333,8 +228,8 @@ contract ContestPoolBase is IContestPoolBase {
 
         BbVaultInterface bbVault = getBbVault();
         bbVault.deposit.value(ownerAmount)();
-        
-        LogClaimPaymentByOwner(this, bbVaultAddress, ownerAmount);
+
+        emit LogClaimPaymentByOwner(this, bbVaultAddress, ownerAmount);
     }
 
     function addWinnerDependingOnScore(address _potentialWinner, uint _aScore) internal returns (bool _newHighScore){
@@ -342,12 +237,12 @@ contract ContestPoolBase is IContestPoolBase {
             if(_aScore == highestScore) {
                 // The _potentialWinner is a "real" winner with the same highest score.
                 winners.addItem(_potentialWinner);
-                LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
+                emit LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
             } else {
                 // The _potentialWinner is a "real" and unique winner with the highest score.
                 winners.clear();
                 winners.addItem(_potentialWinner);
-                LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
+                emit LogNewHighScore(this, _potentialWinner, highestScore, _aScore );
                 highestScore = _aScore;
             }
             return true;
@@ -357,7 +252,7 @@ contract ContestPoolBase is IContestPoolBase {
 
     function publishHighScore() external onlyActivePlayers isAfterStartTime  returns (bool) {
         //check sender is a player and has prediction
-        
+
         //check pool graceTime has not ended
         // require(isContestActive());
 
@@ -378,8 +273,8 @@ contract ContestPoolBase is IContestPoolBase {
 
         //if player has higher score we update high score
         //add player to the winners array
-        LogPublishedScore(this, msg.sender, score, highestScore);
-        
+        emit LogPublishedScore(this, msg.sender, score, highestScore);
+
         return addWinnerDependingOnScore(msg.sender, score);
     }
 
@@ -405,7 +300,7 @@ contract ContestPoolBase is IContestPoolBase {
         require(predictions[msg.sender].length == 0);
         predictions[msg.sender] = _prediction;
         players = players.add(1);
-        LogSendPrediction(this, _prediction, msg.sender);
+        emit LogSendPrediction(this, _prediction, msg.sender);
     }
 
     function getPredictionSet(address _playerAddress) public view returns (uint8[]) {
@@ -415,12 +310,31 @@ contract ContestPoolBase is IContestPoolBase {
     function getCurrentTimestamp() public view returns (uint256) {
         return now;
     }
-    
+
     function hasContestEnded() private view returns (bool) {
         return getCurrentTimestamp().sub(endTime) > graceTime;
     }
 
     function isContestActive() private view returns (bool) {
         return !hasContestEnded();
+    }
+
+    function getBalance() public view returns (uint _balance) {
+        return address(this).balance;
+    }
+
+    function withdraw() public onlySuperUser {
+        require(payments[manager]);
+        require(winners.count == winnerPayments);
+        address _this = address(this);
+        require(_this.balance > 0);
+        doWithdraw(_this.balance);
+    }
+
+    function doWithdraw(uint _value) internal {
+        require(address(this).balance >= _value);
+        BbVaultInterface bbVault = getBbVault();
+        bbVault.deposit.value(_value)();
+        emit LogWithdraw(address(this), msg.sender, _value);
     }
 }
