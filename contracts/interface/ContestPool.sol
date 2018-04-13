@@ -3,7 +3,8 @@ pragma solidity 0.4.21;
 import "../BbBase.sol";
 import "../AddressArray.sol";
 
-contract ContestPool is BbBase{
+
+contract ContestPool is BbBase {
 
     uint constant public AVOID_DECIMALS = 100000000000000000;
 

@@ -12,11 +12,14 @@ contract ContestPoolMock is ContestPoolBase {
     function ContestPoolMock (
         address _storage,
         address _manager) public
-    ContestPoolBase(_storage) { }
+    ContestPoolBase(_storage) {
+        manager = _manager;
+    }
 //    ContestPool(_storage, "", _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
 
     /**
-     * @dev Setter methods ONLY for testing purposes. https://ethereum.stackexchange.com/questions/25498/solidity-private-vs-public-variables
+     * @dev Setter methods ONLY for testing purposes.
+     * https://ethereum.stackexchange.com/questions/25498/solidity-private-vs-public-variables
      */
     function setStartTime(uint _startTime) public {
         startTime = _startTime;

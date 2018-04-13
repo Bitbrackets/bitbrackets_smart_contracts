@@ -59,7 +59,7 @@ contract('ContestPoolGetTotalWinnersFeeTest', accounts => {
             await builder.managerFee(owner, managerFee);
             await builder.ownerFee(owner, ownerFee);
             await builder.paymentsTrue(owner, payments);
-            
+
             //Invocation
             const result = await contestPoolInstance._getTotalWinnersFee();
             

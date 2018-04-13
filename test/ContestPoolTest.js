@@ -1,6 +1,7 @@
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
-const ContestPool = artifacts.require("./ContestPool.sol");
+//const ContestPool = artifacts.require("./ContestPoolBase.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
+const contestPool = artifacts.require("./ContestPool.sol");
 
 const dateUtil = require('./utils/DateUtil');
 const t = require('./utils/TestUtil').title;
@@ -30,7 +31,7 @@ contract('ContestPool', accounts => {
 
     const contestName = stringUtils.uniqueText('Rusia2018');
     const name = stringUtils.uniqueText('MyName');
-
+    let contestPoolAddress;
 
     before('setup suite', async () => {
         contestPoolFactoryInstance = await ContestPoolFactory.deployed();
@@ -48,7 +49,7 @@ contract('ContestPool', accounts => {
             { from : owner }
         );
 
-        let contestPoolAddress;
+
         const tx = await contestPoolFactoryInstance.createContestPool(
             name,
             contestName, 
@@ -59,29 +60,15 @@ contract('ContestPool', accounts => {
             }
         );
         
-        // contestPoolAddress = tx.logs[0].args.contestPoolAddress;
-        // console.log('Contest Pool Address', contestPoolAddress);
-        // constestPoolInstance = ContestPool(contestPoolAddress);
+         contestPoolAddress = tx.logs[0].args.contestPoolAddress;
 
-        // console.log("contest pool instance", contestPoolInstance);
 
     });
 
     beforeEach('setup contract for each test', async () => {
 
-        contestPoolInstance = await ContestPool.new(
-            BbStorage.address,
-            "MyName",
-            manager,
-            "Rusia2018",
-            startTime,
-            endTime,
-            graceTime,
-            maxBalance,
-            amountPerPlayer,
-            managerFee,
-            ownerFee
-        );
+
+        contestPoolInstance = contestPool.at(contestPoolAddress);
     })
 
     it(t('AnyUser', 'setup', 'should have valid instance of ContestPoolFactory'), async () => {
