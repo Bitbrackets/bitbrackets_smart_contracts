@@ -44,8 +44,6 @@ contract('ResultsLookup', function(accounts) {
       await instance.registerResult(contestName, value, games, {from: player});
       assert(false, 'It should have failed because a player cannot register a result.');
     } catch(error) {
-      console.log('error1: ' + error);
-        console.log('error2: ' + error.message);
       assert(error);
       assert(error.message.includes("revert"));
     }
