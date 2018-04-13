@@ -6,9 +6,10 @@ import "./interface/BbVaultInterface.sol";
 import "./interface/ResultsLookupInterface.sol";
 import "./AddressArray.sol";
 import "./SafeMath.sol";
-import "./interface/IContestPoolBase.sol";
+import "./interface/ContestPool.sol";
 
-contract ContestPoolBase is IContestPoolBase {
+
+contract ContestPoolBase is ContestPool {
     using SafeMath for uint256;
     using AddressArray for AddressArray.Addresses;
 

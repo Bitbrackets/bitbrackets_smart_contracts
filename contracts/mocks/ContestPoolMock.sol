@@ -1,9 +1,9 @@
 pragma solidity 0.4.21;
 
-import "../../contracts/ContestPool.sol";
+import "../../contracts/ContestPoolBase.sol";
 
 
-contract ContestPoolMock is ContestPool {
+contract ContestPoolMock is ContestPoolBase {
     uint public currentTime;
     
     uint8[] public mockResult;
@@ -12,7 +12,8 @@ contract ContestPoolMock is ContestPool {
     function ContestPoolMock (
         address _storage,
         address _manager) public
-    ContestPool(_storage, "", _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
+    ContestPoolBase(_storage) { }
+//    ContestPool(_storage, "", _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
 
     /**
      * @dev Setter methods ONLY for testing purposes. https://ethereum.stackexchange.com/questions/25498/solidity-private-vs-public-variables

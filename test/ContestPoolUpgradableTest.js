@@ -1,8 +1,7 @@
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ContestPoolUpgradable = artifacts.require("./ContestPoolUpgradable.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
-// const contestPool = artifacts.require("./ContestPoolBase.sol");
-const contestPool = artifacts.require("./IContestPoolBase.sol");
+const contestPool = artifacts.require("./ContestPool.sol");
 
 const dateUtil = require('./utils/DateUtil');
 const t = require('./utils/TestUtil').title;

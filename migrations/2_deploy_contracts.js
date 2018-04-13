@@ -1,6 +1,5 @@
 const config = require("../truffle");
 const AddressArray = artifacts.require("./AddressArray.sol");
-const ContestPool = artifacts.require("./ContestPool.sol");
 const BbVault = artifacts.require("./BbVault.sol");
 const BbVaultMock = artifacts.require("./BbVaultMock.sol");
 const AddressArrayClient = artifacts.require("./AddressArrayClient.sol");
@@ -56,8 +55,8 @@ module.exports = function(deployer, network, accounts) {
             await deployer.deploy(AddressArray);
     
             if(deployMocks) {
-                await deployer.link(AddressArray, ContestPool);
-                await deployer.deploy(ContestPool, owner, "", manager, "", 0,0,0,10, 10000, 10, 10);
+                // await deployer.link(AddressArray, ContestPool);
+                // await deployer.deploy(ContestPool, owner, "", manager, "", 0,0,0,10, 10000, 10, 10);
 
                 await deployer.link(AddressArray, AddressArrayClient);
                 await deployer.deploy(AddressArrayClient);

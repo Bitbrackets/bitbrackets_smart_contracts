@@ -1,14 +1,9 @@
 pragma solidity 0.4.21;
 
 import "../BbBase.sol";
-//import "./interface/BbStorageInterface.sol";
-//import "./interface/BbVaultInterface.sol";
-//import "./interface/ResultsLookupInterface.sol";
 import "../AddressArray.sol";
-//import "./SafeMath.sol";
-//import "./interface/IContestPool.sol";
 
-contract IContestPoolBase is BbBase{
+contract ContestPool is BbBase{
 
     uint constant public AVOID_DECIMALS = 100000000000000000;
 
