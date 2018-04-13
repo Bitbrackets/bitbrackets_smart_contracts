@@ -1,6 +1,5 @@
 const config = require("../truffle");
 const AddressArray = artifacts.require("./AddressArray.sol");
-const ContestPool = artifacts.require("./ContestPool.sol");
 const BbVault = artifacts.require("./BbVault.sol");
 const BbVaultMock = artifacts.require("./BbVaultMock.sol");
 const AddressArrayClient = artifacts.require("./AddressArrayClient.sol");
@@ -9,6 +8,7 @@ const BbStorage = artifacts.require("./BbStorage.sol");
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
 const BbUpgrade = artifacts.require("./BbUpgrade.sol");
+const ContestPoolBase = artifacts.require("./ContestPoolBase.sol");
 const jsonfile = require('jsonfile');
 const contractsJson = './build/contracts.json';
 
@@ -55,8 +55,8 @@ module.exports = function(deployer, network, accounts) {
             await deployer.deploy(AddressArray);
     
             if(deployMocks) {
-                await deployer.link(AddressArray, ContestPool);
-                await deployer.deploy(ContestPool, owner, "", manager, "", 0,0,0,10, 10000, 10, 10);
+                // await deployer.link(AddressArray, ContestPool);
+                // await deployer.deploy(ContestPool, owner, "", manager, "", 0,0,0,10, 10000, 10, 10);
 
                 await deployer.link(AddressArray, AddressArrayClient);
                 await deployer.deploy(AddressArrayClient);
@@ -78,6 +78,10 @@ module.exports = function(deployer, network, accounts) {
             await deployer.link(AddressArray, ContestPoolFactory);
             await deployer.deploy(ContestPoolFactory, BbStorage.address);
             addContractInfo("ContestPoolFactory", ContestPoolFactory.address);
+
+            await deployer.link(AddressArray, ContestPoolBase);
+            await deployer.deploy(ContestPoolBase, BbStorage.address);
+            addContractInfo("ContestPoolBase", ContestPoolBase.address);
 
             await deployer.deploy(BbUpgrade, BbStorage.address);
             addContractInfo("BbUpgrade", BbUpgrade.address);
@@ -105,11 +109,22 @@ module.exports = function(deployer, network, accounts) {
                 ContestPoolFactory.address
             );
 
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.address', ContestPoolBase.address),
+                ContestPoolBase.address
+            );
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'contestPoolBase'),
+                ContestPoolBase.address
+            );
+
             //BbVault: Register address and name
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.address', BbVault.address),
                 BbVault.address
             );
+
+
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'bbVault'),
                 BbVault.address
@@ -127,7 +142,7 @@ module.exports = function(deployer, network, accounts) {
 
             /*** Permissions *********/
 
-            // Register owner by name    
+            // Register owner by name
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'owner'),
                 owner
@@ -174,6 +189,9 @@ module.exports = function(deployer, network, accounts) {
             console.log(BbVault.address);
             console.log('\x1b[33m%s\x1b[0m:', 'Set BbUpgrade Address');
             console.log(BbUpgrade.address);
+            console.log(BbVault.address);
+            console.log('\x1b[33m%s\x1b[0m:', 'Set ContestPoolBase Address');
+            console.log(ContestPoolBase.address);
             console.log('\x1b[32m%s\x1b[0m', 'Post - Storage Direct Access Removed');
 
             jsonfile.writeFile(contractsJson, contracts, {spaces: 2, EOL: '\r\n'}, function (err) {

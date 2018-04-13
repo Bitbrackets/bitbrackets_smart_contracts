@@ -80,5 +80,7 @@ contract BbBase {
     function roleCheck(string _role, address _address) internal view {
         require(roleHas(_role, _address) == true);
     }
+
+
 }
 

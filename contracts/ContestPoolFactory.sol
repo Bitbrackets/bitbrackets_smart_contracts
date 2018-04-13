@@ -1,6 +1,7 @@
 pragma solidity 0.4.21;
 
-import "./ContestPool.sol";
+//import "./ContestPool.sol";
+import "./ContestPoolUpgradable.sol";
 import "./interface/BbStorageInterface.sol";
 import "./interface/BbVaultInterface.sol";
 import "./BbBase.sol";
@@ -99,8 +100,8 @@ contract ContestPoolFactory is BbBase {
         );
     }
         
-    function createContestPool(bytes32 _name, bytes32 _contestName, uint _amountPerPlayer) 
-        public payable exists(_contestName) returns (address) {
+    function createContestPool(bytes32 _name, bytes32 _contestName, uint _amountPerPlayer)
+        public payable exists(_contestName) returns (ContestPoolUpgradable) {
         require(_name != bytes32(0x0));
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
@@ -108,7 +109,7 @@ contract ContestPoolFactory is BbBase {
         require(definition.maxBalance > _amountPerPlayer);
 
         address manager = msg.sender;
-        ContestPool newContestPoolAddress = new ContestPool(
+        ContestPoolUpgradable newContestPoolAddress = new ContestPoolUpgradable(
             address(bbStorage),
             _name,
             manager,
