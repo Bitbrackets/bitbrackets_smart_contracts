@@ -27,6 +27,12 @@ contract ContestPoolBase is ContestPool {
         _;
     }
 
+    modifier isBeforeGraceTime() {
+        uint endGraceTime = endTime.add(graceTime);
+        require(getCurrentTimestamp() < endGraceTime);
+        _;
+    }
+
     modifier isInGraceTime() {
         uint startGraceTime = endTime;
         uint endGraceTime = endTime.add(graceTime);
@@ -251,30 +257,15 @@ contract ContestPoolBase is ContestPool {
         return false;
     }
 
-    function publishHighScore() external onlyActivePlayers isAfterStartTime  returns (bool) {
-        //check sender is a player and has prediction
-
-        //check pool graceTime has not ended
-        // require(isContestActive());
-
-        //check current results
+    function publishHighScore() external onlyActivePlayers isBeforeGraceTime returns (bool) {
+        //check sender is a player and has prediction check current results
         var (result, games) = getResult();
         uint8[] memory prediction = predictions[msg.sender];
 
-        //compare players prediction to current results
-        // and compute player score
+        //compare players prediction to current results and compute player score
         uint score = calculatePlayerScore(result, prediction, games);
 
         require(score > 0);
-
-        //update player score in contract if its different from
-        //his last score
-        // TODO we need to keep track of players score and games counted to save gas
-        // each time they publish
-
-        //if player has higher score we update high score
-        //add player to the winners array
-        emit LogPublishedScore(this, msg.sender, score, highestScore);
 
         return addWinnerDependingOnScore(msg.sender, score);
     }

@@ -54,6 +54,11 @@ contract ContestPoolFactory is BbBase {
         _;
     }
 
+    modifier isNotOwner(address _address) {
+        require(getOwner() != _address);
+        _;
+    }
+
     /**** methods ***********/
 
 
@@ -117,7 +122,7 @@ contract ContestPoolFactory is BbBase {
     }
         
     function createContestPool(bytes32 _name, bytes32 _contestName, uint _amountPerPlayer)
-        public payable exists(_contestName) returns (ContestPoolUpgradable) {
+        public payable exists(_contestName) isNotOwner(msg.sender) returns (ContestPoolUpgradable) {
         require(_name != bytes32(0x0));
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
@@ -131,12 +136,17 @@ contract ContestPoolFactory is BbBase {
         return newContestPoolAddress;
     }
 
+
     function getOwner() internal view returns (address _owner) {
+        return bbStorage.getAddress(keccak256("contract.name", "owner"));
+    }
+
+    function getBbVaultAddress() internal view returns (address _owner) {
         return bbStorage.getAddress(keccak256("contract.name", "bbVault"));
     }
 
     function getBbVault() internal view returns (BbVaultInterface _vault) {
-        return BbVaultInterface(getOwner());
+        return BbVaultInterface(getBbVaultAddress());
     }
 
     function withdrawFee() public onlySuperUser {

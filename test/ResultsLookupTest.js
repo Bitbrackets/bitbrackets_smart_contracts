@@ -14,6 +14,11 @@ let contestName;
 
 contract('ResultsLookup', function(accounts) {
 
+  const ceo = accounts[1];
+  const manager = accounts[2];
+  const playe1 = accounts[3];
+  const player2 = accounts[4];
+
   beforeEach('Setup contract for each test', async() => {
     instance = await ResultsLookup.deployed();
     contestName = stringUtils.stringToBytes32('Rusia2018');
@@ -37,6 +42,16 @@ contract('ResultsLookup', function(accounts) {
     assert.equal(games,result[1].toNumber());
   });
 
+  it(t('manager', 'getResult', 'Should able to get a result (pre registered).'), async function(){
+   
+    await instance.registerResult(contestName, value, games, {from: manager});
+    const result = await instance.getResult(contestName, {from: manager});
+    
+    assertBigNumberArrayIsEqual(toBigNumberArray(value), result[0]);
+    
+    assert.equal(games,result[1].toNumber());
+  });
+
   it(t('aNonOwner', 'registerResult', 'Should not able to register a result.', true), async function() {
     const player = accounts[5];
     
@@ -48,21 +63,31 @@ contract('ResultsLookup', function(accounts) {
       assert(error.message.includes("revert"));
     }
   });
-  // TODO should not be able to get a result from a contest that does not exist
-  // TODO access to be restricted to contracts in ContestPool
-  xit(t('aNonOwner', 'getResult', 'Should not able to get a result pre registered.', true), async function() {
+
+  it(t('anOwner', 'getResult', 'Should not able to get a result from a contest that does not exist.', true), async function() {
     const owner = accounts[0];
     const player = accounts[1];
 
-    await instance.registerResult(contestName, value, games,  {from: owner});
-
     try {
-      await instance.getResult(contestName, {from: player});
-      assert(false, 'It should have failed because a player cannot get a result.');
+      await instance.getResult('ContestNameNotExist', {from: player});
+      assert(false, 'It should have failed because contest name does not exist.');
     } catch(error) {
       assert(error);
       assert(error.message.includes("revert"));
     }
+  });
+
+  it(t('aNonOwner', 'getResult', 'Should able to get a result pre registered.', true), async function() {
+    const owner = accounts[0];
+    const player = accounts[1];
+    const _contestName = 'MyContestName';
+
+    await instance.registerResult(_contestName, value, games, {from: manager});
+    const result = await instance.getResult(_contestName, {from: player2});
+    
+    assertBigNumberArrayIsEqual(toBigNumberArray(value), result[0]);
+    
+    assert.equal(games,result[1].toNumber());
   });
   
   it(t('aOwner', 'getResult', 'Should able to register two results and get the last result.', true), async function() {

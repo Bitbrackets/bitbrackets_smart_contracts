@@ -90,5 +90,3 @@ Slack
 ### TODO List ##
 
 * Fix warnings in smart contracts.
-* Remove ^ in the dependencies in package.json file.
-* Remove ^ in smart contracts.
