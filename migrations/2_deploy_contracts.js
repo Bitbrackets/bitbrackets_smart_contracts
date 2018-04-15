@@ -160,7 +160,6 @@ module.exports = function(deployer, network, accounts) {
             );
 
             /*** Permissions *********/
-
             // Register owner by name
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'owner'),
