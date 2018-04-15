@@ -67,6 +67,12 @@ ADDRESS_COUNT_KEY=3
 ```
 If some of them are not defined in ``.env``, the process will take those values by default.
 
+### How get JSON sample with events info. ###
+
+There is a test file named ```./test/ContestPoolFactoryCreateEventsDataTest.js```. To generate events data, you need to run that file using the command line:
+```truffle test ./test/ContestPoolFactoryCreateEventsDataTest.js```
+
+After executing the test, it will create an ```events.json``` file in the root folder. That file will contains all events data.
 
 ### Contribution guidelines ###
 
@@ -84,5 +90,8 @@ Slack
 ### TODO List ##
 
 * Fix warnings in smart contracts.
-* Remove ^ in the dependencies in package.json file.
-* Remove ^ in smart contracts.
+* Add authors in test files (equals to smart contract files).
+* Add LICENSE file in root folder.
+* Check passwords/users/other information before moving to "official" repository.
+* Check README file.
+* Check if the event LogPublishedScore in ContestPool is needed. It contains a LogNewHighScore event.

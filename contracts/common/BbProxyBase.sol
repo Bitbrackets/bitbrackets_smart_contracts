@@ -20,8 +20,7 @@ contract BbProxyBase is  DelegateProxy, BbBase {
 
         // Check that targetAddress is a contract to delegate
         address targetAddress = getTargetAddress(_targetId);
-        //require(isContract(targetAddress));
-
+        //TODO WARNING compiling unused variable targetAddress.
     }
 
     function () public payable {

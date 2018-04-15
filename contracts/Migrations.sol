@@ -1,5 +1,12 @@
 pragma solidity 0.4.21;
 
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract Migrations {
   address public owner;
   uint public last_completed_migration;

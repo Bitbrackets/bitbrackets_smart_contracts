@@ -8,7 +8,7 @@ var utils = require("./utils/utils.js");
 
 let instance;
 
-contract('ContestPoolFactory', function (accounts) {
+contract('ContestPoolFactoryTest', function (accounts) {
 
     const defaultName = "MyContestPool";
     const owner = accounts[0];
@@ -98,7 +98,6 @@ contract('ContestPoolFactory', function (accounts) {
 
     it(t('aUser', 'createContestPool', 'Should be able to send create a contest pool based on a definition.'), async function () {
         const contestName = stringUtils.uniqueText('Rusia2018');
-        // TODO : add test to check manager and owner address of contest pool should be different
         const startTime = 1000;
         const endTime = 2000;
         const graceTime = 2;
@@ -141,6 +140,32 @@ contract('ContestPoolFactory', function (accounts) {
                 contestName: contestNameBytes32
             }
         }, 1, callback);
+    });
+
+    it(t('aOwner', 'createContestPool', 'Should not be able to create a contest pool (manager == owner).', true), async function () {
+        const contestName = stringUtils.uniqueText('Rusia2018');
+        const startTime = 1000;
+        const endTime = 2000;
+        const graceTime = 2;
+        const maxBalance = web3.toWei(1, 'ether');
+        const fee = web3.toWei(0.01, 'ether');
+        const amountPerPlayer = web3.toWei(0.1, 'ether');
+        const contestNameBytes32 = stringUtils.stringToBytes32(contestName);
+
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee,
+        {from: owner});
+
+        try {
+            await instance.createContestPool(defaultName, contestName, amountPerPlayer, {
+                from: owner,
+                value: fee
+            });
+            assert.ok(false, 'It should fail because owner address is equal to manager address.');
+        } catch (error) {
+            assert(error);
+            assert(error.message.includes("revert"));
+        }
+
     });
 
     it(t('aUser', 'createContestPool', 'Should not be able to create a contest pool with not pre-existed contest name.', true), async function () {

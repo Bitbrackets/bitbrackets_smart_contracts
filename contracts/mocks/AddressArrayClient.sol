@@ -2,10 +2,12 @@ pragma solidity 0.4.21;
 
 import "../../contracts/AddressArray.sol";
 
-/**
- * This contract is ONLY to can test AddressArray from JS side.
+ /*
+ * @title This contract is created ONLY to can test AddressArray.
  *
- * @author Guillermo Salazar
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
  */
 contract AddressArrayClient  {
     using AddressArray for AddressArray.Addresses;

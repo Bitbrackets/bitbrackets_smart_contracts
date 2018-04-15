@@ -1,17 +1,20 @@
 const config = require("../truffle");
 const AddressArray = artifacts.require("./AddressArray.sol");
 const BbVault = artifacts.require("./BbVault.sol");
+const BbRole = artifacts.require("./BbRole.sol");
 const BbVaultMock = artifacts.require("./BbVaultMock.sol");
 const AddressArrayClient = artifacts.require("./AddressArrayClient.sol");
 const ContestPoolMock = artifacts.require("./ContestPoolMock.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
+const ContestPoolFactoryMock = artifacts.require("./mocks/ContestPoolFactoryMock.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
 const BbUpgrade = artifacts.require("./BbUpgrade.sol");
 const ContestPoolBase = artifacts.require("./ContestPoolBase.sol");
 const jsonfile = require('jsonfile');
 const contractsJson = './build/contracts.json';
 
+const ADMIN_ROLE = 'admin';
 const contracts = [];
 const networksForMocks = ["test"];
 
@@ -64,6 +67,9 @@ module.exports = function(deployer, network, accounts) {
                 await deployer.link(AddressArray, ContestPoolMock);
                 await deployer.deploy(ContestPoolMock, owner, manager);
 
+                await deployer.link(AddressArray, ContestPoolFactoryMock);
+                await deployer.deploy(ContestPoolFactoryMock, BbStorage.address);
+
                 await deployer.deploy(BbVaultMock, BbStorage.address);
                 await storageInstance.setAddress(
                     config.web3.utils.soliditySha3('contract.name', 'bbVaultMock'),
@@ -75,6 +81,9 @@ module.exports = function(deployer, network, accounts) {
                 );
             }
     
+            await deployer.deploy(BbRole, BbStorage.address);
+            addContractInfo("BbRole", BbRole.address);
+
             await deployer.link(AddressArray, ContestPoolFactory);
             await deployer.deploy(ContestPoolFactory, BbStorage.address);
             addContractInfo("ContestPoolFactory", ContestPoolFactory.address);
@@ -97,6 +106,16 @@ module.exports = function(deployer, network, accounts) {
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'bbUpgrade'),
                 BbUpgrade.address
+            );
+
+            //BbRole: Register address and name
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.address', BbRole.address),
+                BbRole.address
+            );
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'bbRole'),
+                BbRole.address
             );
 
             //ContestPoolFactory: Register address and name
@@ -141,36 +160,22 @@ module.exports = function(deployer, network, accounts) {
             );
 
             /*** Permissions *********/
-
             // Register owner by name
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.name', 'owner'),
                 owner
             );
-            // Register manager by name
-            await storageInstance.setAddress(
-                config.web3.utils.soliditySha3('contract.name', 'manager'),
-                manager
-            );
-            await storageInstance.setBool(
-                config.web3.utils.soliditySha3('access.role', 'admin', manager),
-                manager
-            );
-            // Register ceo by name
-            await storageInstance.setAddress(
-                config.web3.utils.soliditySha3('contract.name', 'ceo'),
-                ceo
-            );
-            await storageInstance.setBool(
-                config.web3.utils.soliditySha3('access.role', 'admin', ceo),
-                ceo
-            );
+
             // Register required votes to approve a transaction request.
             const requiredVotes = 2;
             await storageInstance.setUint(
                 config.web3.utils.soliditySha3('vault.account.required'),
                 requiredVotes
             );
+
+            const bbRole = await BbRole.deployed();
+            await bbRole.adminRoleAdd(ADMIN_ROLE, ceo, {from: owner});
+            await bbRole.adminRoleAdd(ADMIN_ROLE, manager, {from: owner});
 
             // Disable direct access to storage now
             await storageInstance.setBool(
@@ -180,7 +185,9 @@ module.exports = function(deployer, network, accounts) {
 
             // Log it
             console.log('\x1b[33m%s\x1b[0m:', 'Set Storage Address');
-            console.log(BbStorage.address); 
+            console.log(BbStorage.address);
+            console.log('\x1b[33m%s\x1b[0m:', 'Set Role Address');
+            console.log(BbRole.address); 
             console.log('\x1b[33m%s\x1b[0m:', 'Set ContestPoolFactory Address');
             console.log(ContestPoolFactory.address);
             console.log('\x1b[33m%s\x1b[0m:', 'Set ResultsLookup Address');

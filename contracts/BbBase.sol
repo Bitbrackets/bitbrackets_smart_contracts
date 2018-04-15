@@ -2,10 +2,13 @@ pragma solidity 0.4.21;
 
 import "./interface/BbStorageInterface.sol";
 
-/// @title Base settings / modifiers for BitBrackets Contracts
-/// @author Doug Molina
-
-
+/*
+ * @title Base settings / modifiers for BitBrackets Contracts.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract BbBase {
 
 

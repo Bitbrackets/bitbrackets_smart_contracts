@@ -2,6 +2,13 @@ pragma solidity 0.4.21;
 
 import '../BbVault.sol';
 
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract BbVaultMock is BbVault  {
 
     function BbVaultMock (address _storage) public BbVault(_storage) { }
