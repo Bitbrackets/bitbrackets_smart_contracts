@@ -5,6 +5,7 @@ const ContestPoolFactoryMock = artifacts.require("./mocks/ContestPoolFactoryMock
 const ContestPool = artifacts.require("./ContestPool.sol");
 const CustomContract = artifacts.require("./CustomContract.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
+const BbRole = artifacts.require("./BbRole.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const contracts = require('./resources/contracts');
@@ -73,14 +74,14 @@ contract('ContestPoolFactoryRinkebyTest', function (accounts) {
     console.log('Accounts to use are: ');
     console.log(accounts);
     const owner = accounts[0];
-    const player1 = accounts[1];
+    const ceo = accounts[1];
     const manager = accounts[2];
-    const player3 = accounts[3];
-    const player4 = accounts[4];
-    const player5 = accounts[5];
-    const player6 = accounts[6];
-    const player7 = accounts[7];
-    const player8 = accounts[8];
+    const player1 = accounts[3];
+    const player2 = accounts[4];
+    const player3 = accounts[5];
+    const player4 = accounts[6];
+    const player5 = accounts[7];
+    const player6 = accounts[8];
     const managerFee = 10;
     const ownerFee = 10;
     const defaultPrediction = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100];
@@ -101,10 +102,22 @@ contract('ContestPoolFactoryRinkebyTest', function (accounts) {
         const maxBalance = web3.toWei(10, 'ether');
 
         console.log(`Creating a contest pool definition: "${contestName}"`);
-        const definitionResult = await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee, {from: accounts[0]});
-
+        const definitionResult = await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee, {from: owner});
         addEvent(definitionResult);
-        
+
+        const bbRole = await BbRole.deployed();
+        const adminRoleAddResult = await bbRole.adminRoleAdd('admin', player6, {from: owner});
+        addEvent(adminRoleAddResult);
+
+        const adminRoleRemoveResult = await bbRole.adminRoleRemove('admin', player6, {from: owner});
+        addEvent(adminRoleRemoveResult);
+
+        const transferOwnershipToPlayer6Result = await bbRole.transferOwnership(player6, {from: owner});
+        addEvent(transferOwnershipToPlayer6Result);
+
+        const transferOwnershipToOwnerResult = await bbRole.transferOwnership(owner, {from: player6});
+        addEvent(transferOwnershipToOwnerResult);
+
         logResult('ContestPoolDefinition created.', getValues(definitionResult));
 
         const amountPerPlayer = web3.toWei(0.001, 'ether');

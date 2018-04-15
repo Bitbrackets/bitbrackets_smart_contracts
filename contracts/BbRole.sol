@@ -54,6 +54,8 @@ contract BbRole is BbBase {
         bbStorage.deleteBool(keccak256("access.role", "owner", msg.sender));
         // Add new owner
         bbStorage.setBool(keccak256("access.role", "owner", _newOwner), true);
+
+        emit LogOwnershipTransferred(msg.sender, _newOwner);
     }
 
 
