@@ -3,9 +3,13 @@ pragma solidity 0.4.21;
 import "./AddressArray.sol";
 import "./common/BbProxyBase.sol";
 
-
-
-
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract ContestPoolUpgradable is BbProxyBase {
     using AddressArray for AddressArray.Addresses;
 
@@ -66,7 +70,6 @@ contract ContestPoolUpgradable is BbProxyBase {
         uint _amountPerPlayer,
         uint _managerFee,
         uint _ownerFee
-        // bytes32 _targetId
     ) public BbBase(_storage) BbProxyBase(_storage, "contestPoolBase")
     {
         manager = _manager;
@@ -80,13 +83,6 @@ contract ContestPoolUpgradable is BbProxyBase {
         ownerFee = _ownerFee;
         managerFee = _managerFee;
     }
-
-
-//    function getVersion() public view returns (uint256 ) {
-//        address target = getTargetAddress(targetId);
-//        require(target != 0); // if contract code hasn't been set yet, don't call
-//        delegatedFwd(target, msg.data);
-//    }
 
     /**
     * @dev ERC897, the address the proxy would delegate calls to

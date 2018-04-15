@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.21;
 
 import "./BbBase.sol";
 import "./interface/BbStorageInterface.sol";
@@ -272,6 +272,9 @@ contract ContestPoolBase is ContestPool {
         uint score = calculatePlayerScore(result, prediction, games);
 
         require(score > 0);
+
+        //if player has higher score we update high score add player to the winners array
+        emit LogPublishedScore(this, msg.sender, score, highestScore);
 
         return addWinnerDependingOnScore(msg.sender, score);
     }

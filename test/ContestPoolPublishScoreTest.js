@@ -8,8 +8,6 @@ const t = require('./utils/TestUtil').title;
 const { getScoreWithArray } = require('./utils/ScoreUtil');
 const Builder = require('./utils/ContestPoolBuilder');
 
-
-//TODO add tests with complete set of games
 contract('ContestPoolPublishScoreTest', accounts => {
     let contestPoolInstance;
     let resultsLookupInstance;
@@ -74,7 +72,6 @@ contract('ContestPoolPublishScoreTest', accounts => {
             }}, 1, emptyCallback);
             
             const highestScore = await contestPoolInstance.highestScore();
-            //console.log("high score", highestScore.toNumber());
             const winner1 = await contestPoolInstance.getWinners();
 
             assert.equal(player1, winner1[0]);

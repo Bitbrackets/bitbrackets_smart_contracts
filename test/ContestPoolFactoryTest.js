@@ -8,7 +8,7 @@ var utils = require("./utils/utils.js");
 
 let instance;
 
-contract('ContestPoolFactory', function (accounts) {
+contract('ContestPoolFactoryTest', function (accounts) {
 
     const defaultName = "MyContestPool";
     const owner = accounts[0];

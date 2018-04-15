@@ -90,3 +90,8 @@ Slack
 ### TODO List ##
 
 * Fix warnings in smart contracts.
+* Add authors in test files (equals to smart contract files).
+* Add LICENSE file in root folder.
+* Check passwords/users/other information before moving to "official" repository.
+* Check README file.
+* Check if the event LogPublishedScore in ContestPool is needed. It contains a LogNewHighScore event.

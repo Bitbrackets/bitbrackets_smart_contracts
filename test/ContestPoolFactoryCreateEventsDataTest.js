@@ -8,7 +8,6 @@ const BbStorage = artifacts.require("./BbStorage.sol");
 const BbRole = artifacts.require("./BbRole.sol");
 const ResultsLookup = artifacts.require("./ResultsLookup.sol");
 const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
-const contracts = require('./resources/contracts');
 
 const t = require('./utils/TestUtil').title;
 const stringUtils = require('./utils/StringUtil');
