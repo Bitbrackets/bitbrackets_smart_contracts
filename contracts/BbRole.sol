@@ -10,18 +10,18 @@ contract BbRole is BbBase {
     /*** Events **************/
 
     event LogRoleAdded(
-        string _roleName, 
-        address _address
+        address indexed anAddress,
+        string roleName
     );
 
     event LogRoleRemoved(
-        string _roleName, 
-        address _address
+        address indexed anAddress,
+        string roleName
     );
 
     event LogOwnershipTransferred(
-        address indexed _previousOwner, 
-        address indexed _newOwner
+        address indexed previousOwner, 
+        address indexed newOwner
     );
 
 
@@ -88,7 +88,7 @@ contract BbRole is BbBase {
         // Add it
         bbStorage.setBool(keccak256("access.role", _role, _address), true);
         // Log it
-        emit LogRoleAdded(_role, _address);
+        emit LogRoleAdded(_address, _role);
     }
 
     /**
@@ -100,7 +100,7 @@ contract BbRole is BbBase {
         // Remove from storage
         bbStorage.deleteBool(keccak256("access.role", _role, _address));
         // Log it
-        emit LogRoleRemoved(_role, _address);
+        emit LogRoleRemoved(_address, _role);
     }
 
 
