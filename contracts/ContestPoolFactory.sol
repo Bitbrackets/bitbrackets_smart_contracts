@@ -14,12 +14,19 @@ import "./BbBase.sol";
  */
 contract ContestPoolFactory is BbBase {
 
+
      /*** events ***************/
     event CreateContestPoolDefinition(
         bytes32 indexed contestName,
         uint indexed startTime,
         uint indexed endTime,
-        uint graceTime
+        uint graceTime,
+        uint maxAllowedBalance,
+        uint fee,
+        uint managerFeePercentage,
+        uint ownerFeePercentage,
+        uint published_at
+
     );
     
     event CreateContestPool(
@@ -102,11 +109,16 @@ contract ContestPoolFactory is BbBase {
             ownerFee: _ownerFee
         });
         definitions[_contestName] = newDefinition;
-        emit CreateContestPoolDefinition(
+        emit CreateContestPoolDefinition (
             _contestName, 
             _startTime, 
             _endTime, 
-            _graceTime
+            _graceTime,
+            _maxBalance,
+            _fee,
+            _managerFee,
+            _ownerFee,
+            getCurrentTimestamp()
         );
     }
 
@@ -158,5 +170,8 @@ contract ContestPoolFactory is BbBase {
         require(_this.balance > 0);
         BbVaultInterface bbVault = getBbVault();
         bbVault.deposit.value(_this.balance)();
+    }
+    function getCurrentTimestamp() public view returns (uint256) {
+        return now;
     }
 }
