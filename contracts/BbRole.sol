@@ -3,8 +3,13 @@ pragma solidity 0.4.21;
 import "./BbBase.sol";
 import "./interface/BbStorageInterface.sol";
 
-/// @title Role Based Access Control for BitBrackets
-/// @author Doug Molina
+/*
+ * @title Role Based Access Control for BitBrackets
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract BbRole is BbBase {
 
     /*** Events **************/

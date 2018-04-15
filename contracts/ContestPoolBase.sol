@@ -8,7 +8,13 @@ import "./AddressArray.sol";
 import "./SafeMath.sol";
 import "./interface/ContestPool.sol";
 
-
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract ContestPoolBase is ContestPool {
     using SafeMath for uint256;
     using AddressArray for AddressArray.Addresses;

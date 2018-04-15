@@ -3,6 +3,13 @@ pragma solidity 0.4.21;
 import "../ContestPoolFactory.sol";
 import "./ContestPoolMock.sol";
 
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract ContestPoolFactoryMock is ContestPoolFactory {
     
     function ContestPoolFactoryMock (address _storage) public ContestPoolFactory(_storage) { }

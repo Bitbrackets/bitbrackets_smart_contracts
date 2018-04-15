@@ -1,9 +1,12 @@
 pragma solidity 0.4.21;
 
-
-/// @title Eternal Storage for Bit Brackets Contracts
-/// inspired by the awesome RocketPool project and Eternal Storage implementations
-/// @author Doug Molina
+/*
+ * @title Eternal Storage for Bit Brackets Contracts inspired by the awesome RocketPool project and Eternal Storage implementations.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract BbStorage {
 
     /**** Storage Types *******/

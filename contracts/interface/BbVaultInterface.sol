@@ -1,9 +1,11 @@
 pragma solidity 0.4.21;
 
-/**
- * This contract is used as a vault for all the contracts in BitBrackets.
- * 
- * @author Guillermo Salazar
+ /*
+ * @title This contract is used as a vault for all the contracts in BitBrackets.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
  */
 contract BbVaultInterface {
 

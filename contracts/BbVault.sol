@@ -4,13 +4,12 @@ import "./BbBase.sol";
 import "./interface/BbVaultInterface.sol";
 import "./SafeMath.sol";
 
-
-/**
- * This contract is the BbVaultInterface's implementation for BitBrackets.
- * This contract stores the ethers transferred from other BitBrackets' contracts for safe keeping.
- * It also implements a multiple signatures logic for transfering ether to other accounts based on votes from the owners.
+/*
+ * @title This contract is the BbVaultInterface's implementation for BitBrackets. This contract stores the ethers transferred from other BitBrackets' contracts for safe keeping. It also implements a multiple signatures logic for transfering ether to other accounts based on votes from the owners.
  *
- * @author Guillermo Salazar
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
  */
 contract BbVault is BbBase, BbVaultInterface {
 
