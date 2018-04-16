@@ -89,6 +89,9 @@ Slack
 
 ### TODO List ##
 
+* Add require to avoid creating ContestPools if Contest definition time has passed
+* Add view method to Factory to query existing definitions
+* Add methods to Factory to disable/modify/delete existing Contest Definitions 
 * Fix warnings in smart contracts.
 * Add authors in test files (equals to smart contract files).
 * Add LICENSE file in root folder.
