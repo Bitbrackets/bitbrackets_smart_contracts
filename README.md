@@ -27,7 +27,7 @@ http://truffleframework.com/ganache/
   Repository for BitBrackets Smart Contracts repositories
   0.0.1
 
-### How do I get set up?
+## How do I get set up?
 
 #### Working with Truffle
 
@@ -41,7 +41,7 @@ truffle test
 * Project uses Open Zepellin Contracts
   https://github.com/OpenZeppelin/zeppelin-solidity
 
-### Deployment instructions
+## Deployment instructions
 
 * Download and install Geth (https://geth.ethereum.org/downloads/)
 * The folder **./private_network** contains all the data and commands for the private network.
@@ -93,7 +93,7 @@ There is a test file named `./test/ContestPoolFactoryCreateEventsDataTest.js`. T
 
 After executing the test, it will create an `events.json` file in the root folder. That file will contains all events data.
 
-### Contribution guidelines
+## Contribution guidelines
 
 * Writing tests
 * Code review
@@ -101,19 +101,20 @@ After executing the test, it will create an `events.json` file in the root folde
 
 Using Solium for Linter Solidity https://github.com/duaraghav8/Solium
 
-### Who do I talk to?
+## Who do I talk to?
 
-* Repo owner or admin
-  Slack
+* [Repo owner or admin](mailto:code@bitbrackets.io.com?Subject=Hello%20again)
+* [Telegram](https://t.me/bitbrackets)
+* [Reddit](https://www.reddit.com/r/ethdev/comments/8cwv16/smart_contracts_for_world_cup_prediction_pool/)
 
-### TODO List
+## TODO List
 
 * PENDING Close contestPoolBase from direct access only allow access via Proxy Contracts
-* DONE Add require to avoid creating ContestPools if Contest definition time has passed
+* ~~Add require to avoid creating ContestPools if Contest definition time has passed~~
 * PENDING (It could be invoking factory.definitions('ContestName')) Add view method to Factory to query existing definitions
-* DONE Add methods to Factory to disable/modify/delete existing Contest Definitions
+* ~~Add methods to Factory to disable/modify/delete existing Contest Definitions~~
 * Fix warnings in smart contracts.
-* DONE Add authors in test files (equals to smart contract files).
+* ~~Add authors in test files (equals to smart contract files).~~
 * Add LICENSE file in root folder.
 * Check passwords/users/other information before moving to "official" repository.
 * Check README file.
