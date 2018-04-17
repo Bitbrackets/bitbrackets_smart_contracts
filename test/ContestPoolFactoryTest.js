@@ -1,13 +1,23 @@
 var ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
+var ContestPoolFactoryMock = artifacts.require("./mocks/ContestPoolFactoryMock.sol");
 var ContestPool = artifacts.require("./ContestPool.sol");
 var BbVault = artifacts.require("./BbVault.sol");
 const t = require('./utils/TestUtil').title;
 const stringUtils = require('./utils/StringUtil');
-const toMillis = require('./utils/DateUtil').toMillis;
+const {toMillis, toSeconds, daysToSeconds} = require('./utils/DateUtil');
 var utils = require("./utils/utils.js");
 
 let instance;
 
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 contract('ContestPoolFactoryTest', function (accounts) {
 
     const defaultName = "MyContestPool";
@@ -18,7 +28,7 @@ contract('ContestPoolFactoryTest', function (accounts) {
     const ownerFee = 10;
 
     beforeEach('setup contract for each test', async () => {
-        instance = await ContestPoolFactory.deployed();
+        instance = await ContestPoolFactoryMock.deployed();
     });
 
     it(t('aUser', 'new', 'Should deploy ContestPoolFactory contract.'), async function () {
@@ -28,11 +38,13 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
     it(t('aOwner', 'createContestPoolDefinition', 'Should be able to create a contest pool definition.'), async function () {
         const contestName = stringUtils.uniqueText('ContestPool');
-        const startTime = 1000;
-        const endTime = 2000;
-        const graceTime = 2;
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
         const fee = web3.toWei(0.01, 'ether');
         const maxBalance = web3.toWei(10, 'ether');
+
+        await instance.setCurrentTime(toSeconds(2018, 01, 01));
 
         await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
 
@@ -48,9 +60,9 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
     it(t('aOwner', 'createContestPoolDefinition', 'Should not be able to create a contest pool definition twice (equals contest name).', true), async function () {
         const contestName = stringUtils.uniqueText('NewContestPool');
-        const startTime = 1000;
-        const endTime = 2000;
-        const graceTime = 2;
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
         const maxBalance = web3.toWei(10, 'ether');
         const fee = web3.toWei(0.01, 'ether');
         await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
@@ -98,15 +110,17 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
     it(t('aUser', 'createContestPool', 'Should be able to send create a contest pool based on a definition.'), async function () {
         const contestName = stringUtils.uniqueText('Rusia2018');
-        const startTime = 1000;
-        const endTime = 2000;
-        const graceTime = 2;
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
         const maxBalance = web3.toWei(1, 'ether');
         const fee = web3.toWei(0.01, 'ether');
         const amountPerPlayer = web3.toWei(0.1, 'ether');
         const contestNameBytes32 = stringUtils.stringToBytes32(contestName);
 
         await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
+
+        await instance.setCurrentTime(toSeconds(2018, 01, 01));
 
         await instance.createContestPool(defaultName, contestName, amountPerPlayer, {
             from: accounts[3],
@@ -136,7 +150,7 @@ contract('ContestPoolFactoryTest', function (accounts) {
             assert.equal(maxBalanceContestPool, maxBalance);
         };
         await utils.assertEvent(instance, {
-            event: "CreateContestPool", args: {
+            event: "ContestPoolCreated", args: {
                 contestName: contestNameBytes32
             }
         }, 1, callback);
@@ -144,9 +158,9 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
     it(t('aOwner', 'createContestPool', 'Should not be able to create a contest pool (manager == owner).', true), async function () {
         const contestName = stringUtils.uniqueText('Rusia2018');
-        const startTime = 1000;
-        const endTime = 2000;
-        const graceTime = 2;
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
         const maxBalance = web3.toWei(1, 'ether');
         const fee = web3.toWei(0.01, 'ether');
         const amountPerPlayer = web3.toWei(0.1, 'ether');
@@ -185,9 +199,9 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
     it(t('aPlayer', 'createContestPool', 'Should not be able to create a contest pool without paying a fee.', true), async function () {
         const contestName = stringUtils.uniqueText('MyCustomContestPool');
-        const startTime = 1000;
-        const endTime = 2000;
-        const graceTime = 2;
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
         const maxBalance = web3.toWei(1, 'ether');
         const fee = web3.toWei(0.01, 'ether');
         const amountPerPlayer = web3.toWei(0.1, 'ether');
@@ -209,9 +223,9 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
     it(t('aPlayer', 'createContestPool', 'When creating a contest pool, the factory balance should be increased based on the fee defined in the pool definition.'), async function () {
         const contestName = stringUtils.uniqueText('MyPool');
-        const startTime = 1000;
-        const endTime = 2000;
-        const graceTime = 2;
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
         const maxBalance = web3.toWei(10, 'ether');
         const amountPerPlayer = web3.toWei(0.01, 'ether');
         const fee = web3.toWei(5, 'ether');
@@ -220,6 +234,8 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
         const previousBalanceFactory = parseInt(fee) + parseInt(initialBalanceFactory);
         await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
+
+        await instance.setCurrentTime(toSeconds(2018, 01, 01));
 
         await instance.createContestPool(defaultName, contestName, amountPerPlayer, {
             from: accounts[3],
@@ -233,9 +249,9 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
     it(t('aPlayer', 'createContestPool', 'Should not be able to create a contest pool paying a different fee.', true), async function () {
         const contestName = stringUtils.uniqueText('MyContest');
-        const startTime = 1000;
-        const endTime = 2000;
-        const graceTime = 2;
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
         const maxBalance = web3.toWei(10, 'ether');
         const amountPerPlayer = web3.toWei(0.01, 'ether');
         const fee = web3.toWei(5, 'ether');
@@ -302,20 +318,22 @@ contract('ContestPoolFactoryTest', function (accounts) {
     
     it(t('aPlayer', 'withdrawFee', 'Should not able to withdraw balance from factory.', true), async function () {
         const contestName = stringUtils.uniqueText('MyContest');
-        const graceTime = 2;
+        const graceTime = daysToSeconds(2);
         const amountPerPlayer = web3.toWei(0.01, 'ether');
         const fee = web3.toWei(0.005, 'ether');
 
         await instance.createContestPoolDefinition(
             contestName,
             fee,
-            toMillis(2018, 01, 01),
-            toMillis(2018, 02, 01),
+            toSeconds(2018, 01, 10),
+            toSeconds(2018, 02, 01),
             graceTime,
             web3.toWei(5, 'ether'),
             managerFee,
             ownerFee
         );
+
+        await instance.setCurrentTime(toSeconds(2018, 01, 01));
 
         await instance.createContestPool(
             defaultName,
@@ -339,9 +357,9 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
     it(t('aPlayer', 'createContestPoolDefinition', 'Should be able to create a contest pool definition with fee equals to 0.'), async function () {
         const contestName = stringUtils.uniqueText('MyContestPool');
-        const startTime = 1000;
-        const endTime = 2000;
-        const graceTime = 2;
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
         const maxBalance = web3.toWei(10, 'ether');
         const fee = 0;
 
@@ -354,5 +372,60 @@ contract('ContestPoolFactoryTest', function (accounts) {
         assert.equal(graceTime, result[3]);
         assert.equal(maxBalance, result[4]);
         assert.equal(fee, result[5]);
+    });
+
+    it(t('aPlayer', 'disableContestPool', 'Should not be able to create a contest pool definition which is disabled.', true), async function () {
+        const contestName = stringUtils.uniqueText('CurrentContestPool');
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
+        const maxBalance = web3.toWei(10, 'ether');
+        const fee = 0;
+
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
+        
+        const initialResult = await instance.definitions(contestName);
+
+        assert.equal(true, initialResult[9]);
+
+        await instance.setCurrentTime(toSeconds(2018, 01, 01));
+
+        await instance.disableContestPool(contestName, {from: owner});
+
+        try {
+            await instance.createContestPool(
+                defaultName,
+                contestName,
+                web3.toWei(0.1, 'ether'), {
+                    from: accounts[3],
+                    value: fee
+                }
+            );
+            assert(false, 'It should have failed because contest pool definition is disabled.');
+        } catch (error) {
+            assert(error);
+            assert(error.message.includes("revert"));
+        }
+        const finalResult = await instance.definitions(contestName);
+        assert.equal(false, finalResult[9]);
+    });
+   
+    it(t('anOwner', 'deleteContestPool', 'Should get default values when definition is deleted.'), async function () {
+        const contestName = stringUtils.uniqueText('CurrentContestPool');
+        const startTime = toSeconds(2018, 04, 01);
+        const endTime = toSeconds(2018, 04, 10);
+        const graceTime = daysToSeconds(5);
+        const maxBalance = web3.toWei(10, 'ether');
+        const fee = 0;
+
+        await instance.createContestPoolDefinition(contestName, fee, startTime, endTime, graceTime, maxBalance, managerFee, ownerFee);
+        
+        await instance.deleteContestPool(contestName, {from: owner});
+
+        const result = await instance.definitions(contestName);
+
+        assert.equal('0x0000000000000000000000000000000000000000000000000000000000000000', result[0]);//Contest Name
+        assert.equal(false, result[6]);//Exists
+        assert.equal(false, result[9]);//Enabled
     });
 });

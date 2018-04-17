@@ -12,6 +12,8 @@ import "./ContestPoolMock.sol";
  */
 contract ContestPoolFactoryMock is ContestPoolFactory {
     
+    uint public currentTime;
+
     function ContestPoolFactoryMock (address _storage) public ContestPoolFactory(_storage) { }
 
     function createContestPoolInstance(ContestPoolDefinition _definition, bytes32 _name, address _manager, uint _amountPerPlayer) internal returns (address _newContestPoolAddress) {
@@ -26,5 +28,25 @@ contract ContestPoolFactoryMock is ContestPoolFactory {
         newContestPool.setContestName(_definition.contestName);
         newContestPool.setName(_name);
         return newContestPool;
+    }
+
+    function getCurrentTimestamp() public view returns (uint256) {
+        return currentTime;
+    }
+
+    function setCurrentTime(uint _currentTime) public {
+        currentTime = _currentTime;
+    }
+
+    function _isEnabled(bytes32 _contestName) isEnabled(_contestName) public view {
+
+    }
+
+    function _isDisabled(bytes32 _contestName) isDisabled(_contestName) public view {
+
+    }
+
+    function _isActive(bytes32 _contestName) isActive(_contestName) public view {
+        
     }
 }

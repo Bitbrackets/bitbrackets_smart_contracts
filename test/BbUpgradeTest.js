@@ -11,6 +11,15 @@ var utils = require("./utils/utils.js");
 let instance;
 let bbStorage;
 
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 contract('BbUpgradeTest', function (accounts) {
 
     const owner = accounts[0];

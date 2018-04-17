@@ -1,5 +1,13 @@
 const BigNumber = require('bignumber.js');
 
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 module.exports = {
     titleFail: function (who, func, desc) {
         return this.title(who, func, desc, true);

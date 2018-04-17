@@ -16,15 +16,19 @@ var utils = require("./utils/utils.js");
 
 const events = [];
 
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 const addEvent = (event) => {
     const receipt = event.receipt;
     const logs = event.logs;
-    /*
-    console.log('Receipt:');
-    console.log(receipt);
-    console.log('Logs');
-    console.log(logs)
-    */
+
     console.log(`Event: ${logs[0].event} -> Gas Used: ${receipt.gasUsed}.`)
     events.push({
             "data" : {
@@ -130,7 +134,6 @@ contract('ContestPoolFactoryRinkebyTest', function (accounts) {
 
         const withdrawFeeResult = await instance.withdrawFee({from: owner});
         console.log('WithdrawFeeResult sent.');
-        //console.log(withdrawFeeResult.receipt);
 
         const contestPoolAddress = getValue(contestPoolResult, 'contestPoolAddress');
 

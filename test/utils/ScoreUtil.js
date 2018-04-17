@@ -1,5 +1,13 @@
 const _ = require('lodash');
 
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 function parseBigInt(bigint, base) {
     //convert bigint string to array of digit values
     for (var values = [], i = 0; i < bigint.length; i++) {

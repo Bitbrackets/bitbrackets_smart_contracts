@@ -8,7 +8,15 @@ const t = require('./utils/TestUtil').title;
 const stringUtils = require('./utils/StringUtil');
 
 
-// test suite
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 contract('ContestPoolUpgradable', accounts => {
     let bbStorageInstance;
     let contestPoolInstanceA;
@@ -89,11 +97,6 @@ contract('ContestPoolUpgradable', accounts => {
 
         contestPoolAddressA = txA.logs[0].args.contestPoolAddress;
         contestPoolAddressB = txB.logs[0].args.contestPoolAddress;
-        // console.log('Contest Pool Address', contestPoolAddress);
-        // constestPoolInstance = ContestPool(contestPoolAddress);
-
-         console.log("contestPoolAddressA ", contestPoolAddressA);
-        console.log("contestPoolAddressB ", contestPoolAddressB);
 
     });
 
@@ -102,10 +105,6 @@ contract('ContestPoolUpgradable', accounts => {
         contestPoolInstanceA = contestPool.at(contestPoolAddressA)
         contestPoolInstanceB = contestPool.at(contestPoolAddressB)
         contestPoolUpgradableInstance = ContestPoolUpgradable.at(contestPoolAddressA)
-
-        console.log('cpiA' + contestPoolInstanceA.address);
-        console.log('cpiA' + contestPoolInstanceB.address);
-
     })
 
     it(t('AnyUser', 'setup', 'should have valid instance of ContestPoolFactory'), async () => {
@@ -120,7 +119,7 @@ contract('ContestPoolUpgradable', accounts => {
         const startTimeContract = await contestPoolInstanceA.startTime();
         const endTimeContract = await contestPoolInstanceA.endTime();
         const graceTimeContract = await contestPoolInstanceA.graceTime();
-        console.log('startTimeContract ' + startTimeContract);
+
         assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
         assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
         assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTime);
@@ -129,8 +128,7 @@ contract('ContestPoolUpgradable', accounts => {
         const targetId = await contestPoolUpgradableInstance.getTargetId();
         const version = await contestPoolInstanceA.getVersion();
         const address = await contestPoolUpgradableInstance.implementation();
-        console.log('targetId ' + targetId);
-        console.log('address ' + address);
+
         assert.equal('contestPoolBase', targetId, "Contest Impl should be " + 'contestPoolBase');
         assert.equal(1, version, "Contest Impl version should be " + 1);
     });
@@ -139,8 +137,7 @@ contract('ContestPoolUpgradable', accounts => {
         const nameB = await contestPoolInstanceB.contestName();
         const contestNameABytes32 = stringUtils.stringToBytes32(contestName);
         const contestNameBBytes32 = stringUtils.stringToBytes32(contestNameB);
-        console.log('contestNameA ' + nameA);
-        console.log('contestNameB ' + nameB);
+
         assert.equal(contestNameABytes32, nameA, "Contest name should be " + contestName);
         assert.equal(contestNameBBytes32, nameB, "Contest name should be " + contestNameB);
     });

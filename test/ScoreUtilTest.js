@@ -9,6 +9,14 @@ const {
 } = require('./utils/ScoreUtil');
 
 
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 describe('Unit tests for ScoreUtil JS', () => {
     let predictionStr, prediction, 
         exactPredictionStr, exactPrediction, result, 
@@ -27,9 +35,6 @@ describe('Unit tests for ScoreUtil JS', () => {
 
     it('Exact Prediction and Result should match', () => {
         console.log("exact Prediction", exactPrediction);
-
-        console.log("results", result);
-        console.log("results length", resultLength);
 
         assert(_.isEqual(result, exactPrediction));
     });

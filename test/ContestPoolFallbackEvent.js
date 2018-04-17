@@ -7,9 +7,14 @@ const leche = require('leche');
 const withData = leche.withData;
 const t = require('./utils/TestUtil').title;
 
-/**
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
  * 
- * @author Guillermo Salazar
  */
 contract('ContestPoolFallbackEventTest', accounts => {
     let contestPoolInstance;

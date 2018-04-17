@@ -12,6 +12,15 @@ let games;
 let value;
 let contestName;
 
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 contract('ResultsLookup', function(accounts) {
 
   const ceo = accounts[1];

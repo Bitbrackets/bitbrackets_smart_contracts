@@ -14,26 +14,44 @@ import "./BbBase.sol";
  */
 contract ContestPoolFactory is BbBase {
 
-
      /*** events ***************/
-    event CreateContestPoolDefinition(
+    event ContestPoolDefinitionCreated (
+        address indexed contractAddress,
         bytes32 indexed contestName,
-        uint indexed startTime,
-        uint indexed endTime,
+        uint startTime,
+        uint endTime,
         uint graceTime,
         uint maxAllowedBalance,
         uint fee,
         uint managerFeePercentage,
         uint ownerFeePercentage,
         uint published_at
-
     );
     
-    event CreateContestPool(
+    event ContestPoolCreated (
+        address indexed contractAddress,
         bytes32 indexed contestName,
         address indexed manager,
-        address indexed contestPoolAddress,
+        address contestPoolAddress,
         bytes32 name
+    );
+
+    event ContestPoolDeleted (
+        address indexed contractAddress,
+        bytes32 indexed contestName,
+        uint when
+    );
+
+    event ContestPoolDisabled (
+        address indexed contractAddress,
+        bytes32 indexed contestName,
+        uint when
+    );
+
+    event ContestPoolEnabled (
+        address indexed contractAddress,
+        bytes32 indexed contestName,
+        uint when
     );
 
     /**** Structs ***********/
@@ -48,6 +66,7 @@ contract ContestPoolFactory is BbBase {
         bool exists;
         uint ownerFee;
         uint managerFee;
+        bool enabled;
     }
 
     /**** Properties ***********/
@@ -55,6 +74,16 @@ contract ContestPoolFactory is BbBase {
     mapping(bytes32 => ContestPoolDefinition) public definitions;
 
     /*** Modifiers ***************/
+
+    modifier isEnabled(bytes32 _contestName) {
+        require(definitions[_contestName].enabled);
+        _;
+    }
+
+    modifier isDisabled(bytes32 _contestName) {
+        require(!definitions[_contestName].enabled);
+        _;
+    }
 
     modifier isNew(bytes32 _contestName) {
         require(!definitions[_contestName].exists);
@@ -68,6 +97,11 @@ contract ContestPoolFactory is BbBase {
 
     modifier isNotOwner(address _address) {
         require(getOwner() != _address);
+        _;
+    }
+
+    modifier isActive(bytes32 _contestName) {
+        require(getCurrentTimestamp() < definitions[_contestName].startTime);
         _;
     }
 
@@ -106,10 +140,12 @@ contract ContestPoolFactory is BbBase {
             fee: _fee,
             exists: true,
             managerFee: _managerFee,
-            ownerFee: _ownerFee
+            ownerFee: _ownerFee,
+            enabled: true
         });
         definitions[_contestName] = newDefinition;
-        emit CreateContestPoolDefinition (
+        emit ContestPoolDefinitionCreated (
+            address(this),
             _contestName, 
             _startTime, 
             _endTime, 
@@ -139,7 +175,7 @@ contract ContestPoolFactory is BbBase {
     }
         
     function createContestPool(bytes32 _name, bytes32 _contestName, uint _amountPerPlayer)
-        public payable exists(_contestName) isNotOwner(msg.sender) returns (address _newContestPoolAddress) {
+        public payable exists(_contestName) isNotOwner(msg.sender) isEnabled(_contestName) isActive(_contestName) returns (address _newContestPoolAddress) {
         require(_name != bytes32(0x0));
         require(_amountPerPlayer > 0);
         ContestPoolDefinition storage definition = definitions[_contestName];
@@ -149,8 +185,23 @@ contract ContestPoolFactory is BbBase {
         address manager = msg.sender;
         address newContestPoolAddress = createContestPoolInstance(definition, _name, manager, _amountPerPlayer);
 
-        emit CreateContestPool(definition.contestName, manager, newContestPoolAddress, _name);
+        emit ContestPoolCreated(address(this), definition.contestName, manager, newContestPoolAddress, _name);
         return newContestPoolAddress;
+    }
+
+    function deleteContestPool(bytes32 _contestName) public onlySuperUser exists(_contestName) {
+        delete definitions[_contestName];
+        emit ContestPoolDeleted(address(this),_contestName, now);
+    }
+
+    function disableContestPool(bytes32 _contestName) public onlySuperUser exists(_contestName) isEnabled(_contestName)  {
+        definitions[_contestName].enabled = false;
+        emit ContestPoolDisabled(address(this),_contestName, now);
+    }
+
+    function enableContestPool(bytes32 _contestName) public onlySuperUser exists(_contestName) isDisabled(_contestName) {
+        definitions[_contestName].enabled = true;
+        emit ContestPoolEnabled(address(this),_contestName, now);
     }
 
     function getOwner() internal view returns (address _owner) {
