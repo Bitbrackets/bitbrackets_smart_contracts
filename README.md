@@ -104,6 +104,7 @@ Slack
 
 ### TODO List ##
 
+* PENDING  Close contestPoolBase from direct access only allow access via Proxy Contracts
 * DONE  Add require to avoid creating ContestPools if Contest definition time has passed
 * PENDING   (It could be invoking factory.definitions('ContestName')) Add view method to Factory to query existing definitions
 * DONE  Add methods to Factory to disable/modify/delete existing Contest Definitions 
