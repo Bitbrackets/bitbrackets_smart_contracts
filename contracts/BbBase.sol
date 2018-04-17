@@ -57,6 +57,17 @@ contract BbBase {
         _;
     }
 
+    modifier notPaused(bytes32 _contestName, address _contestAddress) {
+        require(!bbStorage.getBool(keccak256("state.paused.contestName", _contestName)) &&
+            !bbStorage.getBool(keccak256("state.paused.contestAddress", _contestAddress)) &&
+            !bbStorage.getBool(keccak256("state.EMERGENCY")));
+        _;
+    }
+
+    modifier emergencyOnly(){
+        require(bbStorage.getBool(keccak256("state.EMERGENCY")));
+        _;
+    }
   
     /*** Constructor **********/
    
@@ -83,6 +94,7 @@ contract BbBase {
     function roleCheck(string _role, address _address) internal view {
         require(roleHas(_role, _address) == true);
     }
+
 
 
 }
