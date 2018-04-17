@@ -1,5 +1,6 @@
 # Bitbrackets.io
 
+[![CircleCI](https://circleci.com/gh/Bitbrackets/bitbrackets_smart_contracts/tree/master.svg?style=svg)](https://circleci.com/gh/Bitbrackets/bitbrackets_smart_contracts/tree/master)
 ## Description
 
 BitBrackets is a platform to build prediction pools for
@@ -103,7 +104,7 @@ Using Solium for Linter Solidity https://github.com/duaraghav8/Solium
 
 ## Who do I talk to?
 
-* [Repo owner or admin](mailto:code@bitbrackets.io.com?Subject=Hello%20again)
+* [Repo owner or admin](mailto:code@bitbrackets.io.com?Subject=Hello)
 * [Telegram](https://t.me/bitbrackets)
 * [Reddit](https://www.reddit.com/r/ethdev/comments/8cwv16/smart_contracts_for_world_cup_prediction_pool/)
 
