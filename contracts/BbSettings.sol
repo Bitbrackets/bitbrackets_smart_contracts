@@ -2,7 +2,13 @@ pragma solidity 0.4.21;
 import "./interface/BbStorageInterface.sol";
 import "./BbBase.sol";
 import "./interface/BbSettingsInterface.sol";
-
+/*
+* @title This contract is used as a vault for all the contracts in BitBrackets.
+*
+* @author Douglas Molina <doug.molina@bitbrackets.io>
+* @author Guillermo Salazar <guillermo@bitbrackets.io>
+* @author Daniel Tutila <daniel@bitbrackets.io>
+*/
 
 contract BbSettings is BbBase, BbSettingsInterface {
     function BbSettings(address _storageAddress) public BbBase(_storageAddress) {
