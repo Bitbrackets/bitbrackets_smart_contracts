@@ -3,7 +3,7 @@ pragma solidity 0.4.21;
 import "../../contracts/ContestPoolBase.sol";
 
 /*
- * @title TODO Add comments.
+ * @title Mock of contestPoolBase contract with methods that are used in test.
  *
  * @author Douglas Molina <doug.molina@bitbrackets.io>
  * @author Guillermo Salazar <guillermo@bitbrackets.io>
