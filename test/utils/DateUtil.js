@@ -1,5 +1,13 @@
 const moment = require('moment');
 
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 module.exports = {
     toMoment: function (year, month, day) {
         return moment(year + "-" + month + '-' + day);

@@ -5,8 +5,13 @@ const withData = leche.withData;
 const t = require('./utils/TestUtil').title;
 const {assertEvent, emptyCallback} = require('./utils/utils');
 
-/**
- * Using 'Leche' for multiple data provider.
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
  * 
  * @dev https://github.com/box/leche
  */

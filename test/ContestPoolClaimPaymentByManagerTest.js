@@ -7,8 +7,14 @@ const t = require('./utils/TestUtil').title;
 const amount = require('./utils/AmountUtil').expected;
 const Builder = require('./utils/ContestPoolBuilder');
 
-/**
- * @author Guillermo Salazar
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
  */
 contract('ContestPoolClaimPaymentByManagerTest', accounts => {
     let contestPoolInstance;

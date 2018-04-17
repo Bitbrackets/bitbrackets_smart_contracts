@@ -1,5 +1,4 @@
 const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
-//const ContestPool = artifacts.require("./ContestPoolBase.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 const contestPool = artifacts.require("./ContestPool.sol");
 
@@ -8,7 +7,15 @@ const t = require('./utils/TestUtil').title;
 const stringUtils = require('./utils/StringUtil');
 
 
-// test suite
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 contract('ContestPool', accounts => {
     let bbStorageInstance;
     let contestPoolInstance;

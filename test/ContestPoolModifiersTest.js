@@ -7,10 +7,14 @@ const t = require('./utils/TestUtil').title;
 const daysToSeconds = require('./utils/DateUtil').daysToSeconds;
 const Builder = require('./utils/ContestPoolBuilder');
 
-/**
- * Using 'Leche' for multiple data provider.
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
  * 
- * @dev https://github.com/box/leche
  */
 contract('ContestPoolModifiersTest', accounts => {
     let contestPoolInstance;

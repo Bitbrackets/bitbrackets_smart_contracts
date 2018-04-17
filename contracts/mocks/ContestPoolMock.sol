@@ -21,7 +21,6 @@ contract ContestPoolMock is ContestPoolBase {
     ContestPoolBase(_storage) {
         manager = _manager;
     }
-//    ContestPool(_storage, "", _manager, " ", 0, 0, 0, 0, 0, 0, 0) { }
 
     /**
      * @dev Setter methods ONLY for testing purposes.

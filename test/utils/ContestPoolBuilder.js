@@ -1,6 +1,12 @@
 const dateUtil = require('./DateUtil');
 
-/**
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
  * @dev https://stackoverflow.com/questions/20534702/node-js-use-of-module-exports-as-a-constructor
  */
 function ContestPoolBuilder(_contestPool) {

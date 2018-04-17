@@ -8,6 +8,15 @@ const t = require('./utils/TestUtil').title;
 const { getScoreWithArray } = require('./utils/ScoreUtil');
 const Builder = require('./utils/ContestPoolBuilder');
 
+
+/*
+ * @title TODO Add comments.
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ * 
+ */
 contract('ContestPoolPublishScoreTest', accounts => {
     let contestPoolInstance;
     let resultsLookupInstance;
