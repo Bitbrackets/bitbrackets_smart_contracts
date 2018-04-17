@@ -1,5 +1,20 @@
 # README #
 
+* Description
+BitBrackets is a platform to build prediction pools for 
+sporting events with your friends and family. It is secured
+by Smart Contracts in the Ethereum blockchain.
+
+Anybody can create a pool, invite players. Players send a 
+prediction before the sporting event starts. The predictions
+are saved in the Blockchain and later when the results
+from the event come in, the smart contracts verify predictions
+against results and whoever has the higher score wins the pool.
+
+Currently the MVP is mainly design for the upcoming soccer World Cup
+but the platform could support any sporting event pool in the future.
+
+
 Download truffle v4.1.0 or up
 https://github.com/trufflesuite/truffle/releases
 
