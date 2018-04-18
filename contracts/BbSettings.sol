@@ -10,7 +10,9 @@ import "./interface/BbSettingsInterface.sol";
 * @author Daniel Tutila <daniel@bitbrackets.io>
 */
 
+
 contract BbSettings is BbBase, BbSettingsInterface {
+
     function BbSettings(address _storageAddress) public BbBase(_storageAddress) {
         version = 1;
     }
@@ -27,7 +29,7 @@ contract BbSettings is BbBase, BbSettingsInterface {
         bbStorage.setBool(keccak256("state.paused.contestName", _contestName), true);
     }
 
-    function pauseByContestAddress(address _contestAddress) external onlyOwnerOrAdmin{
+    function pauseByContestAddress(address _contestAddress) external onlyOwnerOrAdmin {
         bbStorage.setBool(keccak256("state.paused.contestAddress", _contestAddress), true);
     }
 
@@ -48,16 +50,15 @@ contract BbSettings is BbBase, BbSettingsInterface {
     }
 
     function isContestNamePaused(bytes32 _contestName) external  returns (bool) {
-       return  bbStorage.getBool(keccak256("state.paused.contestName", _contestName));
+        return bbStorage.getBool(keccak256("state.paused.contestName", _contestName));
     }
 
     function isContestAddressPaused(address _contestAddress) external returns (bool) {
-        return  bbStorage.getBool(keccak256("state.paused.contestAddress", _contestAddress));
+        return bbStorage.getBool(keccak256("state.paused.contestAddress", _contestAddress));
     }
 
     function isEmergency() external returns (bool) {
-
-        return  bbStorage.getBool(keccak256("state.EMERGENCY"));
+        return bbStorage.getBool(keccak256("state.EMERGENCY"));
     }
 
 
