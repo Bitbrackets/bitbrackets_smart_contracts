@@ -1,9 +1,12 @@
-<p align="center">
-<img width=75% src="https://bitbrackets.io/logo.png">
-# Bitbrackets.io
-</p>
-
+<h1 align="center">
+<img width=12.5% src="https://bitbrackets.io/logo.png">
+Bitbrackets
+<br>
+</h1>
+----
 [![CircleCI](https://circleci.com/gh/Bitbrackets/bitbrackets_smart_contracts/tree/master.svg?style=svg)](https://circleci.com/gh/Bitbrackets/bitbrackets_smart_contracts/tree/master)
+
+----
 ## Description
 
 BitBrackets is a platform to build prediction pools for
