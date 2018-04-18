@@ -23,18 +23,17 @@ against results and whoever has the higher score wins the pool.
 Currently the MVP is mainly design for the upcoming soccer World Cup
 but the platform could support any sporting event pool in the future.
 
-Download truffle v4.1.0 or up
-https://github.com/trufflesuite/truffle/releases
+Download truffle v4.1.0 or up from [here](https://github.com/trufflesuite/truffle/releases)
 
+```
 npm install -g truffle
-
-Download ganache client
-http://truffleframework.com/ganache/
+```
+Download [Ganache client](http://truffleframework.com/ganache/)
 
 * Quick summary
   Repository for BitBrackets Smart Contracts repositories
   0.0.1
-
+* Using [Solium](https://github.com/duaraghav8/Solium) for Linter Solidity
 ## How do I get set up?
 
 #### Working with Truffle
@@ -43,11 +42,10 @@ cd into your working directory.
 From there, you can run truffle compile, truffle migrate and truffle test to compile your contracts, deploy those contracts to the network, and run their associated unit tests.
 
 #### How to run tests
-
+```
 truffle test
-
-* Project uses Open Zepellin Contracts
-  https://github.com/OpenZeppelin/zeppelin-solidity
+```
+* Project uses [Open Zepellin Contracts](https://github.com/OpenZeppelin/zeppelin-solidity)
 
 ## Deployment instructions
 
@@ -96,8 +94,11 @@ If some of them are not defined in `.env`, the process will take those values by
 
 ### How get JSON sample with events info.
 
-There is a test file named `./test/ContestPoolFactoryCreateEventsDataTest.js`. To generate events data, you need to run that file using the command line:
-`truffle test ./test/ContestPoolFactoryCreateEventsDataTest.js`
+To generate events data, you need to run that file using the command line:
+
+``
+truffle test ./test/ContestPoolFactoryCreateEventsDataTest.js
+``
 
 After executing the test, it will create an `events.json` file in the root folder. That file will contains all events data.
 
@@ -107,11 +108,10 @@ After executing the test, it will create an `events.json` file in the root folde
 * Code review
 * Other guidelines
 
-Using Solium for Linter Solidity https://github.com/duaraghav8/Solium
 
 ## Who do I talk to?
 
-* [Repo owner or admin](mailto:code@bitbrackets.io.com?Subject=Hello)
+* [Repo owner or admin](mailto:code@bitbrackets.io?Subject=Hello)
 * [Telegram](https://t.me/bitbrackets)
 
 
