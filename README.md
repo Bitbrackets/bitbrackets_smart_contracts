@@ -34,6 +34,8 @@ Download [Ganache client](http://truffleframework.com/ganache/)
   Repository for BitBrackets Smart Contracts repositories
   0.0.1
 * Using [Solium](https://github.com/duaraghav8/Solium) for Linter Solidity
+* Project uses [Open Zepellin Contracts](https://github.com/OpenZeppelin/zeppelin-solidity)
+
 ## How do I get set up?
 
 #### Working with Truffle
@@ -45,7 +47,6 @@ From there, you can run truffle compile, truffle migrate and truffle test to com
 ```
 truffle test
 ```
-* Project uses [Open Zepellin Contracts](https://github.com/OpenZeppelin/zeppelin-solidity)
 
 ## Deployment instructions
 
@@ -123,7 +124,7 @@ After executing the test, it will create an `events.json` file in the root folde
 * ~~Add methods to Factory to disable/modify/delete existing Contest Definitions~~
 * Fix warnings in smart contracts.
 * ~~Add authors in test files (equals to smart contract files).~~
-* Add LICENSE file in root folder.
+* ~~Add LICENSE file in root folder.~~
 * Check passwords/users/other information before moving to "official" repository.
 * Check README file.
 * Check if the event LogPublishedScore in ContestPool is needed. It contains a LogNewHighScore event.
