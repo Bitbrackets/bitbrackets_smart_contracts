@@ -1,4 +1,7 @@
+<p align="center">
+<img width=75% src="https://bitbrackets.io/logo.png">
 # Bitbrackets.io
+</p>
 
 [![CircleCI](https://circleci.com/gh/Bitbrackets/bitbrackets_smart_contracts/tree/master.svg?style=svg)](https://circleci.com/gh/Bitbrackets/bitbrackets_smart_contracts/tree/master)
 ## Description
@@ -106,7 +109,7 @@ Using Solium for Linter Solidity https://github.com/duaraghav8/Solium
 
 * [Repo owner or admin](mailto:code@bitbrackets.io.com?Subject=Hello)
 * [Telegram](https://t.me/bitbrackets)
-* [Reddit](https://www.reddit.com/r/ethdev/comments/8cwv16/smart_contracts_for_world_cup_prediction_pool/)
+
 
 ## TODO List
 
