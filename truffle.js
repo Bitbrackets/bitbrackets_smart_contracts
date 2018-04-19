@@ -1,7 +1,7 @@
 require('dotenv').config();
 const Web3 = require("web3");
 
-const DEFAULT_GAS_WEI = 4600000;
+const DEFAULT_GAS_WEI = 6000000;
 const DEFAULT_ADDRESS_COUNT = 3;
 const DEFAULT_ADDRESS_INDEX = 0;
 const DEFAULT_GAS_GWEI_PRICE = "20";
