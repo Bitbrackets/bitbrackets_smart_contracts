@@ -131,17 +131,17 @@ contract ContestPool is BbBase {
 
     function getMaxUsersCount() public view returns (uint usersCount) ;
 
-    function claimPaymentByWinner()  isAfterGraceTime onlyWinner public;
+    function claimPaymentByWinner()  isAfterGraceTime onlyWinner notPaused(contestName, this) public;
 
-    function claimPaymentByManager()  onlyManager isAfterGraceTime allWinnerHaveClaimedPayment public;
+    function claimPaymentByManager()  onlyManager isAfterGraceTime allWinnerHaveClaimedPayment notPaused(contestName, this) public;
 
     function getPoolBalance() public view returns (uint _poolBalance);
 
-    function claimPaymentByOwner()  onlySuperUser isAfterStartTime public;
+    function claimPaymentByOwner()  onlySuperUser isAfterStartTime notPaused(contestName, this) public;
 
-    function publishHighScore() external onlyActivePlayers isAfterStartTime  returns (bool);
+    function publishHighScore() external onlyActivePlayers isAfterStartTime notPaused(contestName, this)  returns (bool);
 
-    function sendPredictionSet(uint8[] _prediction)  onlyForPlayers isBeforeStartTime isAmountPerPlayer  public payable;
+    function sendPredictionSet(uint8[] _prediction)  onlyForPlayers isBeforeStartTime isAmountPerPlayer notPaused(contestName, this) public payable;
 
     function getPredictionSet(address _playerAddress) public view returns (uint8[]);
 
@@ -149,7 +149,7 @@ contract ContestPool is BbBase {
 
     function getBalance() public view returns (uint _balance);
 
-    function withdraw()  onlySuperUser public;
+    function withdraw()  onlySuperUser notPaused(contestName, this) public;
 
     function getVersion() public pure returns (uint256 );
 }

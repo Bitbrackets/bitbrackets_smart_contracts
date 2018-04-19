@@ -191,7 +191,7 @@ contract ContestPoolBase is ContestPool {
     *   https://consensys.github.io/smart-contract-best-practices/
     *   recommendations/#be-aware-of-the-tradeoffs-between-send-transfer-and-callvalue
     **/
-    function claimPaymentByWinner() public isAfterGraceTime onlyWinner {
+    function claimPaymentByWinner() public isAfterGraceTime onlyWinner notPaused(contestName, this) {
         require(winners.count > winnerPayments);
         require(!payments[msg.sender]);
         uint winnersAmount = getWinnerAmount();
@@ -212,7 +212,7 @@ contract ContestPoolBase is ContestPool {
         return partialBalance.mul(currentFee).div(uint(100));
     }
 
-    function claimPaymentByManager() public onlyManager isAfterGraceTime allWinnerHaveClaimedPayment {
+    function claimPaymentByManager() public onlyManager isAfterGraceTime allWinnerHaveClaimedPayment notPaused(contestName, this) {
         require(!payments[manager]);
         uint managerAmount = getAmount(managerFee);
 
@@ -231,7 +231,7 @@ contract ContestPoolBase is ContestPool {
         return players.mul(amountPerPlayer).sub(amountPaid);
     }
 
-    function claimPaymentByOwner() public onlySuperUser isAfterStartTime {
+    function claimPaymentByOwner() public onlySuperUser isAfterStartTime notPaused(contestName, this) {
         address bbVaultAddress = getOwner();
         require(!payments[bbVaultAddress]);
         uint ownerAmount = getAmount(ownerFee);
@@ -263,7 +263,7 @@ contract ContestPoolBase is ContestPool {
         return false;
     }
 
-    function publishHighScore() external onlyActivePlayers isBeforeGraceTime returns (bool) {
+    function publishHighScore() external onlyActivePlayers isBeforeGraceTime notPaused(contestName, this) returns (bool) {
         //check sender is a player and has prediction check current results
         var (result, games) = getResult();
         uint8[] memory prediction = predictions[msg.sender];
@@ -296,7 +296,7 @@ contract ContestPoolBase is ContestPool {
         return ResultsLookupInterface(resultLookupAddress).getResult(contestName);
     }
 
-    function sendPredictionSet(uint8[] _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer payable {
+    function sendPredictionSet(uint8[] _prediction) public onlyForPlayers isBeforeStartTime isAmountPerPlayer notPaused(contestName, this) payable {
         require(_prediction.length > 0);
         require(predictions[msg.sender].length == 0);
         predictions[msg.sender] = _prediction;
@@ -324,7 +324,7 @@ contract ContestPoolBase is ContestPool {
         return address(this).balance;
     }
 
-    function withdraw() public onlySuperUser {
+    function withdraw() public onlySuperUser notPaused(contestName, this){
         require(payments[manager]);
         require(winners.count == winnerPayments);
         address _this = address(this);

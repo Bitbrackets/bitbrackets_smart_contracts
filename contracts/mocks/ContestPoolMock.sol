@@ -3,7 +3,7 @@ pragma solidity 0.4.21;
 import "../../contracts/ContestPoolBase.sol";
 
 /*
- * @title TODO Add comments.
+ * @title Mock of contestPoolBase contract with methods that are used in test.
  *
  * @author Douglas Molina <doug.molina@bitbrackets.io>
  * @author Guillermo Salazar <guillermo@bitbrackets.io>
@@ -22,6 +22,27 @@ contract ContestPoolMock is ContestPoolBase {
         manager = _manager;
     }
 
+    
+    function init(bytes32 _contestName,
+        uint _startTime,
+        uint _endTime,
+        uint _graceTime,
+        uint _amountPerPlayer,
+        uint _maxBalance,
+        uint _managerFee,
+        uint _ownerFee,
+        bytes32 _name) public
+    {
+                setStartTime(_startTime);
+                setEndTime(_endTime);
+                setGraceTime(_graceTime);
+                setAmountPerPlayer(_amountPerPlayer);
+                setOwnerFee(_ownerFee);
+                setManagerFee(_managerFee);
+                setMaxBalance(_maxBalance);
+                setContestName(_contestName);
+                setName(_name);
+    }
     /**
      * @dev Setter methods ONLY for testing purposes.
      * https://ethereum.stackexchange.com/questions/25498/solidity-private-vs-public-variables

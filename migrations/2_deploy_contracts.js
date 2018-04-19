@@ -13,6 +13,7 @@ const BbUpgrade = artifacts.require("./BbUpgrade.sol");
 const ContestPoolBase = artifacts.require("./ContestPoolBase.sol");
 const jsonfile = require('jsonfile');
 const contractsJson = './build/contracts.json';
+const BbSettings = artifacts.require("./BbSettings.sol");
 
 const ADMIN_ROLE = 'admin';
 const contracts = [];
@@ -54,6 +55,9 @@ module.exports = function(deployer, network, accounts) {
 
             await deployer.deploy(BbVault, BbStorage.address);
             addContractInfo("BbVault", BbVault.address);
+
+            await deployer.deploy(BbSettings, BbStorage.address);
+            addContractInfo("BbSettings", BbSettings.address);
 
             await deployer.deploy(AddressArray);
     
@@ -149,6 +153,17 @@ module.exports = function(deployer, network, accounts) {
                 BbVault.address
             );
 
+            //BbVault: Registering BbSettings address and name
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.address', BbSettings.address),
+                BbSettings.address
+            );
+
+            await storageInstance.setAddress(
+                config.web3.utils.soliditySha3('contract.name', 'BbSettings'),
+                BbSettings.address
+            );
+
             //ResultsLookup: Register address and name
             await storageInstance.setAddress(
                 config.web3.utils.soliditySha3('contract.address', ResultsLookup.address),
@@ -194,9 +209,10 @@ module.exports = function(deployer, network, accounts) {
             console.log(ResultsLookup.address);
             console.log('\x1b[33m%s\x1b[0m:', 'Set BbVault Address');
             console.log(BbVault.address);
+            console.log('\x1b[33m%s\x1b[0m:', 'Set BBSettings Address');
+            console.log(BbSettings.address);
             console.log('\x1b[33m%s\x1b[0m:', 'Set BbUpgrade Address');
             console.log(BbUpgrade.address);
-            console.log(BbVault.address);
             console.log('\x1b[33m%s\x1b[0m:', 'Set ContestPoolBase Address');
             console.log(ContestPoolBase.address);
             console.log('\x1b[32m%s\x1b[0m', 'Post - Storage Direct Access Removed');

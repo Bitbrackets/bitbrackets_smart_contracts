@@ -29,13 +29,14 @@ jobs:
            <<: *cache-options
       - run:
           name: install-truffle
-          command: sudo npm install -g truffle    
+          command: sudo npm install -g truffle
       - run:
           name: install-ganache
           command: sudo npm install -g ganache-cli       
       - run:
           name: install-package-dependencies
-          command: npm install    
+          command: npm install
+
       # Download and cache dependencies
       - run: truffle compile --reset --all
 
@@ -46,6 +47,10 @@ jobs:
           <<: *cache-options
           paths:
             - ./node_modules
+       ##ckecking versions
+      - run:
+          name: version
+          command: truffle version
       - run:
           name: test
           command: truffle test  
