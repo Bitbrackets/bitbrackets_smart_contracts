@@ -77,69 +77,7 @@ contract('ContestPoolGetWinnerAmountTest', accounts => {
             await builder.winners(owner, winners);
             await builder.currentTime(owner, 2018, 01, 05);
             await builder.predictionsDef(amountPerPlayer, defaultPrediction, players);
-            /*
-            await builder.currentTime(owner, 2018, 01, 22);
 
-            
-            
-            const balance1 = await contestPoolInstance.getBalance();
-            const getFeePerWinner1 = await contestPoolInstance._getFeePerWinner();
-            const getTotalWinnersFee1 = await contestPoolInstance._getTotalWinnersFee();
-            const winnerPayments1 = await contestPoolInstance._getPendingPayments();
-            const ownerAndManagerFees1 = await contestPoolInstance._getOwnerAndManagerFees();
-            const getPartialBalanceFee1 = await contestPoolInstance.getPartialBalanceFee();
-            const getPartialBalance1 = await contestPoolInstance.getPartialBalance();
-            console.log('Before Claiming Payments');
-            console.log('Balance:     ' + await contestPoolInstance.getBalance());
-            console.log('Fee Per Winner:    ' + getFeePerWinner1);
-            console.log('Total Winners Fee: ' + getTotalWinnersFee1);
-            console.log('Pending Pay:       ' + winnerPayments1);
-            console.log('Owner + Manager:   ' + ownerAndManagerFees1);
-            console.log('Partial Balance Fee:   ' + getPartialBalanceFee1);
-            console.log('Partial Balance:       ' + getPartialBalance1);
-            
-            const value = await contestPoolInstance._getWinnerAmount();
-            console.log('Winner Amount:     ' + value);
-
-            await builder.claimPaymentByWinner([player3]);
-            
-            const balance3 = await contestPoolInstance.getBalance();
-            const getFeePerWinner3 = await contestPoolInstance._getFeePerWinner();
-            const getTotalWinnersFee3 = await contestPoolInstance._getTotalWinnersFee();
-            const winnerPayments3 = await contestPoolInstance._getPendingPayments();
-            const getPartialBalanceFee3 = await contestPoolInstance.getPartialBalanceFee();
-            const getPartialBalance3 = await contestPoolInstance.getPartialBalance();
-            
-            console.log('-------------------------------------------');
-            console.log('Claiming Payments #1');
-            console.log('Balance:               ' + balance3);
-            console.log('Fee Per Winner:        ' + getFeePerWinner3);
-            console.log('Total Winners Fee:     ' + getTotalWinnersFee3);
-            console.log('Pending Pay:           ' + winnerPayments3);
-            console.log('Partial Balance Fee:   ' + getPartialBalanceFee3);
-            console.log('Partial Balance:       ' + getPartialBalance3);
-
-            const value2 = await contestPoolInstance._getWinnerAmount();
-            console.log('Winner Amount:     ' + value2);
-
-            await builder.claimPaymentByWinner([player5]);
-            
-            const balance4 = await contestPoolInstance.getBalance();
-            const getFeePerWinner2 = await contestPoolInstance._getFeePerWinner();
-            const getTotalWinnersFee2 = await contestPoolInstance._getTotalWinnersFee();
-            const winnerPayments2 = await contestPoolInstance._getPendingPayments();
-            const getPartialBalanceFee2 = await contestPoolInstance.getPartialBalanceFee();
-            const getPartialBalance2 = await contestPoolInstance.getPartialBalance();
-            console.log('-------------------------------------------');
-            console.log('After Claiming Payments');
-            console.log('Balance:     ' + balance4);
-            console.log('Fee Per Winner:    ' + getFeePerWinner2);
-            console.log('Total Winners Fee: ' + getTotalWinnersFee2);
-            console.log('Pending Pay:       ' + winnerPayments2);
-            console.log('Partial Balance Fee:   ' + getPartialBalanceFee2);
-            console.log('Partial Balance:       ' + getPartialBalance2);
-            
-            */
             //Invocation
             const result = await contestPoolInstance._getWinnerAmount();
 
