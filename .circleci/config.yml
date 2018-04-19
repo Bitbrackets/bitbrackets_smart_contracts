@@ -35,7 +35,9 @@ jobs:
           command: sudo npm install -g ganache-cli       
       - run:
           name: install-package-dependencies
-          command: npm install    
+          command: npm install
+      ##ckecking versions
+       - run: truffle version
       # Download and cache dependencies
       - run: truffle compile --reset --all
 
