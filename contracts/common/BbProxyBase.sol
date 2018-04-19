@@ -3,9 +3,14 @@ pragma solidity ^0.4.19;
 import "../BbBase.sol";
 import "./DelegateProxy.sol";
 import "../interface/BbStorageInterface.sol";
-//import "../ERCProxy.sol";
-/// @title Base Proxy Implementation for Contracts
-/// @author Doug Molina
+
+/*
+ * @title Base Proxy Implementation for Contracts
+ *
+ * @author Douglas Molina <doug.molina@bitbrackets.io>
+ * @author Guillermo Salazar <guillermo@bitbrackets.io>
+ * @author Daniel Tutila <daniel@bitbrackets.io>
+ */
 contract BbProxyBase is  DelegateProxy, BbBase {
     
     string public targetId;
@@ -17,10 +22,6 @@ contract BbProxyBase is  DelegateProxy, BbBase {
     */
     function BbProxyBase(address _storage, string _targetId) public BbBase(_storage) {
         targetId = _targetId;
-
-        // Check that targetAddress is a contract to delegate
-        address targetAddress = getTargetAddress(_targetId);
-        //TODO WARNING compiling unused variable targetAddress.
     }
 
     function () public payable {
@@ -36,8 +37,4 @@ contract BbProxyBase is  DelegateProxy, BbBase {
     function getTargetAddress(string _targetId) internal view returns (address) {
         return bbStorage.getAddress(keccak256("contract.name", _targetId));
     }
-
-
-
-
 }

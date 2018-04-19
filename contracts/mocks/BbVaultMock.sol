@@ -13,7 +13,7 @@ contract BbVaultMock is BbVault  {
 
     function BbVaultMock (address _storage) public BbVault(_storage) { }
 
-    function _onlyAccountOwner() public view onlyOwnerOrAdmin {}
+    function _onlyAccountOwner() public view onlySuperUser {}
 
     function _requestTransactionIsPresent(bytes _name) public view requestTransactionIsPresent(_name, true) {
     }

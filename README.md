@@ -118,11 +118,11 @@ After executing the test, it will create an `events.json` file in the root folde
 
 ## TODO List
 
-* PENDING Close contestPoolBase from direct access only allow access via Proxy Contracts
+* Close contestPoolBase from direct access only allow access via Proxy Contracts
 * ~~Add require to avoid creating ContestPools if Contest definition time has passed~~
-* PENDING (It could be invoking factory.definitions('ContestName')) Add view method to Factory to query existing definitions
+* (It could be invoking factory.definitions('ContestName')) Add view method to Factory to query existing definitions
 * ~~Add methods to Factory to disable/modify/delete existing Contest Definitions~~
-* Fix warnings in smart contracts.
+* ~~Fix warnings in smart contracts.~~
 * ~~Add authors in test files (equals to smart contract files).~~
 * ~~Add LICENSE file in root folder.~~
 * Check passwords/users/other information before moving to "official" repository.

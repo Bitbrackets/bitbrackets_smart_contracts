@@ -3,14 +3,12 @@ import "./interface/BbStorageInterface.sol";
 import "./BbBase.sol";
 import "./interface/BbSettingsInterface.sol";
 /*
-* @title This contract is used as a vault for all the contracts in BitBrackets.
+* @title TODO Add comments.
 *
 * @author Douglas Molina <doug.molina@bitbrackets.io>
 * @author Guillermo Salazar <guillermo@bitbrackets.io>
 * @author Daniel Tutila <daniel@bitbrackets.io>
 */
-
-
 contract BbSettings is BbBase, BbSettingsInterface {
 
     function BbSettings(address _storageAddress) public BbBase(_storageAddress) {
@@ -18,34 +16,29 @@ contract BbSettings is BbBase, BbSettingsInterface {
     }
 
     /*** Modifiers *************/
-    /// @dev Only allow access from the owner or Admin
-    modifier onlyOwnerOrAdmin() {
-        require(roleHas("admin", msg.sender) == true ||
-        roleHas("owner", msg.sender) == true);
-        _;
-    }
 
-    function pauseByContestName(bytes32 _contestName) external onlyOwnerOrAdmin {
+    /*** Functions */
+    function pauseByContestName(bytes32 _contestName) external onlySuperUser {
         bbStorage.setBool(keccak256("state.paused.contestName", _contestName), true);
     }
 
-    function pauseByContestAddress(address _contestAddress) external onlyOwnerOrAdmin {
+    function pauseByContestAddress(address _contestAddress) external onlySuperUser {
         bbStorage.setBool(keccak256("state.paused.contestAddress", _contestAddress), true);
     }
 
-    function setEmergency() external onlyOwnerOrAdmin {
+    function setEmergency() external onlySuperUser {
         bbStorage.setBool(keccak256("state.EMERGENCY"), true);
     }
 
-    function removePauseByContestName(bytes32 _contestName) external onlyOwnerOrAdmin {
+    function removePauseByContestName(bytes32 _contestName) external onlySuperUser {
         bbStorage.setBool(keccak256("state.paused.contestName", _contestName), false);
     }
 
-    function removePauseByContestAddress(address _contestAddress) external onlyOwnerOrAdmin {
+    function removePauseByContestAddress(address _contestAddress) external onlySuperUser {
         bbStorage.setBool(keccak256("state.paused.contestAddress", _contestAddress), false);
     }
 
-    function removeEmergency() external onlyOwnerOrAdmin {
+    function removeEmergency() external onlySuperUser {
         bbStorage.setBool(keccak256("state.EMERGENCY"), false);
     }
 

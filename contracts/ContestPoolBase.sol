@@ -265,7 +265,10 @@ contract ContestPoolBase is ContestPool {
 
     function publishHighScore() external onlyActivePlayers isBeforeGraceTime notPaused(contestName, this) returns (bool) {
         //check sender is a player and has prediction check current results
-        var (result, games) = getResult();
+        uint8[100] memory result;
+        uint games;
+      
+        (result, games) = getResult();
         uint8[] memory prediction = predictions[msg.sender];
 
         //compare players prediction to current results and compute player score
