@@ -45,7 +45,10 @@ contract BbBase {
     * @dev Modifier to scope access to admins
     */
     modifier onlySuperUser() {
-        require(roleHas("owner", msg.sender) || roleHas("admin", msg.sender));
+        require(
+            roleHas("owner", msg.sender) == true || 
+            roleHas("admin", msg.sender) == true
+        );
         _;
     }
 
