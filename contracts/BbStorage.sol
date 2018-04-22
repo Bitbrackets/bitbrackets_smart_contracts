@@ -28,6 +28,8 @@ contract BbStorage {
         if (boolStorage[keccak256("contract.storage.initialised")] == true) {
             // Make sure the access is permitted to only contracts in our control
             require(addressStorage[keccak256("contract.address", msg.sender)] != 0x0);
+        } else {
+            require(boolStorage[keccak256("access.role", "owner", msg.sender)]);
         }
         _;
     }
