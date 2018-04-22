@@ -21,11 +21,11 @@ contract ContestPoolFactory is BbBase {
         uint startTime,
         uint endTime,
         uint graceTime,
-        uint maxAllowedBalance,
+        uint maxBalance,
         uint fee,
         uint managerFeePercentage,
         uint ownerFeePercentage,
-        uint published_at
+        uint publishedAt
     );
     
     event ContestPoolCreated (
@@ -33,7 +33,8 @@ contract ContestPoolFactory is BbBase {
         bytes32 indexed contestName,
         address indexed manager,
         address contestPoolAddress,
-        bytes32 name
+        bytes32 name,
+        uint amountPerPlayer
     );
 
     event ContestPoolDeleted (
@@ -185,7 +186,13 @@ contract ContestPoolFactory is BbBase {
         address manager = msg.sender;
         address newContestPoolAddress = createContestPoolInstance(definition, _name, manager, _amountPerPlayer);
 
-        emit ContestPoolCreated(address(this), definition.contestName, manager, newContestPoolAddress, _name);
+        emit ContestPoolCreated(
+            address(this),
+            definition.contestName,
+            manager,
+            newContestPoolAddress,
+            _name,
+            _amountPerPlayer);
         return newContestPoolAddress;
     }
 
