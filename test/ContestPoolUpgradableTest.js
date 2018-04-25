@@ -2,11 +2,15 @@ const ContestPoolFactory = artifacts.require("./ContestPoolFactory.sol");
 const ContestPoolUpgradable = artifacts.require("./ContestPoolUpgradable.sol");
 const BbStorage = artifacts.require("./BbStorage.sol");
 const contestPool = artifacts.require("./ContestPool.sol");
-
+const BbUpgrade = artifacts.require("./BbUpgrade.sol");
+const ContestPoolMock = artifacts.require("./mocks/ContestPoolMock.sol");
 const dateUtil = require('./utils/DateUtil');
 const t = require('./utils/TestUtil').title;
+const {assertEvent, emptyCallback} = require('./utils/utils');
 const stringUtils = require('./utils/StringUtil');
-
+const toMillis = require('./utils/DateUtil').toMillis;
+var utils = require("./utils/utils.js");
+const config = require("../truffle");
 
 
 /*
@@ -15,7 +19,7 @@ const stringUtils = require('./utils/StringUtil');
  * @author Douglas Molina <doug.molina@bitbrackets.io>
  * @author Guillermo Salazar <guillermo@bitbrackets.io>
  * @author Daniel Tutila <daniel@bitbrackets.io>
- * 
+ *
  */
 contract('ContestPoolUpgradable', accounts => {
     let bbStorageInstance;
@@ -23,6 +27,7 @@ contract('ContestPoolUpgradable', accounts => {
     let contestPoolInstanceB;
     let contestPoolUpgradableInstance;
     let contestPoolFactoryInstance;
+    let bbUpgradeInstance;
 
     let owner = accounts[0];
     let manager = accounts[9];
@@ -44,18 +49,25 @@ contract('ContestPoolUpgradable', accounts => {
     const contestNameB = stringUtils.uniqueText('Test2018');
 
     let contestPoolAddressA;
-    let contestPoolAddressB;
+    let contestPoolAddressB, contestPoolVersion2Instance;
     before('setup suite', async () => {
 
         contestPoolFactoryInstance = await ContestPoolFactory.deployed();
         bbStorageInstance = await BbStorage.deployed();
+        bbUpgradeInstance = await BbUpgrade.deployed();
 
+        contestPoolVersion2Instance = await ContestPoolMock.new(
+            BbStorage.address,
+            manager
+        );
+
+        console.log('mock->' + contestPoolVersion2Instance.address );
         await contestPoolFactoryInstance.createContestPoolDefinition(
-            contestName, 
-            fee, 
-            startTime, 
-            endTime, 
-            graceTime, 
+            contestName,
+            fee,
+            startTime,
+            endTime,
+            graceTime,
             maxBalance,
             managerFee,
             ownerFee,
@@ -77,7 +89,7 @@ contract('ContestPoolUpgradable', accounts => {
 
         const txA = await contestPoolFactoryInstance.createContestPool(
             'nameA',
-            contestName, 
+            contestName,
             amountPerPlayer,
             {
                 from: manager,
@@ -140,6 +152,20 @@ contract('ContestPoolUpgradable', accounts => {
 
         assert.equal(contestNameABytes32, nameA, "Contest name should be " + contestName);
         assert.equal(contestNameBBytes32, nameB, "Contest name should be " + contestNameB);
+    });
+
+    it(t('aOwner', 'upgradeContract', 'Should be able to upgrade contest pool contract'), async function () {
+        const contractName = 'contestPoolBase';
+
+        const oldAddress = await bbStorageInstance.getAddress(config.web3.utils.soliditySha3('contract.name', contractName));
+
+        const currentVersion = await contestPoolInstanceA.getVersion();
+        assert.equal(1, currentVersion, "Contest Impl version should be " + 1);
+        await bbUpgradeInstance.upgradeContract(contractName, contestPoolVersion2Instance.address);
+
+        const newVersion = await contestPoolInstanceA.getVersion();
+        assert.equal(2, newVersion, "Contest Impl version should be " + 2);
+
     });
 
 });

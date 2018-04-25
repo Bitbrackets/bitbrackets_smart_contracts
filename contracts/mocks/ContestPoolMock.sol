@@ -158,4 +158,8 @@ contract ContestPoolMock is ContestPoolBase {
 
     function _isAfterGraceTime() public view isAfterGraceTime {
     }
+    function getVersion() public pure returns (uint256 ) {
+        return 2;
+    }
+
 }
