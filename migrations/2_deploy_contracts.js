@@ -188,15 +188,15 @@ module.exports = function(deployer, network, accounts) {
                 requiredVotes
             );
 
-            const bbRole = await BbRole.deployed();
-            await bbRole.adminRoleAdd(ADMIN_ROLE, ceo, {from: owner});
-            await bbRole.adminRoleAdd(ADMIN_ROLE, manager, {from: owner});
-
             // Disable direct access to storage now
             await storageInstance.setBool(
                 config.web3.utils.soliditySha3('contract.storage.initialised'),
                 true
             );
+
+            const bbRole = await BbRole.deployed();
+            await bbRole.adminRoleAdd(ADMIN_ROLE, ceo, {from: owner});
+            await bbRole.adminRoleAdd(ADMIN_ROLE, manager, {from: owner});
 
             // Log it
             console.log('\x1b[33m%s\x1b[0m:', 'Set Storage Address');
