@@ -158,4 +158,6 @@ contract ContestPool is BbBase {
     function withdraw()  onlySuperUser notPaused(contestName, this) public;
 
     function getVersion() public pure returns (uint256 );
+
+    function getContestDetails() public view returns(address, bytes32, uint, uint, uint, uint);
 }

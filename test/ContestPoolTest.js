@@ -68,8 +68,15 @@ contract('ContestPool', accounts => {
         );
         
          contestPoolAddress = tx.logs[0].args.contestPoolAddress;
+         const cname = tx.logs[0].args.contestName;
+        const def = await contestPoolFactoryInstance.definitions(contestName);
+        console.log('contestPoolAddress ' + contestPoolAddress);
+        console.log('cname ' + cname);
+        console.log(tx.logs[0]);
+        console.log(tx.logs[0].args.amountPerPlayer);
+        console.log(def);
 
-
+        console.log('amountPerPlayer ' + tx.logs[0].args.amountPerPlayer);
     });
 
     beforeEach('setup contract for each test', async () => {
@@ -94,5 +101,24 @@ contract('ContestPool', accounts => {
         assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
         assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
         assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTime);
+    });
+
+    it(t('AnyUser', 'new', 'Should be able to get the contest details'), async () => {
+
+        const details = await contestPoolInstance.getContestDetails();
+        const managerContract =  details[0];
+        const nameContract =  stringUtils.cleanNulls(web3.toAscii(details[1]));
+        const nameContract2 = await contestPoolInstance.name();
+        const startTimeContract = details[2];
+        const endTimeContract = details[3];
+        const players = details[4];
+        const maxBalanceContract = details[5];
+        console.log( details);
+
+
+        assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
+        assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
+        assert.equal(maxBalance, maxBalanceContract, "Contest grace time should be " + maxBalance);
+        assert.equal(name, contestName, "Contest name time should be " + name);
     });
 });

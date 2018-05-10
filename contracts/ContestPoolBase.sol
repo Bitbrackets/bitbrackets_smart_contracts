@@ -341,4 +341,17 @@ contract ContestPoolBase is ContestPool {
         bbVault.deposit.value(_value)();
         emit LogWithdraw(address(this), msg.sender, _value);
     }
+
+    function getContestDetails() public view returns (address, bytes32, uint, uint, uint, uint){
+        return (
+            manager,
+            name,
+            startTime,
+            endTime,
+            players,
+            amountPerPlayer
+
+
+        );
+    }
 }
