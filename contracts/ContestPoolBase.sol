@@ -350,8 +350,6 @@ contract ContestPoolBase is ContestPool {
             endTime,
             players,
             amountPerPlayer
-
-
         );
     }
 }

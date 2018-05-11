@@ -23,11 +23,13 @@ ContestPoolBuilder.prototype.name = async function name(who, name) {
 ContestPoolBuilder.prototype.startTime = async function startTime(who, year, month, day) {
     const startTimeInMillis = dateUtil.toSeconds(year, month, day);
     await this.contestPool.setStartTime(startTimeInMillis, {from: who});
+    return startTimeInMillis;
 };
 
 ContestPoolBuilder.prototype.endTime = async function endTime(who, year, month, day) {
     const endTimeInMillis = dateUtil.toSeconds(year, month, day);
     await this.contestPool.setEndTime(endTimeInMillis, {from: who});
+    return endTimeInMillis;
 };
 
 ContestPoolBuilder.prototype.graceTimeDays = async function graceTimeDays(who, graceTimeInDays) {
