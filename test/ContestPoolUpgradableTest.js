@@ -160,11 +160,20 @@ contract('ContestPoolUpgradable', accounts => {
         const oldAddress = await bbStorageInstance.getAddress(config.web3.utils.soliditySha3('contract.name', contractName));
 
         const currentVersion = await contestPoolInstanceA.getVersion();
+        const nameA = await contestPoolInstanceA.contestName();
+        const contestNameABytes32 = stringUtils.stringToBytes32(contestName);
+
+        assert.equal(contestNameABytes32, nameA, "Contest name should be " + contestName);
         assert.equal(1, currentVersion, "Contest Impl version should be " + 1);
+
         await bbUpgradeInstance.upgradeContract(contractName, contestPoolVersion2Instance.address);
 
         const newVersion = await contestPoolInstanceA.getVersion();
+        const nameAAfterUpdate = await contestPoolInstanceA.contestName();
+        const contestNameABytes32AfterUpdate = stringUtils.stringToBytes32(nameAAfterUpdate);
+
         assert.equal(2, newVersion, "Contest Impl version should be " + 2);
+        assert.equal(contestNameABytes32AfterUpdate, nameA, "Contest name should continue being " + contestName);
 
     });
 
