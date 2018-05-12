@@ -112,13 +112,14 @@ contract('ContestPool', accounts => {
         const startTimeContract = details[2];
         const endTimeContract = details[3];
         const players = details[4];
-        const maxBalanceContract = details[5];
+        const maxBalanceContract = details[5]+0;
+        console.log( '------>>>>>');
         console.log( details);
 
 
         assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
         assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
         assert.equal(maxBalance, maxBalanceContract, "Contest grace time should be " + maxBalance);
-        assert.equal(name, contestName, "Contest name time should be " + name);
+        assert.equal(name, nameContract, "Contest name time should be " + nameContract);
     });
 });

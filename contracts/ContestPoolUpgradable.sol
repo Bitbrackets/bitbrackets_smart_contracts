@@ -97,4 +97,15 @@ contract ContestPoolUpgradable is BbProxyBase {
     function proxyType() public pure returns (uint256 proxyTypeId) {
         return 2;
     }
+
+    function getContestDetails() public view returns (address, bytes32, uint, uint, uint, uint){
+        return (
+        manager,
+        name,
+        startTime,
+        endTime,
+        players,
+        amountPerPlayer
+        );
+    }
 }
