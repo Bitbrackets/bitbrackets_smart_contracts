@@ -27,7 +27,13 @@ module.exports = {
         return moment().toDate().getTime();
     },
     nowInSeconds: function() {
-        return moment().toDate().getTime() / 1000;
+        return moment().toDate().getTime() ;
+    },
+    tomorrowInSeconds: function() {
+        return moment(0, "HH").add(1,'days').toDate().getTime() ;
+    },
+    aWeekFromNowInSeconds: function() {
+        return moment(0, "HH").add(7,'days').toDate().getTime();
     },
     daysToMillis: function(days) {
         return days * 24 * 60 * 60 * 1000;
