@@ -30,10 +30,10 @@ module.exports = {
         return moment().toDate().getTime() / 1000;
     },
     tomorrowInSeconds: function() {
-        return moment(0, "HH").add(1,'days').toDate().getTime() ;
+        return moment(0, "HH").add(1,'days').toDate().getTime() / 1000;
     },
     aWeekFromNowInSeconds: function() {
-        return moment(0, "HH").add(7,'days').toDate().getTime();
+        return moment(0, "HH").add(7,'days').toDate().getTime()/ 1000;
     },
     daysToMillis: function(days) {
         return days * 24 * 60 * 60 * 1000;
