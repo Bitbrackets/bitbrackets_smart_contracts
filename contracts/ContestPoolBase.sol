@@ -396,7 +396,7 @@ contract ContestPoolBase is ContestPoolStorage, ContestPool {
         return contestName;
     }
 
-    function getContestDetails() public view returns (address, bytes32, bytes32, uint, uint, uint, uint, uint, uint, uint, uint, uint){
+    function getContestDetails() public view returns (address, bytes32, bytes32, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint){
         return (
         manager,            //0
         name,               //1
@@ -409,7 +409,8 @@ contract ContestPoolBase is ContestPoolStorage, ContestPool {
         maxBalance,         //8
         ownerFee,           //9
         managerFee,         //10
-        amountPaid          //11
+        amountPaid,          //11
+        highestScore
         );
     }
 }
