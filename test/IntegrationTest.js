@@ -41,7 +41,7 @@ contract('ContestPoolUpgradable', accounts => {
     const fee = web3.toWei(0.01, 'ether');
     const maxBalance = web3.toWei(1, 'ether');
     const amountPerPlayer = web3.toWei(0.1, 'ether');
-
+    const feee = web3.toWei(0.01000000000001, 'ether');
     const managerFee = 10;
     const ownerFee = 10;
 
@@ -127,7 +127,7 @@ contract('ContestPoolUpgradable', accounts => {
         const address = await contestPoolUpgradableInstance.implementation();
 
         assert.equal('contestPoolBase', targetId, "Contest Impl should be " + 'contestPoolBase');
-        assert.equal(1, version, "Contest Impl version should be " + 1);
+        assert.equal(1, version, "Contest Impl version should be " + 1 + " not actual" + version);
     });
     it(t('AnyUser', 'new', 'Two different contest should be pointing to implementation'), async () => {
         const nameA = await contestPoolInstanceA.contestName();
@@ -143,12 +143,18 @@ contract('ContestPoolUpgradable', accounts => {
 
         console.log('startTime      ', startTime);
         console.log('endTime        ', endTime);
-        console.log('now            ', dateUtil.nowInSeconds());
+        console.log('feee           ', fee);
+        const before = await web3.eth.getBalance(contestPoolInstanceA.address).toNumber();
+
         const sendPredictionSetResult = await contestPoolInstanceA.sendPredictionSet(
             defaultPrediction,
             {from: player1, value: amountPerPlayer}
+
         );
 
+        const after = await web3.eth.getBalance(contestPoolInstanceA.address).toNumber();
+        console.log('before            ', before);
+        console.log('after             ', after);
     });
 
 });
