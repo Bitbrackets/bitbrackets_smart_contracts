@@ -128,9 +128,10 @@ contract('ContestPoolUpgradable', accounts => {
     });
 
     it(t('AnyUser', 'new', 'Should be initialized with correct values'), async () => {
-        const startTimeContract = await contestPoolInstanceA.startTime();
-        const endTimeContract = await contestPoolInstanceA.endTime();
-        const graceTimeContract = await contestPoolInstanceA.graceTime();
+        const details = await contestPoolInstanceA.getContestDetails();
+        const startTimeContract =  details[3];
+        const endTimeContract = details[4];
+        const graceTimeContract = details[5];
 
         assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
         assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
@@ -145,8 +146,10 @@ contract('ContestPoolUpgradable', accounts => {
         assert.equal(1, version, "Contest Impl version should be " + 1);
     });
     it(t('AnyUser', 'new', 'Two different contest should be pointing to implementation'), async () => {
-        const nameA = await contestPoolInstanceA.contestName();
-        const nameB = await contestPoolInstanceB.contestName();
+        const detailsA = await contestPoolInstanceA.getContestDetails();
+        const detailsB = await contestPoolInstanceB.getContestDetails();
+        const nameA = detailsA[2];
+        const nameB = detailsB[2];
         const contestNameABytes32 = stringUtils.stringToBytes32(contestName);
         const contestNameBBytes32 = stringUtils.stringToBytes32(contestNameB);
 
