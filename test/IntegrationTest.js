@@ -163,11 +163,10 @@ contract('ContestPoolUpgradable', accounts => {
         const details = await contestPoolInstanceA.getContestDetails();
         const managerContract =  details[0];
         const nameContract =  stringUtils.cleanNulls(web3.toAscii(details[1]));
-        //const nameContract2 = await contestPoolInstanceA.name();
-        const startTimeContract = details[2];
-        const endTimeContract = details[3];
-        const players = details[4];
-        const amountPerPlayerContract = details[5];
+        const startTimeContract = details[3];
+        const endTimeContract = details[4];
+        const graceTimeContract = details[5];
+        const amountPerPlayerContract = details[7];
         console.log( '------>>>>>');
         console.log( details);
 
@@ -175,7 +174,8 @@ contract('ContestPoolUpgradable', accounts => {
         assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
         assert.equal(manager, managerContract, "Contest's manager should be " + startTime);
         assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
-        assert.equal(amountPerPlayer, amountPerPlayerContract, "Contest grace time should be " + maxBalance);
+        assert.equal(amountPerPlayer, amountPerPlayerContract, "Amount per player should be " + amountPerPlayer);
+        assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTimeContract);
         assert.equal('nameA', nameContract, "Contest name time should be " + nameContract);
     });
 

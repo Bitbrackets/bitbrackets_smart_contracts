@@ -136,12 +136,13 @@ contract('ContestPoolFactoryTest', function (accounts) {
 
             assert.ok(contestPoolAddress);
             assert.ok(contestPool);
+            const details = await contestPool.getContestDetails();
 
-            const maxBalanceContestPool = await contestPool.maxBalance();
-            const contestNameContestPool = await contestPool.contestName();
-            const startDateContestPool = await contestPool.startTime();
-            const endDateContestPool = await contestPool.endTime();
-            const daysGraceContestPool = await contestPool.graceTime();
+            const maxBalanceContestPool = details[7];
+            const contestNameContestPool = details[2];
+            const startDateContestPool =  details[3];
+            const endDateContestPool =  details[4];
+            const daysGraceContestPool = details[5];
 
             assert.equal(maxBalanceContestPool, maxBalance);
             assert.equal(contestNameContestPool, contestNameBytes32);

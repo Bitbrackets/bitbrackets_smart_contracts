@@ -396,16 +396,20 @@ contract ContestPoolBase is ContestPoolStorage, ContestPool {
         return contestName;
     }
 
-    function getContestDetails() public view returns (address, bytes32, uint, uint, uint, uint, uint, uint){
+    function getContestDetails() public view returns (address, bytes32, bytes32, uint, uint, uint, uint, uint, uint, uint, uint, uint){
         return (
-        manager,
-        name,
-        startTime,
-        endTime,
-        players,
-        amountPerPlayer,
-        ownerFee,
-        managerFee
+        manager,            //0
+        name,               //1
+        contestName,        //2
+        startTime,          //3
+        endTime,            //4
+        graceTime,          //5
+        players,            //6
+        amountPerPlayer,    //7
+        maxBalance,         //8
+        ownerFee,           //9
+        managerFee,         //10
+        amountPaid          //11
         );
     }
 }

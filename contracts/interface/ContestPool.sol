@@ -67,5 +67,5 @@ contract ContestPool is  BbBase {
 
     function getContestName() public view returns(bytes32);
 
-    function getContestDetails() public view returns(address, bytes32, uint, uint, uint, uint, uint, uint);
+    function getContestDetails() public view returns(address, bytes32, bytes32, uint, uint, uint, uint, uint, uint, uint, uint, uint);
 }
