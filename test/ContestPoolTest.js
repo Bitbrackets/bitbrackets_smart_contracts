@@ -87,9 +87,11 @@ contract('ContestPool', accounts => {
     });
 
     it(t('AnyUser', 'new', 'Should be initialized with correct values'), async () => {
-        const startTimeContract = await contestPoolInstance.startTime();
-        const endTimeContract = await contestPoolInstance.endTime();
-        const graceTimeContract = await contestPoolInstance.graceTime();
+
+        const details = await contestPoolInstance.getContestDetails();
+        const startTimeContract =  details[3];
+        const endTimeContract = details[4];
+        const graceTimeContract = details[5];
 
         assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
         assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);

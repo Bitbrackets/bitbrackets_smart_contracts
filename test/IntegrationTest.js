@@ -8,13 +8,13 @@ const dateUtil = require('./utils/DateUtil');
 const t = require('./utils/TestUtil').title;
 const {assertEvent, emptyCallback} = require('./utils/utils');
 const stringUtils = require('./utils/StringUtil');
-const toMillis = require('./utils/DateUtil').toMillis;
-var utils = require("./utils/utils.js");
+// const toMillis = require('./utils/DateUtil').toMillis;
+// var utils = require("./utils/utils.js");
 const config = require("../truffle");
-
+const BigNumber = require('bignumber.js');
 
 /*
- * @title TODO Add comments.
+ * @title IntegrationTest.
  *
  * @author Douglas Molina <doug.molina@bitbrackets.io>
  * @author Guillermo Salazar <guillermo@bitbrackets.io>
@@ -35,11 +35,11 @@ contract('ContestPoolUpgradable', accounts => {
     let player2 = accounts[2];
     let player3 = accounts[3];
 
-    let startTime = dateUtil.toMillis(2018, 6, 14);
-    let endTime = dateUtil.toMillis(2018, 7, 16);
+    let startTime = dateUtil.tomorrowInSeconds();
+    let endTime = dateUtil.aWeekFromNowInSeconds();
     let graceTime = 1;
     const fee = web3.toWei(0.01, 'ether');
-    const maxBalance = web3.toWei(1, 'ether');
+    const maxBalance = web3.toWei(2, 'ether');
     const amountPerPlayer = web3.toWei(0.1, 'ether');
 
     const managerFee = 10;
@@ -50,6 +50,8 @@ contract('ContestPoolUpgradable', accounts => {
 
     let contestPoolAddressA;
     let contestPoolAddressB, contestPoolVersion2Instance;
+
+    const defaultPrediction = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100];
     before('setup suite', async () => {
 
         contestPoolFactoryInstance = await ContestPoolFactory.deployed();
@@ -119,24 +121,6 @@ contract('ContestPoolUpgradable', accounts => {
         contestPoolUpgradableInstance = ContestPoolUpgradable.at(contestPoolAddressA)
     })
 
-    it(t('AnyUser', 'setup', 'should have valid instance of ContestPoolFactory'), async () => {
-
-        assert(contestPoolFactoryInstance);
-        assert(contestPoolFactoryInstance.address);
-        assert(contestPoolInstanceA);
-        assert(contestPoolInstanceA.address);
-    });
-
-    it(t('AnyUser', 'new', 'Should be initialized with correct values'), async () => {
-        const details = await contestPoolInstanceA.getContestDetails();
-        const startTimeContract =  details[3];
-        const endTimeContract = details[4];
-        const graceTimeContract = details[5];
-
-        assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
-        assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
-        assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTime);
-    });
     it(t('AnyUser', 'new', 'Should be pointing to implementation'), async () => {
         const targetId = await contestPoolUpgradableInstance.getTargetId();
         const version = await contestPoolInstanceA.getVersion();
@@ -146,10 +130,8 @@ contract('ContestPoolUpgradable', accounts => {
         assert.equal(1, version, "Contest Impl version should be " + 1);
     });
     it(t('AnyUser', 'new', 'Two different contest should be pointing to implementation'), async () => {
-        const detailsA = await contestPoolInstanceA.getContestDetails();
-        const detailsB = await contestPoolInstanceB.getContestDetails();
-        const nameA = detailsA[2];
-        const nameB = detailsB[2];
+        const nameA = await contestPoolInstanceA.getContestName();
+        const nameB = await contestPoolInstanceB.getContestName();
         const contestNameABytes32 = stringUtils.stringToBytes32(contestName);
         const contestNameBBytes32 = stringUtils.stringToBytes32(contestNameB);
 
@@ -157,18 +139,44 @@ contract('ContestPoolUpgradable', accounts => {
         assert.equal(contestNameBBytes32, nameB, "Contest name should be " + contestNameB);
     });
 
-    it(t('aOwner', 'upgradeContract', 'Should be able to upgrade contest pool contract'), async function () {
-        const contractName = 'contestPoolBase';
+    it(t('aOwner', 'SendPrediction', 'Should be able to send a prediction.'), async function () {
 
-        const oldAddress = await bbStorageInstance.getAddress(config.web3.utils.soliditySha3('contract.name', contractName));
+        console.log('startTime      ', startTime);
+        console.log('endTime        ', endTime);
+        const before = await web3.eth.getBalance(contestPoolInstanceA.address).toNumber();
 
-        const currentVersion = await contestPoolInstanceA.getVersion();
-        assert.equal(1, currentVersion, "Contest Impl version should be " + 1);
-        await bbUpgradeInstance.upgradeContract(contractName, contestPoolVersion2Instance.address);
+        const sendPredictionSetResult = await contestPoolInstanceA.sendPredictionSet(
+            defaultPrediction,
+            {from: player1, value: amountPerPlayer}
 
-        const newVersion = await contestPoolInstanceA.getVersion();
-        assert.equal(2, newVersion, "Contest Impl version should be " + 2);
+        );
 
+        const after = await web3.eth.getBalance(contestPoolInstanceA.address).toNumber();
+        console.log('before            ', before);
+        console.log('after             ', after);
+
+        assert.equal(amountPerPlayer, after, "Contest balance should be " + amountPerPlayer);
+
+    });
+    it(t('AnyUser', 'new', 'Should be able to get the contest details'), async () => {
+
+        const details = await contestPoolInstanceA.getContestDetails();
+        const managerContract =  details[0];
+        const nameContract =  stringUtils.cleanNulls(web3.toAscii(details[1]));
+        const startTimeContract = details[3];
+        const endTimeContract = details[4];
+        const graceTimeContract = details[5];
+        const amountPerPlayerContract = details[7];
+        console.log( '------>>>>>');
+        console.log( details);
+
+
+        assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
+        assert.equal(manager, managerContract, "Contest's manager should be " + startTime);
+        assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
+        assert.equal(amountPerPlayer, amountPerPlayerContract, "Amount per player should be " + amountPerPlayer);
+        assert.equal(graceTime, graceTimeContract, "Contest grace time should be " + graceTimeContract);
+        assert.equal('nameA', nameContract, "Contest name time should be " + nameContract);
     });
 
 });

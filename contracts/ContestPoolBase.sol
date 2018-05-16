@@ -4,9 +4,9 @@ import "./BbBase.sol";
 import "./interface/BbStorageInterface.sol";
 import "./interface/BbVaultInterface.sol";
 import "./interface/ResultsLookupInterface.sol";
-import "./AddressArray.sol";
 import "./SafeMath.sol";
 import "./interface/ContestPool.sol";
+import "./ContestPoolStorage.sol";
 
 /*
  * @title TODO Add comments.
@@ -15,10 +15,60 @@ import "./interface/ContestPool.sol";
  * @author Guillermo Salazar <guillermo@bitbrackets.io>
  * @author Daniel Tutila <daniel@bitbrackets.io>
  */
-contract ContestPoolBase is ContestPool {
+contract ContestPoolBase is ContestPoolStorage, ContestPool {
     using SafeMath for uint256;
-    using AddressArray for AddressArray.Addresses;
+    uint constant private AVOID_DECIMALS = 100000000000000000;
+    /**** Events ***********/
 
+    event LogWithdraw (
+        address indexed contractAddress,
+        address indexed player,
+        uint amount
+    );
+
+    event LogSendPrediction (
+        address indexed contractAddress,
+        uint8[] prediction,
+        address indexed player
+    );
+
+    event LogClaimPaymentByWinner (
+        address indexed contractAddress,
+        address indexed winner,
+        uint prize
+    );
+
+    event LogClaimPaymentByManager (
+        address indexed contractAddress,
+        address indexed manager,
+        uint prize
+    );
+
+    event LogClaimPaymentByOwner (
+        address indexed contractAddress,
+        address indexed owner,
+        uint prize
+    );
+
+    event LogPublishedScore (
+        address indexed contractAddress,
+        address indexed player,
+        uint score,
+        uint highScore
+    );
+
+    event LogNewHighScore (
+        address indexed contractAddress,
+        address indexed player,
+        uint previousHighScore,
+        uint newHighScore
+    );
+
+    event LogFallbackEvent (
+        address indexed contractAddress,
+        address indexed player,
+        uint value
+    );
 
     /*** Modifiers ***************/
 
@@ -340,5 +390,26 @@ contract ContestPoolBase is ContestPool {
         BbVaultInterface bbVault = getBbVault();
         bbVault.deposit.value(_value)();
         emit LogWithdraw(address(this), msg.sender, _value);
+    }
+
+    function getContestName() public view returns(bytes32){
+        return contestName;
+    }
+
+    function getContestDetails() public view returns (address, bytes32, bytes32, uint, uint, uint, uint, uint, uint, uint, uint, uint){
+        return (
+        manager,            //0
+        name,               //1
+        contestName,        //2
+        startTime,          //3
+        endTime,            //4
+        graceTime,          //5
+        players,            //6
+        amountPerPlayer,    //7
+        maxBalance,         //8
+        ownerFee,           //9
+        managerFee,         //10
+        amountPaid          //11
+        );
     }
 }
