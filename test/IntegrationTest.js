@@ -11,7 +11,7 @@ const stringUtils = require('./utils/StringUtil');
 // const toMillis = require('./utils/DateUtil').toMillis;
 // var utils = require("./utils/utils.js");
 const config = require("../truffle");
-
+const BigNumber = require('bignumber.js');
 
 /*
  * @title IntegrationTest.
@@ -39,7 +39,7 @@ contract('ContestPoolUpgradable', accounts => {
     let endTime = dateUtil.aWeekFromNowInSeconds();
     let graceTime = 1;
     const fee = web3.toWei(0.01, 'ether');
-    const maxBalance = web3.toWei(1, 'ether');
+    const maxBalance = web3.toWei(2, 'ether');
     const amountPerPlayer = web3.toWei(0.1, 'ether');
 
     const managerFee = 10;
@@ -167,7 +167,7 @@ contract('ContestPoolUpgradable', accounts => {
         const startTimeContract = details[2];
         const endTimeContract = details[3];
         const players = details[4];
-        const maxBalanceContract = details[5]+0;
+        const amountPerPlayerContract = details[5];
         console.log( '------>>>>>');
         console.log( details);
 
@@ -175,7 +175,7 @@ contract('ContestPoolUpgradable', accounts => {
         assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
         assert.equal(manager, managerContract, "Contest's manager should be " + startTime);
         assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
-        assert.equal(maxBalance, maxBalanceContract, "Contest grace time should be " + maxBalance);
+        assert.equal(amountPerPlayer, amountPerPlayerContract, "Contest grace time should be " + maxBalance);
         assert.equal('nameA', nameContract, "Contest name time should be " + nameContract);
     });
 
