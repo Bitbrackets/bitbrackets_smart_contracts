@@ -14,28 +14,6 @@ import "../AddressArray.sol";
 contract ContestPool is  BbBase {
 
 
-    /*** Modifiers ***************/
-    modifier onlyWinner() { _; }
-
-    modifier isAfterGraceTime() { _; }
-
-    modifier isInGraceTime() { _; }
-
-    modifier isAfterStartTime() { _; }
-
-    modifier isBeforeStartTime() { _; }
-
-    modifier isAmountPerPlayer() { _; }
-    modifier onlyForPlayers() { _; }
-
-    modifier onlyActivePlayers() { _; }
-
-    modifier notManager() { _; }
-
-    modifier onlyManager() { _; }
-
-    modifier allWinnerHaveClaimedPayment() { _; }
-
 
     function getWinners() public view returns (address[] );
 
@@ -43,17 +21,17 @@ contract ContestPool is  BbBase {
 
     function getMaxUsersCount() public view returns (uint usersCount) ;
 
-    function claimPaymentByWinner()  isAfterGraceTime onlyWinner  public;
+    function claimPaymentByWinner()  public;
 
-    function claimPaymentByManager()  onlyManager isAfterGraceTime allWinnerHaveClaimedPayment public;
+    function claimPaymentByManager()  public;
 
     function getPoolBalance() public view returns (uint _poolBalance);
 
-    function claimPaymentByOwner()  onlySuperUser isAfterStartTime  public;
+    function claimPaymentByOwner()  public;
 
-    function publishHighScore() external onlyActivePlayers isAfterStartTime   returns (bool);
+    function publishHighScore() external  returns (bool);
 
-    function sendPredictionSet(uint8[] _prediction)  onlyForPlayers isBeforeStartTime isAmountPerPlayer  public payable;
+    function sendPredictionSet(uint8[] _prediction) public payable;
 
     function getPredictionSet(address _playerAddress) public view returns (uint8[]);
 
@@ -61,7 +39,7 @@ contract ContestPool is  BbBase {
 
     function getBalance() public view returns (uint _balance);
 
-    function withdraw()  onlySuperUser  public;
+    function withdraw()  public;
 
     function getVersion() public pure returns (uint256 );
 
