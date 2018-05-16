@@ -143,12 +143,40 @@ contract('ContestPoolUpgradable', accounts => {
 
         console.log('startTime      ', startTime);
         console.log('endTime        ', endTime);
-        console.log('now            ', dateUtil.nowInSeconds());
+        const before = await web3.eth.getBalance(contestPoolInstanceA.address).toNumber();
+
         const sendPredictionSetResult = await contestPoolInstanceA.sendPredictionSet(
             defaultPrediction,
             {from: player1, value: amountPerPlayer}
+
         );
 
+        const after = await web3.eth.getBalance(contestPoolInstanceA.address).toNumber();
+        console.log('before            ', before);
+        console.log('after             ', after);
+
+        assert.equal(amountPerPlayer, after, "Contest balance should be " + amountPerPlayer);
+
+    });
+    it(t('AnyUser', 'new', 'Should be able to get the contest details'), async () => {
+
+        const details = await contestPoolInstanceA.getContestDetails();
+        const managerContract =  details[0];
+        const nameContract =  stringUtils.cleanNulls(web3.toAscii(details[1]));
+        //const nameContract2 = await contestPoolInstanceA.name();
+        const startTimeContract = details[2];
+        const endTimeContract = details[3];
+        const players = details[4];
+        const maxBalanceContract = details[5]+0;
+        console.log( '------>>>>>');
+        console.log( details);
+
+
+        assert.equal(startTime, startTimeContract, "Contest start time should be " + startTime);
+        assert.equal(manager, managerContract, "Contest's manager should be " + startTime);
+        assert.equal(endTime, endTimeContract, "Contest end time should be " + endTime);
+        assert.equal(maxBalance, maxBalanceContract, "Contest grace time should be " + maxBalance);
+        assert.equal('nameA', nameContract, "Contest name time should be " + nameContract);
     });
 
 });
