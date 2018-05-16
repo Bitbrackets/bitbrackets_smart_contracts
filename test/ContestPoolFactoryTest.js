@@ -138,7 +138,7 @@ contract('ContestPoolFactoryTest', function (accounts) {
             assert.ok(contestPool);
             const details = await contestPool.getContestDetails();
 
-            const maxBalanceContestPool = details[7];
+            const maxBalanceContestPool = details[8];
             const contestNameContestPool = details[2];
             const startDateContestPool =  details[3];
             const endDateContestPool =  details[4];
