@@ -13,7 +13,8 @@
     "deploy-geth-os": "truffle migrate --reset --network geth",
     "deploy-rinkeby-win": "truffle.cmd migrate --network infuraRinkeby",
     "deploy-rinkeby-os": "truffle migrate --network infuraRinkeby",
-    "coverage": "./node_modules/.bin/solidity-coverage"
+    "coverage": "./node_modules/.bin/solidity-coverage",
+
   },
   "repository": {
     "type": "git",
