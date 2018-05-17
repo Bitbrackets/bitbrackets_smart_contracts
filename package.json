@@ -14,7 +14,7 @@
     "deploy-rinkeby-win": "truffle.cmd migrate --network infuraRinkeby",
     "deploy-rinkeby-os": "truffle migrate --network infuraRinkeby",
     "coverage": "./node_modules/.bin/solidity-coverage",
-
+    "start": "npm run deploy-rinkeby-os"
   },
   "repository": {
     "type": "git",
